@@ -17,6 +17,7 @@ import { URL_NOT_FOUND } from './utils/errorCodes'
 import swaggerUI from 'swagger-ui-express'
 import YAML from 'yamljs'
 import { htmlDocumentationResponse } from './utils/helpers/htmlDocumentationResponse'
+import morgan from 'morgan'
 
 const swaggerDocumentation = YAML.load('./swagger.yaml')
 
@@ -30,6 +31,8 @@ mongoose.connection.once('open', () => {
     console.log(`The app is running on port ${PORT}`)
   })
 })
+
+app.use(morgan('tiny'))
 
 app.get('/', (_req: Request, res: Response) => {
   res.status(200).send(htmlDocumentationResponse)
