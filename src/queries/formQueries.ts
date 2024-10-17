@@ -28,7 +28,7 @@ export const getFormsQuery = async (
       $addFields: {
         formsMatching: {
           $regexMatch: {
-            input: "$forms.title",
+            input: "$forms.name",
             regex: searchString,
             options: "i",
           },
@@ -61,7 +61,7 @@ export const getFormsQuery = async (
             as: "form",
             in: {
               _id: "$$form._id",
-              title: "$$form.title",
+              nam: "$$form.name",
               description: "$$form.description",
               type: "$$form.type",
               questions: {
