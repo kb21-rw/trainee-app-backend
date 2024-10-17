@@ -61,7 +61,7 @@ export const getFormsQuery = async (
             as: "form",
             in: {
               _id: "$$form._id",
-              nam: "$$form.name",
+              name: "$$form.name",
               description: "$$form.description",
               type: "$$form.type",
               questions: {
