@@ -1,4 +1,3 @@
-import { Types } from "mongoose";
 import CustomError from "../middlewares/customError";
 import Form from "../models/Form";
 import Question from "../models/Question";
@@ -6,12 +5,10 @@ import Response from "../models/Response";
 import { FORM_NOT_FOUND, QUESTION_NOT_FOUND } from "../utils/errorCodes";
 import {
   CreateQuestionDto,
-  FormType,
   IQuestion,
   QuestionType,
   UpdateQuestionDto,
 } from "../utils/types";
-import { getCurrentCohort } from "../utils/helpers/cohort";
 
 export const createQuestionService = async (
   formId: string,
@@ -22,30 +19,8 @@ export const createQuestionService = async (
     throw new CustomError(FORM_NOT_FOUND, "Form not found", 404);
   }
 
-  const currentCohort = await getCurrentCohort();
-
   const createdQuestion = await Question.create(questionData);
-
   relatedForm.questionIds.push(createdQuestion.id);
-
-  let userIds: Types.ObjectId[] = [];
-
-  if (relatedForm.type === FormType.Applicant) {
-    userIds = currentCohort.applicants.map(applicant => applicant.id);
-  }
-
-  if (relatedForm.type === FormType.Trainee) {
-    userIds = currentCohort.trainees.map(trainee => trainee.id);
-  }
-
-  const responseIds = await Promise.all(
-    userIds.map(async (userId) => {
-      const response = new Response({ userId });
-      await response.save();
-      return response._id;
-    })
-  );
-  createdQuestion.responseIds = responseIds;
   await createdQuestion.save();
 
   return await relatedForm.save();
