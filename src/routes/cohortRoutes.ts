@@ -1,11 +1,16 @@
 import { Router } from "express";
 import { verifyJWT } from "../middlewares/authenticate";
-import { isAdmin, isProspect } from "../middlewares/authorization";
+import {
+  isAdmin,
+  isAdminOrCoach,
+  isProspect,
+} from "../middlewares/authorization";
 import {
   createCohortController,
   decisionController,
   getApplicationFormController,
   getCohortController,
+  getCohortOverviewController,
   getCohortsController,
   getMyApplicationController,
   updateCohortController,
@@ -14,9 +19,20 @@ import {
 const router = Router();
 
 router.get("/application", verifyJWT, isAdmin, getApplicationFormController);
-router.get("/my-application", verifyJWT, isProspect, getMyApplicationController);
+router.get(
+  "/my-application",
+  verifyJWT,
+  isProspect,
+  getMyApplicationController
+);
 router.get("/", verifyJWT, isAdmin, getCohortsController);
 router.get("/:cohortId", verifyJWT, isAdmin, getCohortController);
+router.get(
+  "/:cohortId/overview",
+  verifyJWT,
+  isAdminOrCoach,
+  getCohortOverviewController
+);
 
 router.post("/", verifyJWT, isAdmin, createCohortController);
 
