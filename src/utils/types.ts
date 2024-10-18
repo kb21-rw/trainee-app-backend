@@ -110,3 +110,9 @@ export interface DecisionDto {
   decision: Decision;
   feedback: string;
 }
+
+export interface ICohortOverviewRequest {
+  cohortId: string;
+  overviewType: FormType.Applicant | FormType.Trainee;
+  coachId?: string;
+}
