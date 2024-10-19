@@ -13,21 +13,17 @@ export const getUserService = async (query: object) => {
 };
 
 export const updateUserService = async (
-  userId: string,
+  id: string,
   {
     name,
     email,
+    verified,
     password,
-  }: {
-    name: string;
-    email: string;
-    password: string;
-  }
+    role,
+    coach,
+  }: Omit<IUser, "id" | "userId" | "googleId" | "applied">
 ) => {
-  const user = await User.findById(userId);
-  if (!user) {
-    throw new CustomError(USER_NOT_FOUND, "User not found", 404);
-  }
+  const user = await getUserService({ _id: id });
 
   if (name) {
     user.name = name;
@@ -35,6 +31,18 @@ export const updateUserService = async (
 
   if (email) {
     user.email = email;
+  }
+
+  if (verified) {
+    user.verified = verified;
+  }
+
+  if (role) {
+    user.role = role;
+  }
+
+  if (coach) {
+    user.coach = coach;
   }
 
   if (password) {
