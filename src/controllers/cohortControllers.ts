@@ -13,6 +13,7 @@ import {
   getMyApplicationService,
   updateCohortService,
 } from "../services/cohortService";
+import { mongodbIdValidation } from "../validations/generalValidation";
 
 export const createCohortController = async (
   req: Request,
@@ -35,7 +36,8 @@ export const getCohortController = async (
 ) => {
   try {
     const { cohortId } = req.params;
-    const cohort = await getCohortService(cohortId);
+    await mongodbIdValidation.validateAsync(cohortId);
+    const cohort = await getCohortService({ _id: cohortId });
     return res.status(200).json(cohort);
   } catch (error) {
     return next(error);
