@@ -1,7 +1,10 @@
 import { NextFunction,Response } from "express";
 import {
   getApplicantsService,
+  updateApplicantService,
 } from "../services/applicantService";
+import { mongodbIdValidation } from "../validations/generalValidation";
+import { editUserSchema } from "../validations/userValidation";
 
 
 export const getApplicants = async (
@@ -24,6 +27,22 @@ export const getApplicants = async (
 
     return res.status(201).send(applicants);
   } catch (error: any) {
+    next(error);
+  }
+};
+
+export const updateApplicantController = async (
+  req: any,
+  res: Response,
+  next: NextFunction,
+) => {
+  try {
+    const applicantId = req.params.id;
+    await mongodbIdValidation.validateAsync(applicantId)
+    await editUserSchema.validateAsync(req.body);
+    const user = await updateApplicantService(applicantId, req.body);
+    return res.status(200).send(user);
+  } catch (error) {
     next(error);
   }
 };
