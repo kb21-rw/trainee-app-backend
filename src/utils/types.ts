@@ -1,5 +1,6 @@
 import { Date, Types } from "mongoose";
 import { Except, SetOptional } from "type-fest";
+import { IUser } from "../models/User";
 
 interface MetaType {
   _id: string;
@@ -110,3 +111,7 @@ export interface DecisionDto {
   decision: Decision;
   feedback: string;
 }
+
+export type updateUserDto = Partial<
+  Pick<IUser, "name" | "email" | "verified" | "password" | "role" | "coach">
+>;
