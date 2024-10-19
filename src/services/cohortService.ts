@@ -119,7 +119,7 @@ export const getMyApplicationService = async (loggedInUserId: string) => {
 export const decisionService = async (body: DecisionDto) => {
   const { userId, decision, feedback } = body;
   const currentCohort = await getCurrentCohort();
-  const user = await getUserService(userId);
+  const user = await getUserService({_id: userId});
 
   if (decision === Decision.Accepted) {
     if (user.role === Role.Applicant) {
