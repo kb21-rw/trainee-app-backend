@@ -3,8 +3,8 @@ import CustomError from "../middlewares/customError";
 import User, { IUser } from "../models/User";
 import { USER_NOT_FOUND } from "../utils/errorCodes";
 
-export const getUserService = async (userId: string) => {
-  const user = await User.findById<IUser>(userId, { password: 0 });
+export const getUserService = async (query: object) => {
+  const user = await User.findOne<IUser>(query);
   if (!user) {
     throw new CustomError(USER_NOT_FOUND, "User not found", 404);
   }
@@ -22,7 +22,7 @@ export const updateUserService = async (
     name: string;
     email: string;
     password: string;
-  },
+  }
 ) => {
   const user = await User.findById(userId);
   if (!user) {
