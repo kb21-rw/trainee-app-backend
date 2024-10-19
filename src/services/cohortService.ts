@@ -1,5 +1,5 @@
 import CustomError from "../middlewares/customError";
-import Cohort from "../models/Cohort";
+import Cohort, { ICohort } from "../models/Cohort";
 import Form, { IForm } from "../models/Form";
 import { getCohortsQuery } from "../queries/cohortQueries";
 import {
@@ -27,7 +27,7 @@ import { getUserFormResponses } from "../utils/helpers/response";
 import { getUserService } from "./userService";
 
 export const getCohortService = async (query: object) => {
-  const cohort = await Cohort.findOne(query);
+  const cohort = await Cohort.findOne<ICohort>(query);
   if (!cohort) {
     throw new CustomError(COHORT_NOT_FOUND, "Cohort not found", 404);
   }
