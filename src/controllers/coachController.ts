@@ -3,12 +3,14 @@ import { editUserSchema } from "../validations/userValidation";
 import {
   getCoachesService,
   updateCoachOrAdminService,
+  addCoachToCohortService,
 } from "../services/coachService";
+import { mongodbIdValidation } from "../validations/generalValidation";
 
 export const getCoaches = async (
   req: any,
   res: Response,
-  next: NextFunction,
+  next: NextFunction
 ) => {
   try {
     const { role } = req.user;
@@ -29,13 +31,28 @@ export const getCoaches = async (
 export const updateCoachOrAdmin = async (
   req: any,
   res: Response,
-  next: NextFunction,
+  next: NextFunction
 ) => {
   try {
     const userId = req.params.id;
     await editUserSchema.validateAsync(req.body);
     const user = await updateCoachOrAdminService(userId, req.body);
     return res.status(200).send(user);
+  } catch (error) {
+    next(error);
+  }
+};
+
+export const addCoachToCohortController = async (
+  req: any,
+  res: Response,
+  next: NextFunction
+) => {
+  try {
+    const { coachId } = req.body;
+    await mongodbIdValidation.validateAsync(coachId);
+    const coach = await addCoachToCohortService(coachId);
+    return res.status(200).send(coach);
   } catch (error) {
     next(error);
   }
