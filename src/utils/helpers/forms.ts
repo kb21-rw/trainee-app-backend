@@ -1,7 +1,7 @@
 import { IForm } from "../../models/Form";
 
 export const getCompleteForm = async (form: IForm) => {
-  const { name, description, type, questionIds } = await form.populate({
+  const { _id, name, description, type, questionIds } = await form.populate({
     path: "questionIds",
     select: "title type options",
   });
@@ -16,5 +16,5 @@ export const getCompleteForm = async (form: IForm) => {
     })
   );
 
-  return { name, description, type, questions };
+  return { _id, name, description, type, questions };
 };

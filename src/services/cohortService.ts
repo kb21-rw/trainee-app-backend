@@ -11,6 +11,7 @@ import {
   CreateCohortDto,
   Decision,
   DecisionDto,
+  ICohortOverviewRequest,
   Role,
   UpdateCohortDto,
 } from "../utils/types";
@@ -25,6 +26,7 @@ import { createStagesHandler } from "../utils/helpers";
 import { getCompleteForm } from "../utils/helpers/forms";
 import { getUserFormResponses } from "../utils/helpers/response";
 import { getUserService } from "./userService";
+import { getCohortOverviewQuery } from "../queries/cohortQueries";
 
 export const getCohortService = async (query: object) => {
   const cohort = await Cohort.findOne<ICohort>(query);
@@ -144,4 +146,10 @@ export const decisionService = async (body: DecisionDto) => {
 
     return await rejectUserHandler(currentCohort, user, feedback, "trainees");
   }
+};
+
+export const getCohortOverviewService = async (
+  request: ICohortOverviewRequest
+) => {
+  return await getCohortOverviewQuery(request);
 };

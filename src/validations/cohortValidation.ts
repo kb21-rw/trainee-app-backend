@@ -8,6 +8,7 @@ export const createCohortValidation = Joi.object({
     .items(Joi.object({ name: Joi.string().min(1), description: Joi.string() }))
     .min(1)
     .message("Add at least 1 stage"),
+  trainingStartDate: Joi.date().min("now").required()
 });
 
 export const updateCohortValidation = Joi.object({

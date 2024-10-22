@@ -37,6 +37,7 @@ export interface CreateCohortDto {
   name: string;
   description?: string;
   stages: Except<IStage, "id">[];
+  trainingStartDate: Date
 }
 export interface UpdateFormDto {
   name: string;
@@ -115,3 +116,8 @@ export interface DecisionDto {
 export type updateUserDto = Partial<
   Pick<IUser, "name" | "email" | "verified" | "password" | "role" | "coach">
 >;
+export interface ICohortOverviewRequest {
+  cohortId: string;
+  overviewType: FormType.Applicant | FormType.Trainee;
+  coachId?: string;
+}

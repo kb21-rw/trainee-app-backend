@@ -8,12 +8,14 @@ import {
   createCohortService,
   decisionService,
   getApplicationFormService,
+  getCohortOverviewService,
   getCohortService,
   getCohortsService,
   getMyApplicationService,
   updateCohortService,
 } from "../services/cohortService";
 import { mongodbIdValidation } from "../validations/generalValidation";
+import { FormType } from "../utils/types";
 
 export const createCohortController = async (
   req: Request,
@@ -112,6 +114,27 @@ export const decisionController = async (
     const decision = await decisionService(body);
     return res.status(201).send(decision);
   } catch (error: any) {
+    next(error);
+  }
+};
+
+export const getCohortOverviewController = async (
+  req: Request,
+  res: Response,
+  next: NextFunction
+) => {
+  try {
+    const { cohortId } = req.params;
+    const { type } = req.query;
+    const overviewType =
+      type === FormType.Trainee ? FormType.Trainee : FormType.Applicant;
+    await mongodbIdValidation.validateAsync(cohortId);
+    const overview = await getCohortOverviewService({
+      cohortId,
+      overviewType,
+    });
+    return res.status(200).json(overview);
+  } catch (error) {
     next(error);
   }
 };
