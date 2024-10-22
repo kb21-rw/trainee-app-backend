@@ -1,7 +1,7 @@
 import CustomError from "../middlewares/customError";
-import Cohort from "../models/Cohort";
+import Cohort, { ICohort } from "../models/Cohort";
 import Form, { IForm } from "../models/Form";
-import { getCohortQuery, getCohortsQuery } from "../queries/cohortQueries";
+import { getCohortsQuery } from "../queries/cohortQueries";
 import {
   COHORT_NOT_FOUND,
   FORM_NOT_FOUND,
@@ -28,8 +28,8 @@ import { getUserFormResponses } from "../utils/helpers/response";
 import { getUserService } from "./userService";
 import { getCohortOverviewQuery } from "../queries/cohortQueries";
 
-export const getCohortService = async (cohortId: string) => {
-  const cohort = await getCohortQuery(cohortId);
+export const getCohortService = async (query: object) => {
+  const cohort = await Cohort.findOne<ICohort>(query);
   if (!cohort) {
     throw new CustomError(COHORT_NOT_FOUND, "Cohort not found", 404);
   }
@@ -121,7 +121,7 @@ export const getMyApplicationService = async (loggedInUserId: string) => {
 export const decisionService = async (body: DecisionDto) => {
   const { userId, decision, feedback } = body;
   const currentCohort = await getCurrentCohort();
-  const user = await getUserService(userId);
+  const user = await getUserService({ _id: userId });
 
   if (decision === Decision.Accepted) {
     if (user.role === Role.Applicant) {

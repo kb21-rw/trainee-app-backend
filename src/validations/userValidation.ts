@@ -7,8 +7,7 @@ export const ProfileSchema = Joi.object({
 });
 
 export const editUserSchema = Joi.object({
-  name: Joi.string().min(3).max(30).optional(),
+  name: Joi.string().min(3).max(30).trim().optional(),
   email: Joi.string().email().optional(),
-  role: Joi.string().valid("ADMIN", "COACH").optional(),
   coach: Joi.string().optional(),
 });

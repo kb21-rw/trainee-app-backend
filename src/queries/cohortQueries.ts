@@ -2,10 +2,6 @@ import Cohort, { ICohort } from "../models/Cohort";
 import { FormType, ICohortOverviewRequest } from "../utils/types";
 import { ObjectId } from "mongodb";
 
-export const getCohortQuery = async (cohortId: string) => {
-  return await Cohort.findById(cohortId);
-};
-
 export const getCohortsQuery = async (searchString: string) => {
   const cohorts: ICohort[] = await Cohort.aggregate([
     {

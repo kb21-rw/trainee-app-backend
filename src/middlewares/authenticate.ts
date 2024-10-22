@@ -20,7 +20,7 @@ export const verifyJWT = (req: any, res: Response, next: () => void) => {
     }
 
     
-    req.user = await getUserService(decoded.id);
+    req.user = await getUserService({_id: decoded.id});
     next();
   });
 };

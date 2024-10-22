@@ -1,5 +1,6 @@
 import { Date, Types } from "mongoose";
 import { Except, SetOptional } from "type-fest";
+import { IUser } from "../models/User";
 
 interface MetaType {
   _id: string;
@@ -112,6 +113,9 @@ export interface DecisionDto {
   feedback: string;
 }
 
+export type updateUserDto = Partial<
+  Pick<IUser, "name" | "email" | "verified" | "password" | "role" | "coach">
+>;
 export interface ICohortOverviewRequest {
   cohortId: string;
   overviewType: FormType.Applicant | FormType.Trainee;

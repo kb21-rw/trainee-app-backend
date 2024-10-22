@@ -13,7 +13,7 @@ export const getProfile = async (
 ) => {
   try {
     const userId = req.user.id;
-    const user = await getUserService(userId);
+    const user = await getUserService({_id: userId});
     return res.status(200).send(user);
   } catch (error) {
     next(error);
