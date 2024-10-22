@@ -29,6 +29,7 @@ export interface ICohort extends Document {
     stages: IStage[];
   };
   stages: IStage[];
+  trainingStartDate: Date;
 }
 
 const CohortSchema = new Schema(
@@ -55,6 +56,10 @@ const CohortSchema = new Schema(
         _id: false,
       },
     ],
+    trainingStartDate: {
+      type: Date,
+      require: true,
+    },
     forms: [
       {
         type: Schema.Types.ObjectId,
