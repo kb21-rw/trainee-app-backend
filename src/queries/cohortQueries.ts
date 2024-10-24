@@ -7,6 +7,7 @@ export const getCohortsQuery = async (searchString: string) => {
     {
       $match: { name: { $regex: new RegExp(searchString, "i") } },
     },
+    { $sort: { createdAt: -1 } },
     {
       $project: {
         name: 1,
