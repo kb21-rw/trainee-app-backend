@@ -13,6 +13,7 @@ import User from "../models/User";
 import { ACCESS_TOKEN_EXPIRATION, secret } from "../constants";
 import jwt from "jsonwebtoken";
 import { Role } from "../utils/types";
+import { getUserService } from "./userService";
 
 export const registerService = async (user: any, body: any) => {
   let newUser;
@@ -67,7 +68,7 @@ export const applicantRegisterService = async (body: any) => {
     name: createdUser.name,
     userId: createdUser.id,
   });
- 
+
   return createdUser;
 };
 
@@ -109,27 +110,20 @@ export const loginService = async (body: any) => {
     throw new CustomError(INVALID_CREDENTIAL, "Invalid credential", 401);
   }
 
-  const accessToken = jwt.sign(
-    { id: user._id },
-    secret,
-    {
-      expiresIn: ACCESS_TOKEN_EXPIRATION,
-    }
-  );
+  const accessToken = jwt.sign({ id: user._id }, secret, {
+    expiresIn: ACCESS_TOKEN_EXPIRATION,
+  });
   return accessToken;
 };
 
 export const resetPasswordService = async (body: any) => {
   const { email } = body;
-  const user: any = await User.findOne({ email });
-  if (!user) {
-    throw new CustomError(USER_NOT_FOUND, "User not found", 404);
-  }
+  const user = await getUserService({ email });
 
   const password = generateRandomPassword(10);
   const hashedPassword = await hash(password, 10);
   user.password = hashedPassword;
   await user.save();
   await sendEmail(user.email, { name: user.name, password });
-  return password;
+  return user._id;
 };

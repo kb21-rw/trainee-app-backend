@@ -88,8 +88,8 @@ export const resetPassword = async (
   try {
     const body = req.body;
     await resetPasswordSchema.validateAsync(body);
-    const password = await resetPasswordService(req.body);
-    return res.status(200).json({ password });
+    const userId = await resetPasswordService(req.body);
+    return res.status(200).json({ userId });
   } catch (error: any) {
     next(error);
   }
