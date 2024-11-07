@@ -25,7 +25,7 @@ export const getCurrentCohort = async () => {
 
 export const getApplicationForm = async (currentCohort: ICohort) => {
   if (!currentCohort.applicationForm.id) {
-    throw new CustomError(NOT_ALLOWED, "Applications aren't open yet", 401);
+    throw new CustomError(NOT_ALLOWED, "Applications aren't open yet", 404);
   }
 
   const applicationForm = await Form.findById<IForm>(
