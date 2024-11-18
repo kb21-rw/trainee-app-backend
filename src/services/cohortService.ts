@@ -115,7 +115,12 @@ export const getMyApplicationService = async (loggedInUserId: string) => {
   );
   const { startDate, endDate } = currentCohort.applicationForm;
 
-  return { ...completeForm, startDate, endDate };
+  return {
+    ...completeForm,
+    startDate,
+    endDate,
+    trainingStartDate: currentCohort.trainingStartDate,
+  };
 };
 
 export const decisionService = async (body: DecisionDto) => {

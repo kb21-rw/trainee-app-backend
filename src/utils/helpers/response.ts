@@ -34,6 +34,7 @@ export const upsertResponse = async (
     }
   }
 
+  // Prevent arrays for Text and SingleSelect questions
   if (Array.isArray(value)) {
     if (question.type === QuestionType.Text) {
       throw new CustomError(NOT_ALLOWED, "Please send a text response", 400);
@@ -64,7 +65,7 @@ export const upsertResponse = async (
 
   const response = await Response.findByIdAndUpdate(
     oldResponse._id,
-    { value },
+    { value: value.length === 0 ? null : value },
     { new: true }
   );
 

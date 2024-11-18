@@ -15,7 +15,7 @@ export const createApplicantResponseValidation = Joi.array().items(
       .message("A questionId is not valid"),
     answer: Joi.alternatives().try(
       Joi.array().items(Joi.string()),
-      Joi.string()
+      Joi.string().min(0),
     ),
   })
 );
