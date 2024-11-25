@@ -142,6 +142,9 @@ export const getCohortOverviewQuery = async ({
         stages: {
           $first: "$stages",
         },
+        applicationForm: {
+          $first: "$applicationForm"
+        },
         applicants: {
           $first: "$applicants",
         },
