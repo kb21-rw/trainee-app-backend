@@ -86,16 +86,10 @@ export const createApplicationFormService = async (
 
   const applicationForm = await Form.create({ name, description, type });
 
-  const applicationStages = stages ?? [];
-  applicationStages.unshift({
-    name: "Application",
-    description: "",
-  });
-
   cohort.applicationForm.id = applicationForm.id;
   cohort.applicationForm.startDate = startDateJs.toDate();
   cohort.applicationForm.endDate = endDateJs.toDate();
-  cohort.applicationForm.stages = createStagesHandler(applicationStages);
+  cohort.applicationForm.stages = createStagesHandler(stages);
 
   await cohort.save();
 

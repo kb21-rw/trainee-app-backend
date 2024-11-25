@@ -19,17 +19,15 @@ export const createFormValidation = Joi.object({
   }),
   stages: Joi.when("type", {
     is: FormType.Application,
-    then: Joi.array().items(
-      Joi.object({
-        id: Joi.string()
-          .hex()
-          .length(24)
-          .message("stageId is not valid")
-          .optional(),
-        name: Joi.string().min(1).required(),
-        description: Joi.string(),
-      })
-    ),
+    then: Joi.array()
+      .items(
+        Joi.object({
+          name: Joi.string().min(1).required(),
+          description: Joi.string(),
+        })
+      )
+      .min(1)
+      .message("Add at least 1 stage"),
     otherwise: Joi.forbidden(),
   }),
 });
