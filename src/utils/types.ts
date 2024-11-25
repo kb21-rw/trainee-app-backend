@@ -117,7 +117,7 @@ export type updateUserDto = Partial<
   Pick<IUser, "name" | "email" | "verified" | "password" | "role" | "coach">
 >;
 export interface ICohortOverviewRequest {
-  cohortId: string;
+  cohortId?: string;
   overviewType: FormType.Applicant | FormType.Trainee;
   coachId?: string;
 }

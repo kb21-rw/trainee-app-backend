@@ -26,13 +26,8 @@ router.get(
   getMyApplicationController
 );
 router.get("/", verifyJWT, isAdmin, getCohortsController);
+router.get("/overview", verifyJWT, isAdminOrCoach, getCohortOverviewController);
 router.get("/:cohortId", verifyJWT, isAdmin, getCohortController);
-router.get(
-  "/:cohortId/overview",
-  verifyJWT,
-  isAdminOrCoach,
-  getCohortOverviewController
-);
 
 router.post("/", verifyJWT, isAdmin, createCohortController);
 

@@ -153,8 +153,16 @@ export const decisionService = async (body: DecisionDto) => {
   }
 };
 
-export const getCohortOverviewService = async (
-  request: ICohortOverviewRequest
-) => {
-  return await getCohortOverviewQuery(request);
+export const getCohortOverviewService = async ({
+  cohortId,
+  overviewType,
+  coachId,
+}: ICohortOverviewRequest) => {
+  const cohortOverview = await getCohortOverviewQuery({
+    cohortId: cohortId ?? (await getCohortService({ isActive: true }))._id,
+    overviewType,
+    coachId,
+  });
+
+  return cohortOverview;
 };

@@ -173,6 +173,9 @@ export const getCohortOverviewQuery = async ({
         forms: {
           $setUnion: ["$forms"],
         },
+        questions: {
+          $setUnion: ["$questions"],
+        },
       },
     },
     // Combine questions with their respective forms
@@ -277,5 +280,5 @@ export const getCohortOverviewQuery = async ({
       },
     },
   ]);
-  return overview;
+  return overview[0];
 };

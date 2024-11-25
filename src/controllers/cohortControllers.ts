@@ -119,16 +119,15 @@ export const decisionController = async (
 };
 
 export const getCohortOverviewController = async (
-  req: Request,
+  req: Request<any, any, any, { cohortId: string; type: FormType }>,
   res: Response,
   next: NextFunction
 ) => {
   try {
-    const { cohortId } = req.params;
-    const { type } = req.query;
+    const { cohortId, type } = req.query;
     const overviewType =
       type === FormType.Trainee ? FormType.Trainee : FormType.Applicant;
-    await mongodbIdValidation.validateAsync(cohortId);
+    cohortId && await mongodbIdValidation.validateAsync(cohortId);
     const overview = await getCohortOverviewService({
       cohortId,
       overviewType,
