@@ -100,7 +100,7 @@ const CohortSchema = new Schema(
         feedbacks: [
           {
             stageId: { type: String, required: true },
-            text: { type: String, required: true },
+            text: { type: String },
           },
         ],
         _id: false,
