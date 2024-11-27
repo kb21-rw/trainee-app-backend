@@ -27,12 +27,12 @@ export const updateCohortValidation = Joi.object({
   ),
 });
 
-export const DecisionSchema = Joi.object({
+export const decisionValidation = Joi.object({
   userId: Joi.string()
     .hex()
     .length(24)
     .message("userId is not valid")
     .required(),
   decision: Joi.string().valid(Decision.Accepted, Decision.Rejected).required(),
-  feedback: Joi.string().optional(),
+  feedback: Joi.string().min(0).required(),
 });

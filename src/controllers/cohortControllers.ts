@@ -1,7 +1,7 @@
 import { NextFunction, Request, Response } from "express";
 import {
   createCohortValidation,
-  DecisionSchema,
+  decisionValidation,
   updateCohortValidation,
 } from "../validations/cohortValidation";
 import {
@@ -110,7 +110,8 @@ export const decisionController = async (
 ) => {
   try {
     const body = req.body;
-    await DecisionSchema.validateAsync(body);
+    console.log(body)
+    await decisionValidation.validateAsync(body);
     const decision = await decisionService(body);
     return res.status(201).send(decision);
   } catch (error: any) {
@@ -127,7 +128,7 @@ export const getCohortOverviewController = async (
     const { cohortId, type } = req.query;
     const overviewType =
       type === FormType.Trainee ? FormType.Trainee : FormType.Applicant;
-    cohortId && await mongodbIdValidation.validateAsync(cohortId);
+    cohortId && (await mongodbIdValidation.validateAsync(cohortId));
     const overview = await getCohortOverviewService({
       cohortId,
       overviewType,
