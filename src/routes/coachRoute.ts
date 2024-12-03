@@ -7,6 +7,6 @@ const router = Router();
 
 router.get("/all", verifyJWT, getCoaches);
 router.patch("/edit-coach-or-admin/:id", verifyJWT, updateCoachOrAdmin);
-router.post("/add", verifyJWT, isAdmin, addCoachToCohortController);
+router.post("/", verifyJWT, isAdmin, addCoachToCohortController);
 
 export default router;
