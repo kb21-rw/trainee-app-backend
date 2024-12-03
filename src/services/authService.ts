@@ -9,42 +9,38 @@ import {
 import { sendEmail } from "../utils/helpers/email";
 import { generateRandomPassword } from "../utils/helpers/password";
 import { generateUserId } from "../utils/helpers/user";
-import User from "../models/User";
+import User, { IUser } from "../models/User";
 import { ACCESS_TOKEN_EXPIRATION, secret } from "../constants";
 import jwt from "jsonwebtoken";
-import { Role } from "../utils/types";
+import { RegisterUserDto, Role } from "../utils/types";
 import { getUserService } from "./userService";
 
-export const registerService = async (user: any, body: any) => {
-  let newUser;
+export const registerService = async (user: IUser, body: RegisterUserDto) => {
   if (user.role !== Role.Admin) {
     throw new CustomError(NOT_ALLOWED, "Only admins can register users", 403);
   }
 
-  let password: string = "";
-  const name = body.name.trim().replace(/\s+/g, " "); // Remove unnecessary extra spaces in names
-  if (body.role === Role.Coach || body.role === Role.Coach) {
-    password = generateRandomPassword(10);
-    const hashedPassword = await hash(password, 10);
-    newUser = {
-      ...body,
-      userId: await generateUserId(),
-      name,
-      password: hashedPassword,
-    };
-  } else {
-    newUser = { ...body, name, userId: await generateUserId() };
+  if (await User.findOne({ email: body.email })) {
+    throw new CustomError(DUPLICATE_USER, "Email is already in use", 409);
   }
 
-  const createdUser = await User.create(newUser);
-  if (createdUser) {
-    await sendEmail(createdUser.email, {
-      name: createdUser.name,
-      email: createdUser.email,
-      role: createdUser.role,
-      password,
-    });
-  }
+  const name = body.name.trim().replace(/\s+/g, " "); // Remove unnecessary extra spaces in names
+  const password: string = generateRandomPassword(10);
+  const hashedPassword = await hash(password, 10);
+
+  const createdUser = await User.create({
+    ...body,
+    userId: await generateUserId(),
+    name,
+    password: hashedPassword,
+  });
+
+  await sendEmail(createdUser.email, {
+    name: createdUser.name,
+    email: createdUser.email,
+    role: createdUser.role,
+    password,
+  });
 
   return createdUser;
 };

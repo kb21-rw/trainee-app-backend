@@ -121,3 +121,9 @@ export interface ICohortOverviewRequest {
   overviewType: FormType.Applicant | FormType.Trainee;
   coachId?: string;
 }
+
+export interface RegisterUserDto {
+  name: string,
+  email: string,
+  role: Exclude<Role, Role.Applicant | Role.Trainee>
+}
