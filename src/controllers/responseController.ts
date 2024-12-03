@@ -14,14 +14,10 @@ export const createCoachResponse = async (
   next: NextFunction
 ) => {
   try {
-    const { questionId } = req.params;
-    const { userId } = req.query;
     const loggedInUser = req.user;
     await createCoachResponseValidation.validateAsync(req.body);
     const createdResponse = await createCoachResponseService(
       loggedInUser,
-      userId,
-      questionId,
       req.body
     );
     return res.status(201).json(createdResponse);

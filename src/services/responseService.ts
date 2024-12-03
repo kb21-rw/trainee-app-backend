@@ -15,42 +15,48 @@ import {
   RESPONSE_NOT_FOUND,
 } from "../utils/errorCodes";
 import Form, { IForm } from "../models/Form";
-import { getCurrentCohort } from "../utils/helpers/cohort";
 import dayjs from "dayjs";
 import {
   getUserFormResponses,
   upsertResponse,
 } from "../utils/helpers/response";
+import { getCohortService } from "./cohortService";
+import { isUserInCohort } from "../utils/helpers/cohort";
 
 export const createCoachResponseService = async (
   loggedInUser: IUser,
-  traineeId: string,
-  questionId: string,
   responseData: CreateResponseDto
 ) => {
-  const { text } = responseData;
+  console.log(responseData);
+  const { questionId, userId, value } = responseData;
 
-  const currentCohort = await getCurrentCohort();
+  const currentCohort = await getCohortService({ isActive: true });
 
-  const trainee = await User.findOne({
-    $and: [{ _id: traineeId }, { role: "TRAINEE" }],
+  const participant = await User.findOne({
+    $and: [
+      { _id: userId },
+      { $or: [{ role: Role.Trainee }, { role: Role.Applicant }] },
+    ],
   });
 
-  if (!trainee || !currentCohort.trainees.includes(trainee.id)) {
+  if (
+    !participant ||
+    !isUserInCohort(currentCohort, participant.id, participant.role)
+  ) {
     throw new CustomError(
       USER_NOT_FOUND,
-      "The trainee does not exist in the current cohort!",
+      "The user does not exist in the current cohort!",
       400
     );
   }
 
   if (
     loggedInUser.role !== Role.Admin &&
-    loggedInUser.id !== trainee.coach?.toString()
+    loggedInUser.id !== participant.coach?.toString()
   ) {
     throw new CustomError(
       NOT_ALLOWED,
-      "Only admin or the coach of a trainee can provide a response",
+      "Only admin or the coach of a trainee/applicant can provide a response",
       403
     );
   }
@@ -65,7 +71,7 @@ export const createCoachResponseService = async (
     );
   }
 
-  return upsertResponse(relatedQuestion, text, traineeId);
+  return upsertResponse(relatedQuestion, value, userId);
 };
 
 export const createApplicantResponseService = async (
@@ -73,7 +79,7 @@ export const createApplicantResponseService = async (
   responseData: CreateApplicationResponseDto[],
   submit: boolean = false
 ) => {
-  const currentCohort = await getCurrentCohort();
+  const currentCohort = await getCohortService({ isActive: true });
 
   const applicantExists = currentCohort.applicants.some(
     (applicant) => applicant.id.toString() === loggedInUser.id

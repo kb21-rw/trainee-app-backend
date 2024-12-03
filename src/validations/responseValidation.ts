@@ -1,6 +1,9 @@
 import Joi from "joi";
+import { mongodbIdValidation } from "./generalValidation";
 
 export const createCoachResponseValidation = Joi.object({
+  userId: mongodbIdValidation,
+  questionId: mongodbIdValidation,
   value: Joi.alternatives().try(
     Joi.array().items(Joi.string().min(1).required()),
     Joi.string().min(1).required()

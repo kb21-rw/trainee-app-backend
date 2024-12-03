@@ -37,7 +37,7 @@ export interface CreateCohortDto {
   name: string;
   description?: string;
   stages: Except<IStage, "id">[];
-  trainingStartDate: Date
+  trainingStartDate: Date;
 }
 export interface UpdateFormDto {
   name: string;
@@ -65,7 +65,9 @@ export interface UpdateQuestionDto {
 }
 
 export interface CreateResponseDto {
-  text: string;
+  userId: string;
+  questionId: string;
+  value: string;
 }
 
 export interface CreateApplicationResponseDto {

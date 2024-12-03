@@ -23,7 +23,6 @@ export const register = async (
     const body = req.body;
     await registerSchema.validateAsync(body);
     const newUser = await registerService(user, body);
-    delete newUser.password;
     return res.status(201).send(newUser);
   } catch (error: any) {
     next(error);

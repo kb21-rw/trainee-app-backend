@@ -5,7 +5,7 @@ import { createApplicantResponse, createCoachResponse } from "../controllers/res
 
 const router = Router();
 
-router.put("/:questionId?", verifyJWT, isAdminOrCoach, createCoachResponse);
+router.put("/?", verifyJWT, isAdminOrCoach, createCoachResponse);
 router.post("/apply", verifyJWT, isProspect, createApplicantResponse);
 
 export default router;

@@ -199,3 +199,32 @@ export const indexOfParticipant = (userId: string, users: IParticipant[]) => {
 
   return userIndex;
 };
+
+export const isUserInCohort = (
+  cohort: ICohort,
+  userId: string,
+  role: Role
+) => {
+  if (role === Role.Applicant) {
+    return (
+      cohort.applicants.find(
+        (applicant) => applicant.id.toString() === userId
+      ) ?? false
+    );
+  }
+
+  if (role === Role.Trainee) {
+    return (
+      cohort.trainees.find((trainee) => trainee.id.toString() === userId) ??
+      false
+    );
+  }
+
+  if (role === Role.Coach) {
+    return (
+      cohort.coaches.find((coachId) => coachId.toString() === userId) ?? false
+    );
+  }
+
+  return false;
+};
