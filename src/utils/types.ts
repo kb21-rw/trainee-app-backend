@@ -37,7 +37,7 @@ export interface CreateCohortDto {
   name: string;
   description?: string;
   stages: Except<IStage, "id">[];
-  trainingStartDate: Date
+  trainingStartDate: Date;
 }
 export interface UpdateFormDto {
   name: string;
@@ -123,7 +123,7 @@ export interface ICohortOverviewRequest {
 }
 
 export interface RegisterUserDto {
-  name: string,
-  email: string,
-  role: Exclude<Role, Role.Applicant | Role.Trainee>
+  name: string;
+  email: string;
+  role: Exclude<Role, Role.Applicant | Role.Trainee>;
 }
