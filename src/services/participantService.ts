@@ -25,7 +25,11 @@ export const updateParticipantService = async (
     );
   }
 
-  if (updates.coach) {
+  if (updates.coach !== undefined) {
+    if (updates.coach === null) {
+      return updateUserService(participantId, updates);
+    }
+
     const coach = currentCohort.coaches.find(
       (coach) => coach.toString() === updates.coach
     );

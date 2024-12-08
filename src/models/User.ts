@@ -10,7 +10,7 @@ export interface IUser extends Document {
   applied: boolean;
   password: string;
   role: Role;
-  coach: string;
+  coach: null | string;
   googleId: null | string;
 }
 

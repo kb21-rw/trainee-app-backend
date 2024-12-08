@@ -35,7 +35,7 @@ export const updateUserService = async (
     user.role = role;
   }
 
-  if (coach) {
+  if (coach !== undefined) {
     user.coach = coach;
   }
 
