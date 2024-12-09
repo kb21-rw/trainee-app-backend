@@ -11,6 +11,7 @@ import questionRoute from './routes/questionRoute'
 import responseRoute from './routes/responseRoute'
 import overviewRoute from './routes/overviewRoute'
 import applicantRoutes from './routes/applicantRoutes'
+import participantRoutes from './routes/participantRoutes'
 import { errorHandler } from './middlewares/errorHandler'
 import CustomError from './middlewares/customError'
 import { URL_NOT_FOUND } from './utils/errorCodes'
@@ -44,6 +45,7 @@ app.use(express.json())
 app.use('/auth', authRoute)
 app.use('/users', userRoute)
 app.use('/trainees', traineeRoute)
+app.use('/participants', participantRoutes)
 app.use('/coaches', coachRoute)
 app.use('/cohorts', cohortRoutes)
 app.use('/forms', formRoute)

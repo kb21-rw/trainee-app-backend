@@ -9,20 +9,12 @@ import {
 } from "../utils/errorCodes";
 import { getCohortService } from "./cohortService";
 import { getUserService } from "./userService";
+import { ObjectId } from "mongodb";
 
-export const getCoachesService = async (
-  role: Role,
-  {
-    searchString,
-    sortBy,
-    coachesPerPage,
-  }: { searchString: string; sortBy: string; coachesPerPage: number }
-) => {
-  if (role !== Role.Admin) {
-    throw new CustomError(NOT_ALLOWED, "Only admins can view coaches", 403);
-  }
-
-  const coaches = await getCoachesQuery(searchString, sortBy, coachesPerPage);
+export const getCoachesService = async (cohortId?: string) => {
+  const coaches = await getCoachesQuery(
+    cohortId ? { _id: new ObjectId(cohortId) } : undefined
+  );
   return coaches;
 };
 

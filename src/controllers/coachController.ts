@@ -7,21 +7,15 @@ import {
 } from "../services/coachService";
 import { mongodbIdValidation } from "../validations/generalValidation";
 
-export const getCoaches = async (
+export const getCoachesController = async (
   req: any,
   res: Response,
   next: NextFunction
 ) => {
   try {
-    const { role } = req.user;
-    const searchString = req.query.searchString || "";
-    const coachesPerPage = Number(req.query.coachesPerPage) || 10;
-    const sortBy = req.query.sortBy || "entry";
-    const coaches = await getCoachesService(role, {
-      searchString,
-      coachesPerPage,
-      sortBy,
-    });
+    const { cohortId } = req.query;
+    await mongodbIdValidation.validateAsync(cohortId);
+    const coaches = await getCoachesService(cohortId);
     return res.status(200).json(coaches);
   } catch (error) {
     next(error);
