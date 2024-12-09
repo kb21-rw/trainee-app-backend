@@ -27,7 +27,6 @@ export const createCoachResponseService = async (
   loggedInUser: IUser,
   responseData: CreateResponseDto
 ) => {
-  console.log(responseData);
   const { questionId, userId, value } = responseData;
 
   const currentCohort = await getCohortService({ isActive: true });

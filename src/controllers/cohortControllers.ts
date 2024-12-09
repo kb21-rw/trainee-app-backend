@@ -110,7 +110,6 @@ export const decisionController = async (
 ) => {
   try {
     const body = req.body;
-    console.log(body)
     await decisionValidation.validateAsync(body);
     const decision = await decisionService(body);
     return res.status(201).send(decision);

@@ -10,7 +10,6 @@ export const updateParticipantController = async (
 ) => {
   try {
     const { participantId } = req.params;
-    console.log(participantId)
     await mongodbIdValidation.validateAsync(participantId);
     await updateParticipantSchema.validateAsync(req.body);
     const participant = await updateParticipantService(participantId, req.body);
