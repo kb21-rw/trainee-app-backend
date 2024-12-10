@@ -16,7 +16,14 @@ export const getCoachesQuery = async (
         as: "coaches",
       },
     },
+    {
+      $project: {
+        _id: 1,
+        name: 1,
+        coaches: 1,
+      },
+    },
   ]);
 
-  return cohort[0]?.coaches ?? [];
+  return cohort[0];
 };
