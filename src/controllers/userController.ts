@@ -3,6 +3,7 @@ import { ProfileSchema } from "../validations/userValidation";
 import {
   deleteUserService,
   getUserService,
+  getUsersService,
   updateUserService,
 } from "../services/userService";
 
@@ -15,6 +16,19 @@ export const getProfile = async (
     const userId = req.user.id;
     const user = await getUserService({_id: userId});
     return res.status(200).send(user);
+  } catch (error) {
+    next(error);
+  }
+};
+
+export const getUsersController = async (
+  req: any,
+  res: Response,
+  next: NextFunction,
+) => {
+  try {
+    const users = await getUsersService();
+    return res.status(200).send(users);
   } catch (error) {
     next(error);
   }

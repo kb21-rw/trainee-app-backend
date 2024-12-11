@@ -13,6 +13,10 @@ export const getUserService = async (query: object) => {
   return user;
 };
 
+export const getUsersService = async () => {
+  return await User.find<IUser[]>();
+};
+
 export const updateUserService = async (
   id: string,
   { name, email, verified, password, role, coach }: updateUserDto
