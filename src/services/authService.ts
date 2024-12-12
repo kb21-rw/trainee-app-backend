@@ -8,15 +8,14 @@ import {
 } from "../utils/errorCodes";
 import { sendEmail } from "../utils/helpers/email";
 import { generateRandomPassword } from "../utils/helpers/password";
-import { generateUserId } from "../utils/helpers/user";
 import User, { IUser } from "../models/User";
 import { ACCESS_TOKEN_EXPIRATION, secret } from "../constants";
 import jwt from "jsonwebtoken";
 import { RegisterUserDto, Role } from "../utils/types";
-import { getUserService } from "./userService";
+import { generateUserIdService, getUserService } from "./userService";
 
-export const registerService = async (user: IUser, body: RegisterUserDto) => {
-  if (user.role !== Role.Admin) {
+export const registerService = async (loggedInUser: IUser, body: RegisterUserDto) => {
+  if (loggedInUser.role !== Role.Admin) {
     throw new CustomError(NOT_ALLOWED, "Only admins can register users", 403);
   }
 
@@ -30,9 +29,10 @@ export const registerService = async (user: IUser, body: RegisterUserDto) => {
 
   const createdUser = await User.create({
     ...body,
-    userId: await generateUserId(),
+    userId: await generateUserIdService(),
     name,
     password: hashedPassword,
+    verified: true,
   });
 
   await sendEmail(createdUser.email, {
@@ -56,7 +56,7 @@ export const applicantRegisterService = async (body: any) => {
   const createdUser = await User.create({
     ...body,
     name,
-    userId: await generateUserId(),
+    userId: await generateUserIdService(),
     password: hashedPassword,
   });
 

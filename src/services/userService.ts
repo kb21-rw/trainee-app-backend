@@ -60,3 +60,13 @@ export const deleteUserService = async (userId: string) => {
 
   return user;
 };
+
+export const generateUserIdService = async () => {
+  let userId = 1;
+  const lastUser = await User.findOne().sort({ userId: -1 });
+  if (lastUser) {
+    userId = parseInt(lastUser.userId, 10) + 1;
+  }
+
+  return String(userId).padStart(6, "0");
+};
