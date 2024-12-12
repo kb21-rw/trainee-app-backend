@@ -20,6 +20,7 @@ export const getCoachesQuery = async (
       $project: {
         _id: 1,
         name: 1,
+        isActive: 1,
         coaches: 1,
       },
     },
