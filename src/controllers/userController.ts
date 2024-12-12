@@ -1,5 +1,5 @@
 import { NextFunction, Request, Response } from "express";
-import { ProfileSchema } from "../validations/userValidation";
+import { getUsersSchema, ProfileSchema } from "../validations/userValidation";
 import {
   deleteUserService,
   getUserService,
@@ -10,11 +10,11 @@ import {
 export const getProfile = async (
   req: any,
   res: Response,
-  next: NextFunction,
+  next: NextFunction
 ) => {
   try {
     const userId = req.user.id;
-    const user = await getUserService({_id: userId});
+    const user = await getUserService({ _id: userId });
     return res.status(200).send(user);
   } catch (error) {
     next(error);
@@ -24,10 +24,12 @@ export const getProfile = async (
 export const getUsersController = async (
   req: any,
   res: Response,
-  next: NextFunction,
+  next: NextFunction
 ) => {
   try {
-    const users = await getUsersService();
+    const search = req.query;
+    await getUsersSchema.validateAsync(search);
+    const users = await getUsersService(search);
     return res.status(200).send(users);
   } catch (error) {
     next(error);
@@ -37,7 +39,7 @@ export const getUsersController = async (
 export const updateProfile = async (
   req: any,
   res: Response,
-  next: NextFunction,
+  next: NextFunction
 ) => {
   try {
     const userId = req.user.id;
@@ -53,7 +55,7 @@ export const updateProfile = async (
 export const deleteUser = async (
   req: Request,
   res: Response,
-  next: NextFunction,
+  next: NextFunction
 ) => {
   try {
     const userId = req.params.userId;
