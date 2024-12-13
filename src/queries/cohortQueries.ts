@@ -143,7 +143,7 @@ export const getCohortOverviewQuery = async ({
           $first: "$stages",
         },
         applicationForm: {
-          $first: "$applicationForm"
+          $first: "$applicationForm",
         },
         applicants: {
           $first: "$applicants",
@@ -249,7 +249,7 @@ export const getCohortOverviewQuery = async ({
                                       : { $eq: ["", ""] },
                                     {
                                       $in: [
-                                        "$$response.user._id", // Use $in to check if user._id is in the list of participant ids
+                                        "$$response.user._id",
                                         {
                                           $map: {
                                             input: `$${overviewType.toLocaleLowerCase()}s`,
@@ -275,7 +275,6 @@ export const getCohortOverviewQuery = async ({
         },
       },
     },
-    // Remove redundant arrays
     {
       $project: {
         questions: 0,
