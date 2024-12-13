@@ -10,7 +10,6 @@ import cohortRoutes from './routes/cohortRoutes'
 import questionRoute from './routes/questionRoute'
 import responseRoute from './routes/responseRoute'
 import overviewRoute from './routes/overviewRoute'
-import applicantRoutes from './routes/applicantRoutes'
 import participantRoutes from './routes/participantRoutes'
 import { errorHandler } from './middlewares/errorHandler'
 import CustomError from './middlewares/customError'
@@ -52,7 +51,6 @@ app.use('/forms', formRoute)
 app.use('/questions', questionRoute)
 app.use('/responses', responseRoute)
 app.use('/overview', overviewRoute)
-app.use('/applicants', applicantRoutes)
 
 app.all('*', (req, _res, next) => {
   const err = new CustomError(
