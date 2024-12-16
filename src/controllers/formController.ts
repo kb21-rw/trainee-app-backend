@@ -7,7 +7,7 @@ import {
   getFormsService,
   createFormService,
   updateFormService,
-  getSingleFormService,
+  getFormService,
   deleteFormService,
 } from "../services/formService";
 import { Types } from "mongoose";
@@ -92,7 +92,7 @@ export const getSingleFormController = async (
     const { formId } = req.params;
     await mongodbIdValidation.validateAsync(formId);
 
-    const form = await getSingleFormService(formId);
+    const form = await getFormService({ _id: formId });
     return res.status(200).json(form);
   } catch (error) {
     return next(error);

@@ -3,6 +3,7 @@ import { FormType } from "../utils/types";
 import { IQuestion } from "./Question";
 
 export interface IForm extends Document {
+  _id: string;
   name: string;
   description: string;
   type: FormType;

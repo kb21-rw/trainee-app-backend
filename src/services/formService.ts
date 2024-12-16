@@ -3,7 +3,7 @@ import CustomError from "../middlewares/customError";
 import Form, { IForm } from "../models/Form";
 import Question from "../models/Question";
 import Response from "../models/Response";
-import { getFormQuery, getFormsQuery } from "../queries/formQueries";
+import { getFormsQuery } from "../queries/formQueries";
 import {
   APPLICATION_FORM_ERROR,
   DUPLICATE_DOCUMENT,
@@ -125,13 +125,11 @@ export const createFormService = async (formData: CreateFormDto) => {
   return form;
 };
 
-export const getSingleFormService = async (formId: string) => {
-  if (!ObjectId.isValid(formId)) {
-    throw new CustomError(FORM_NOT_FOUND, "Form not found", 404);
-  }
+export const getFormService = async (query: object) => {
 
-  const form = await getFormQuery(formId);
-  if (form === null) {
+  const form = await Form.findOne<IForm>(query).populate("questionIds").exec();
+
+  if (!form) {
     throw new CustomError(FORM_NOT_FOUND, "Form not found", 404);
   }
 

@@ -23,7 +23,7 @@ export interface ICohort extends Document {
   coaches: IUser["_id"][];
   forms: IForm["_id"][];
   applicationForm: {
-    id: IForm["_id"];
+    id: IForm["_id"] | null;
     startDate: Date;
     endDate: Date;
     stages: IStage[];

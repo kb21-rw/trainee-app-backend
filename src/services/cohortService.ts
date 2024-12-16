@@ -2,11 +2,7 @@ import CustomError from "../middlewares/customError";
 import Cohort, { ICohort } from "../models/Cohort";
 import Form, { IForm } from "../models/Form";
 import { getCohortsQuery } from "../queries/cohortQueries";
-import {
-  COHORT_NOT_FOUND,
-  FORM_NOT_FOUND,
-  NOT_ALLOWED,
-} from "../utils/errorCodes";
+import { COHORT_NOT_FOUND, FORM_NOT_FOUND } from "../utils/errorCodes";
 import {
   CreateCohortDto,
   Decision,
@@ -17,8 +13,6 @@ import {
 } from "../utils/types";
 import {
   acceptUserHandler,
-  getApplicationForm,
-  getCurrentCohort,
   rejectUserHandler,
   updateStagesHandler,
 } from "../utils/helpers/cohort";
@@ -27,6 +21,7 @@ import { getCompleteForm } from "../utils/helpers/forms";
 import { getUserFormResponses } from "../utils/helpers/response";
 import { getUserService } from "./userService";
 import { getCohortOverviewQuery } from "../queries/cohortQueries";
+import { getFormService } from "./formService";
 
 export const getCohortService = async (query: object) => {
   const cohort = await Cohort.findOne<ICohort>(query);
@@ -79,10 +74,10 @@ export const updateCohortService = async (
 };
 
 export const getApplicationFormService = async () => {
-  const currentCohort = await getCurrentCohort();
+  const currentCohort = await getCohortService({ isActive: true });
 
   if (!currentCohort.applicationForm.id) {
-    throw new CustomError(NOT_ALLOWED, "Applications aren't open yet", 401);
+    return null;
   }
 
   const applicationForm = await Form.findById<IForm>(
@@ -105,9 +100,15 @@ export const getApplicationFormService = async () => {
 };
 
 export const getMyApplicationService = async (loggedInUserId: string) => {
-  const currentCohort = await getCurrentCohort();
+  const currentCohort = await getCohortService({ isActive: true });
 
-  const applicationForm = await getApplicationForm(currentCohort);
+  if (!currentCohort.applicationForm.id) {
+    return null;
+  }
+
+  const applicationForm = await getFormService({
+    _id: currentCohort.applicationForm.id,
+  });
 
   const completeForm = await getUserFormResponses(
     applicationForm,
@@ -125,7 +126,7 @@ export const getMyApplicationService = async (loggedInUserId: string) => {
 
 export const decisionService = async (body: DecisionDto) => {
   const { userId, decision, feedback } = body;
-  const currentCohort = await getCurrentCohort();
+  const currentCohort = await getCohortService({ isActive: true });
   const user = await getUserService({ _id: userId });
 
   if (decision === Decision.Accepted) {

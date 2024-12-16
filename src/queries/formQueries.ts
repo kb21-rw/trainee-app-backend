@@ -1,5 +1,4 @@
 import Cohort from "../models/Cohort";
-import Form from "../models/Form";
 import { GetCohortDto } from "../utils/types";
 
 export const getFormsQuery = async (
@@ -74,9 +73,4 @@ export const getFormsQuery = async (
     },
   ]);
   return cohorts[0];
-};
-
-export const getFormQuery = async (formId: string) => {
-  const forms: any = await Form.findById(formId).populate("questionIds").exec();
-  return forms;
 };

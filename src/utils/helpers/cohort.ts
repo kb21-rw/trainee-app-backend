@@ -4,13 +4,11 @@ import Cohort, { ICohort, IParticipant } from "../../models/Cohort";
 import {
   COHORT_NOT_FOUND,
   DUPLICATE_DOCUMENT,
-  FORM_NOT_FOUND,
   NOT_ALLOWED,
   USER_NOT_FOUND,
 } from "../errorCodes";
 import { IStage, Role } from "../types";
 import { SetOptional } from "type-fest";
-import Form, { IForm } from "../../models/Form";
 import { IUser } from "../../models/User";
 
 export const getCurrentCohort = async () => {
@@ -21,26 +19,6 @@ export const getCurrentCohort = async () => {
   }
 
   return currentCohort;
-};
-
-export const getApplicationForm = async (currentCohort: ICohort) => {
-  if (!currentCohort.applicationForm.id) {
-    throw new CustomError(NOT_ALLOWED, "Applications aren't open yet", 404);
-  }
-
-  const applicationForm = await Form.findById<IForm>(
-    currentCohort.applicationForm.id
-  );
-
-  if (!applicationForm) {
-    throw new CustomError(
-      FORM_NOT_FOUND,
-      "Something wrong, our team is trying to fix it",
-      500
-    );
-  }
-
-  return applicationForm;
 };
 
 export const updateStagesHandler = (
@@ -200,11 +178,7 @@ export const indexOfParticipant = (userId: string, users: IParticipant[]) => {
   return userIndex;
 };
 
-export const isUserInCohort = (
-  cohort: ICohort,
-  userId: string,
-  role: Role
-) => {
+export const isUserInCohort = (cohort: ICohort, userId: string, role: Role) => {
   if (role === Role.Applicant) {
     return (
       cohort.applicants.find(
