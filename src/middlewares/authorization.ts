@@ -1,4 +1,4 @@
-import { Response } from "express";
+import { NextFunction, Response } from "express";
 import { Role } from "../utils/types";
 
 export const isAdmin = (req: any, res: Response, next: () => void) => {
@@ -46,4 +46,20 @@ export const isProspect = (req: any, res: Response, next: () => void) => {
   }
 
   next();
+};
+
+export const isAuthorized = (roles: Role[]) => {
+  return (req: any, res: Response, next: NextFunction) => {
+    const { role } = req.user;
+    if (!roles.includes(role)) {
+      const pluralizedRoles = roles.map(
+        (role) => `${role.toLocaleLowerCase()}s`
+      );
+      return res
+        .status(401)
+        .json({ message: `Only ${pluralizedRoles.join(",")} are allowed` });
+    }
+
+    next();
+  };
 };

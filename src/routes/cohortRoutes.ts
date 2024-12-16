@@ -3,7 +3,7 @@ import { verifyJWT } from "../middlewares/authenticate";
 import {
   isAdmin,
   isAdminOrCoach,
-  isProspect,
+  isAuthorized,
 } from "../middlewares/authorization";
 import {
   createCohortController,
@@ -15,6 +15,7 @@ import {
   getMyApplicationController,
   updateCohortController,
 } from "../controllers/cohortControllers";
+import { Role } from "../utils/types";
 
 const router = Router();
 
@@ -22,7 +23,7 @@ router.get("/application", verifyJWT, isAdmin, getApplicationFormController);
 router.get(
   "/my-application",
   verifyJWT,
-  isProspect,
+  isAuthorized([Role.Prospect, Role.Applicant]),
   getMyApplicationController
 );
 router.get("/", verifyJWT, isAdmin, getCohortsController);
