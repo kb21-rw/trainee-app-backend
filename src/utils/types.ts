@@ -129,3 +129,7 @@ export interface RegisterUserDto {
   email: string;
   role: Exclude<Role, Role.Applicant | Role.Trainee>;
 }
+
+export interface AddApplicantsDto {
+  applicantIds: string[];
+}

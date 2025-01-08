@@ -6,6 +6,7 @@ import {
   isAuthorized,
 } from "../middlewares/authorization";
 import {
+  addApplicantsController,
   createCohortController,
   decisionController,
   getApplicationFormController,
@@ -33,6 +34,7 @@ router.get("/:cohortId", verifyJWT, isAdmin, getCohortController);
 router.post("/", verifyJWT, isAdmin, createCohortController);
 
 router.patch("/decision", verifyJWT, isAdmin, decisionController);
+router.patch("/add-applicants", verifyJWT, isAdmin, addApplicantsController);
 router.patch("/:cohortId", verifyJWT, isAdmin, updateCohortController);
 
 export default router;

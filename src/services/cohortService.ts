@@ -2,8 +2,13 @@ import CustomError from "../middlewares/customError";
 import Cohort, { ICohort } from "../models/Cohort";
 import Form, { IForm } from "../models/Form";
 import { getCohortsQuery } from "../queries/cohortQueries";
-import { COHORT_NOT_FOUND, FORM_NOT_FOUND } from "../utils/errorCodes";
 import {
+  COHORT_NOT_FOUND,
+  FORM_NOT_FOUND,
+  NOT_ALLOWED,
+} from "../utils/errorCodes";
+import {
+  AddApplicantsDto,
   CreateCohortDto,
   Decision,
   DecisionDto,
@@ -19,9 +24,10 @@ import {
 import { createStagesHandler } from "../utils/helpers";
 import { getCompleteForm } from "../utils/helpers/forms";
 import { getUserFormResponses } from "../utils/helpers/response";
-import { getUserService } from "./userService";
+import { getUserService, getUsersService } from "./userService";
 import { getCohortOverviewQuery } from "../queries/cohortQueries";
 import { getFormService } from "./formService";
+import User from "../models/User";
 
 export const getCohortService = async (query: object) => {
   const cohort = await Cohort.findOne<ICohort>(query);
@@ -166,4 +172,37 @@ export const getCohortOverviewService = async ({
   });
 
   return cohortOverview;
+};
+
+export const addApplicantsService = async (body: AddApplicantsDto) => {
+  const { applicantIds } = body;
+  const currentCohort = await getCohortService({ isActive: true });
+  const users = await getUsersService({ _id: { $in: applicantIds } });
+
+  users.forEach((user) => {
+    if (user.role !== Role.Prospect) {
+      throw new CustomError(
+        NOT_ALLOWED,
+        "Only prospects can be added to a cohort",
+        403
+      );
+    }
+
+    currentCohort.applicants.push({
+      id: user._id,
+      passedStages: [],
+      droppedStage: {
+        id: currentCohort.applicationForm.stages[0].id,
+        isConfirmed: false,
+      },
+      feedbacks: [],
+    });
+  });
+
+  await currentCohort.save();
+
+  return await User.updateMany(
+    { _id: { $in: applicantIds } },
+    { role: Role.Applicant }
+  );
 };

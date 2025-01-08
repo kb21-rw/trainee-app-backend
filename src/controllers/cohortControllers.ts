@@ -1,10 +1,12 @@
 import { NextFunction, Request, Response } from "express";
 import {
+  addApplicantsSchema,
   createCohortValidation,
   decisionValidation,
   updateCohortValidation,
 } from "../validations/cohortValidation";
 import {
+  addApplicantsService,
   createCohortService,
   decisionService,
   getApplicationFormService,
@@ -113,6 +115,21 @@ export const decisionController = async (
     await decisionValidation.validateAsync(body);
     const decision = await decisionService(body);
     return res.status(201).send(decision);
+  } catch (error: any) {
+    next(error);
+  }
+};
+
+export const addApplicantsController = async (
+  req: Request,
+  res: Response,
+  next: NextFunction
+) => {
+  try {
+    const { body } = req;
+    await addApplicantsSchema.validateAsync(body);
+    await addApplicantsService(body);
+    return res.status(201).send("Successfully added applicants");
   } catch (error: any) {
     next(error);
   }

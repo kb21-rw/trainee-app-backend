@@ -14,7 +14,7 @@ export const getUserService = async (query: object) => {
 };
 
 export const getUsersService = async (search?: object) => {
-  return await User.find<IUser[]>(search ? search : {});
+  return await User.find<IUser>(search ? search : {});
 };
 
 export const updateUserService = async (
