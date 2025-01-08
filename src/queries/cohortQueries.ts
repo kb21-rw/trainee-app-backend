@@ -35,6 +35,14 @@ export const getCohortOverviewQuery = async ({
       },
     },
     {
+      $lookup: {
+        from: "users",
+        localField: "applicants.id",
+        foreignField: "_id",
+        as: "participantsInfo",
+      },
+    },
+    {
       $set: {
         forms: {
           $concatArrays: [
@@ -147,6 +155,9 @@ export const getCohortOverviewQuery = async ({
         },
         applicants: {
           $first: "$applicants",
+        },
+        participantsInfo: {
+          $first: "$participantsInfo",
         },
         trainees: {
           $first: "$trainees",
