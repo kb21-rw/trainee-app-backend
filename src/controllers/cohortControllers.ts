@@ -129,7 +129,7 @@ export const addApplicantsController = async (
     const { body } = req;
     await addApplicantsSchema.validateAsync(body);
     await addApplicantsService(body);
-    return res.status(201).send("Successfully added applicants");
+    return res.status(201).json("Successfully added applicants");
   } catch (error: any) {
     next(error);
   }

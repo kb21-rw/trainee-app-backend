@@ -131,5 +131,5 @@ export interface RegisterUserDto {
 }
 
 export interface AddApplicantsDto {
-  applicantIds: string[];
+  prospectIds: string[];
 }

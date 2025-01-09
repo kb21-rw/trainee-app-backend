@@ -39,7 +39,7 @@ export const decisionValidation = Joi.object({
 });
 
 export const addApplicantsSchema = Joi.object({
-  applicantIds: Joi.array()
+  prospectIds: Joi.array()
     .items(requiredMongodbIdValidation)
     .min(1)
     .message("Add at least 1 participant")

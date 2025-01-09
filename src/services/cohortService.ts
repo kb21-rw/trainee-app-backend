@@ -175,9 +175,9 @@ export const getCohortOverviewService = async ({
 };
 
 export const addApplicantsService = async (body: AddApplicantsDto) => {
-  const { applicantIds } = body;
+  const { prospectIds } = body;
   const currentCohort = await getCohortService({ isActive: true });
-  const users = await getUsersService({ _id: { $in: applicantIds } });
+  const users = await getUsersService({ _id: { $in: prospectIds } });
 
   users.forEach((user) => {
     if (user.role !== Role.Prospect) {
@@ -202,7 +202,7 @@ export const addApplicantsService = async (body: AddApplicantsDto) => {
   await currentCohort.save();
 
   return await User.updateMany(
-    { _id: { $in: applicantIds } },
+    { _id: { $in: prospectIds } },
     { role: Role.Applicant }
   );
 };
