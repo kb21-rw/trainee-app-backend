@@ -179,6 +179,10 @@ export const addApplicantsService = async (body: AddApplicantsDto) => {
   const currentCohort = await getCohortService({ isActive: true });
   const users = await getUsersService({ _id: { $in: prospectIds } });
 
+  if (!currentCohort.applicationForm.id) {
+    throw new CustomError(FORM_NOT_FOUND, "Application form not found", 404);
+  }
+
   users.forEach((user) => {
     if (user.role !== Role.Prospect) {
       throw new CustomError(
