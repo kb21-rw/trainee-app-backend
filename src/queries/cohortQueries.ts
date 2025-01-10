@@ -208,7 +208,19 @@ export const getCohortOverviewQuery = async ({
                       input: "$questions",
                       as: "question",
                       cond: {
-                        $eq: ["$$question.formId", "$$form._id"],
+                        $and: [
+                          {
+                            $eq: ["$$question.formId", "$$form._id"],
+                          },
+                          {
+                            $ne: [
+                              {
+                                $ifNull: ["$$question._id", null],
+                              },
+                              null,
+                            ],
+                          },
+                        ],
                       },
                     },
                   },
