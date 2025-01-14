@@ -10,7 +10,7 @@ export interface IUser extends Document {
   applied: boolean
   password: string
   role: Role
-  coach: null | string
+  coach?: string
   googleId: null | string
 }
 

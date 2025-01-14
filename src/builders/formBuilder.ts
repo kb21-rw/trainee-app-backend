@@ -1,4 +1,5 @@
-import { IForm } from "../models/Form"
+import { IForm as BaseIForm } from "../models/Form"
+type IForm = Partial<BaseIForm> & { _id: string }
 
 export class Form {
   public readonly _id: string
@@ -6,7 +7,7 @@ export class Form {
   public readonly description?: string
   public readonly questionIds?: string[]
 
-  public constructor(data: Partial<IForm>) {
+  public constructor(data: IForm) {
     this._id = data._id
     this.name = data.name
     this.description = data.description
@@ -15,18 +16,18 @@ export class Form {
 }
 
 export class FormBuilder {
-  private readonly properties: Partial<IForm> = {
+  private readonly properties: IForm = {
     _id: "66203fa2a3465a4a588d12f1",
     name: "Test form",
     description: "form description",
     questionIds: [],
   }
 
-  public static from(properties: Partial<IForm>): FormBuilder {
+  public static from(properties: IForm): FormBuilder {
     return new FormBuilder().with(properties)
   }
 
-  public with(properties: Partial<IForm>): this {
+  public with(properties: IForm): this {
     let key: keyof IForm
 
     for (key in properties) {
@@ -62,7 +63,7 @@ export class FormBuilder {
     return this
   }
 
-  public build(): Partial<IForm> {
+  public build(): IForm {
     return new Form({
       ...this.properties,
     })
