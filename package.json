@@ -9,6 +9,7 @@
     "dev": "nodemon src/server.ts",
     "format": "prettier --write \"src/**/*.ts\"",
     "lint-staged": "lint-staged",
+    "prepare": "husky install",
     "lint-fix": "npx eslint --fix",
     "test": "npm run test:jest --detectOpenHandles",
     "test:jest": "jest --coverage",
@@ -36,6 +37,8 @@
     "yamljs": "^0.3.0"
   },
   "devDependencies": {
+    "@commitlint/cli": "^19.6.1",
+    "@commitlint/config-conventional": "^19.6.0",
     "@types/bcryptjs": "^2.4.4",
     "@types/cors": "^2.8.14",
     "@types/jest": "^29.5.12",
@@ -56,8 +59,8 @@
   },
   "lint-staged": {
     "*.ts": [
-      "prettier --write",
-      "npm run lint-fix"
+      "npm run lint-fix",
+      "prettier --write"
     ]
   }
 }
