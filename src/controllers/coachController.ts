@@ -18,7 +18,7 @@ export const getCoachesController = async (
     const coaches = await getCoachesService(cohortId)
     return res.status(200).json(coaches)
   } catch (error) {
-    next(error)
+    return next(error)
   }
 }
 
@@ -33,7 +33,7 @@ export const updateCoachOrAdmin = async (
     const user = await updateCoachOrAdminService(userId, req.body)
     return res.status(200).send(user)
   } catch (error) {
-    next(error)
+    return next(error)
   }
 }
 
@@ -48,6 +48,6 @@ export const addCoachToCohortController = async (
     const coach = await addCoachToCohortService(coachId)
     return res.status(200).send(coach)
   } catch (error) {
-    next(error)
+    return next(error)
   }
 }

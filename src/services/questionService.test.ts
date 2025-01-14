@@ -19,7 +19,8 @@ jest.mock("../models/Response")
 
 describe("createQuestionService", () => {
   test("Should throw if related form is not found", async () => {
-    ;(Form.findById as jest.Mock).mockReturnValue(null)
+    const findById = Form.findById as jest.Mock
+    findById.mockReturnValue(null)
     const question = new QuestionBuilder().build()
 
     await expect(
@@ -40,16 +41,16 @@ describe("createQuestionService", () => {
     Object.setPrototypeOf(form, {
       save: jest.fn(),
     })
-
-    ;(Form.findById as jest.Mock).mockReturnValue(form)
-    ;(Question.create as jest.Mock).mockReturnValue({
-      ...question,
-      save: jest.fn(),
-    })
-    ;(User.find as jest.Mock).mockReturnValue([trainee])
-    ;(Response.prototype.save as jest.Mock).mockReturnValue(null)
-    ;(Question.prototype.save as jest.Mock).mockReturnValue(null)
-    ;(Form.prototype.save as jest.Mock).mockReturnValue(null)
+    ;(Form.findById as jest.Mock)
+      .mockReturnValue(form)(Question.create as jest.Mock)
+      .mockReturnValue({
+        ...question,
+        save: jest.fn(),
+      })(User.find as jest.Mock)
+      .mockReturnValue([trainee])(Response.prototype.save as jest.Mock)
+      .mockReturnValue(null)(Question.prototype.save as jest.Mock)
+      .mockReturnValue(null)(Form.prototype.save as jest.Mock)
+      .mockReturnValue(null)
 
     await expect(
       createQuestionService("66203fa2a3465a4a588d126e", {
@@ -79,7 +80,8 @@ describe("getAllQuestionsService", () => {
 
 describe("updateQuestionService", () => {
   test("Should throw if the question is not found", async () => {
-    ;(Question.findById as jest.Mock).mockReturnValue(null)
+    const findById = Question.findById as jest.Mock
+    findById.mockReturnValue(null)
 
     await expect(updateQuestionService("", {})).rejects.toThrow(
       "Question not found",
@@ -98,7 +100,6 @@ describe("updateQuestionService", () => {
         return this
       },
     })
-
     ;(Question.findById as jest.Mock).mockReturnValue(question)
 
     await expect(

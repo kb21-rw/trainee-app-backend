@@ -15,6 +15,6 @@ export const updateParticipantController = async (
     const participant = await updateParticipantService(participantId, req.body)
     return res.status(200).send(participant)
   } catch (error) {
-    next(error)
+    return next(error)
   }
 }

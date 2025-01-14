@@ -29,7 +29,7 @@ export const createCohortController = async (
     const createdCohort = await createCohortService(req.body)
     return res.status(201).json(createdCohort)
   } catch (error) {
-    next(error)
+    return next(error)
   }
 }
 
@@ -116,7 +116,7 @@ export const decisionController = async (
     const decision = await decisionService(body)
     return res.status(201).send(decision)
   } catch (error: any) {
-    next(error)
+    return next(error)
   }
 }
 
@@ -131,7 +131,7 @@ export const addApplicantsController = async (
     await addApplicantsService(body)
     return res.status(201).json("Successfully added applicants")
   } catch (error: any) {
-    next(error)
+    return next(error)
   }
 }
 
@@ -151,6 +151,6 @@ export const getCohortOverviewController = async (
     })
     return res.status(200).json(overview)
   } catch (error) {
-    next(error)
+    return next(error)
   }
 }

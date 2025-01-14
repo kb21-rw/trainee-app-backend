@@ -1,5 +1,4 @@
-/* eslint-disable @typescript-eslint/no-unused-vars */
-import { Request, Response, NextFunction } from "express"
+import { Request, Response } from "express"
 
 import CustomError from "./customError"
 export interface ErrorObject {
@@ -59,8 +58,8 @@ export const errorHandler = (
   error: ErrorObject,
   req: Request,
   res: Response,
-  next: NextFunction,
 ) => {
+  // eslint-disable-next-line no-console
   console.log(error)
   switch (true) {
     case error.name === "ValidationError":
@@ -72,7 +71,7 @@ export const errorHandler = (
     case error.code === 11000:
       handleDuplicateError(error, res)
       break
-    case error.kind == "ObjectId":
+    case error.kind === "ObjectId":
       handleObjectIdError(error, res)
       break
     case error instanceof CustomError:

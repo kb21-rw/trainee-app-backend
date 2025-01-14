@@ -15,7 +15,7 @@ export const getOverview = async (
     const overview = await getAllTraineesOverviewService(searchString)
     return res.status(200).json(overview)
   } catch (error) {
-    next(error)
+    return next(error)
   }
 }
 
@@ -35,6 +35,6 @@ export const getMyTraineeOverview = async (
 
     return res.status(200).json(myTraineesOverview)
   } catch (error) {
-    next(error)
+    return next(error)
   }
 }

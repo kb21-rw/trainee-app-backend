@@ -28,6 +28,7 @@ const app = express()
 mongoose.connect(mongodb_url)
 mongoose.connection.once("open", () => {
   app.listen(PORT, () => {
+    // eslint-disable-next-line no-console
     console.log(`The app is running on port ${PORT}`)
   })
 })

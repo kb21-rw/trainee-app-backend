@@ -22,7 +22,7 @@ export const createCoachResponse = async (
     )
     return res.status(201).json(createdResponse)
   } catch (error) {
-    next(error)
+    return next(error)
   }
 }
 
@@ -41,6 +41,6 @@ export const createApplicantResponse = async (
     )
     return res.status(201).json(createdResponse)
   } catch (error) {
-    next(error)
+    return next(error)
   }
 }

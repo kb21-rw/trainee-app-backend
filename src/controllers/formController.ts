@@ -23,7 +23,7 @@ export const createFormController = async (
     const createdForm = await createFormService(req.body)
     return res.status(201).json(createdForm)
   } catch (error) {
-    next(error)
+    return next(error)
   }
 }
 
@@ -48,7 +48,7 @@ export const getFormsController = async (
     const forms = await getFormsService(searchString, cohort)
     return res.status(200).json(forms)
   } catch (error) {
-    next(error)
+    return next(error)
   }
 }
 

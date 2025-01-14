@@ -17,7 +17,7 @@ export const getProfile = async (
     const user = await getUserService({ _id: userId })
     return res.status(200).send(user)
   } catch (error) {
-    next(error)
+    return next(error)
   }
 }
 
@@ -32,7 +32,7 @@ export const getUsersController = async (
     const users = await getUsersService(search)
     return res.status(200).send(users)
   } catch (error) {
-    next(error)
+    return next(error)
   }
 }
 
@@ -48,7 +48,7 @@ export const updateProfile = async (
     const user = await updateUserService(userId, req.body)
     return res.status(200).send(user)
   } catch (error) {
-    next(error)
+    return next(error)
   }
 }
 
@@ -62,6 +62,6 @@ export const deleteUser = async (
     await deleteUserService(userId)
     return res.status(200).send("User deleted successfully")
   } catch (error) {
-    next(error)
+    return next(error)
   }
 }

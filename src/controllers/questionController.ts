@@ -25,7 +25,7 @@ export const createQuestion = async (
     const createdQuestion = await createQuestionService(formId, req.body)
     return res.status(201).json(createdQuestion)
   } catch (error) {
-    next(error)
+    return next(error)
   }
 }
 
@@ -40,7 +40,7 @@ export const getAllQuestions = async (
     const questions = await getAllQuestionsService(searchString, typeQuery)
     return res.status(200).json(questions)
   } catch (error) {
-    next(error)
+    return next(error)
   }
 }
 
@@ -55,7 +55,7 @@ export const updateQuestion = async (
     const updatedQuestion = await updateQuestionService(questionId, req.body)
     return res.status(200).json(updatedQuestion)
   } catch (error) {
-    next(error)
+    return next(error)
   }
 }
 
@@ -73,6 +73,6 @@ export const deleteQuestion = async (
     await deleteQuestionService(questionId)
     return res.status(204).json({ message: "Question deleted successfully" })
   } catch (error) {
-    next(error)
+    return next(error)
   }
 }

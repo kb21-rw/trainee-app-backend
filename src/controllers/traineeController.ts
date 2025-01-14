@@ -22,7 +22,7 @@ export const getTrainees = async (
     })
     return res.status(200).json(trainees)
   } catch (error) {
-    next(error)
+    return next(error)
   }
 }
 
@@ -43,7 +43,7 @@ export const getTraineesForCoach = async (
     })
     return res.status(200).json(trainees)
   } catch (error) {
-    next(error)
+    return next(error)
   }
 }
 
@@ -58,6 +58,6 @@ export const updateTrainee = async (
     const user = await updateTraineeService(userId, req.body)
     return res.status(200).send(user)
   } catch (error) {
-    next(error)
+    return next(error)
   }
 }

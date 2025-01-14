@@ -21,7 +21,7 @@ export const register = async (req: any, res: Response, next: NextFunction) => {
     const newUser = await registerService(user, body)
     return res.status(201).send(newUser)
   } catch (error: any) {
-    next(error)
+    return next(error)
   }
 }
 
@@ -36,7 +36,7 @@ export const applicantRegister = async (
     const newUser = await applicantRegisterService(body)
     return res.status(201).send({ userId: newUser.userId })
   } catch (error: any) {
-    next(error)
+    return next(error)
   }
 }
 
@@ -51,7 +51,7 @@ export const verifyApplicant = async (
       .status(201)
       .send({ userId: verifiedUser.userId, verified: verifiedUser.verified })
   } catch (error: any) {
-    next(error)
+    return next(error)
   }
 }
 
@@ -71,7 +71,7 @@ export const login = async (
       })
       .json({ accessToken })
   } catch (error) {
-    next(error)
+    return next(error)
   }
 }
 
@@ -86,6 +86,6 @@ export const resetPassword = async (
     const userId = await resetPasswordService(req.body)
     return res.status(200).json({ userId })
   } catch (error: any) {
-    next(error)
+    return next(error)
   }
 }
