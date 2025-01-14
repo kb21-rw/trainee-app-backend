@@ -1,13 +1,13 @@
-import { Document, Schema, model } from "mongoose";
-import { FormType } from "../utils/types";
-import { IQuestion } from "./Question";
+import { Document, Schema, model } from "mongoose"
+import { FormType } from "../utils/types"
+import { IQuestion } from "./Question"
 
 export interface IForm extends Document {
-  _id: string;
-  name: string;
-  description: string;
-  type: FormType;
-  questionIds: IQuestion["_id"][];
+  _id: string
+  name: string
+  description: string
+  type: FormType
+  questionIds: IQuestion["_id"][]
 }
 
 const FormSchema = new Schema(
@@ -29,8 +29,8 @@ const FormSchema = new Schema(
       required: true,
     },
   },
-  { timestamps: {} }
-);
-FormSchema.index({ name: "text", description: "text", type: "text" });
+  { timestamps: {} },
+)
+FormSchema.index({ name: "text", description: "text", type: "text" })
 
-export default model("Form", FormSchema);
+export default model("Form", FormSchema)

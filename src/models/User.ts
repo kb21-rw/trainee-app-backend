@@ -1,17 +1,17 @@
-import { Document, Schema, model } from "mongoose";
-import { Role } from "../utils/types";
+import { Document, Schema, model } from "mongoose"
+import { Role } from "../utils/types"
 
 export interface IUser extends Document {
-  id: string;
-  userId: string;
-  name: string;
-  email: string;
-  verified: boolean;
-  applied: boolean;
-  password: string;
-  role: Role;
-  coach: null | string;
-  googleId: null | string;
+  id: string
+  userId: string
+  name: string
+  email: string
+  verified: boolean
+  applied: boolean
+  password: string
+  role: Role
+  coach: null | string
+  googleId: null | string
 }
 
 const UserSchema = new Schema(
@@ -55,8 +55,8 @@ const UserSchema = new Schema(
       default: null,
     },
   },
-  { timestamps: {} }
-);
-UserSchema.index({ name: "text" });
+  { timestamps: {} },
+)
+UserSchema.index({ name: "text" })
 
-export default model<IUser>("User", UserSchema);
+export default model<IUser>("User", UserSchema)

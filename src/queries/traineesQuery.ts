@@ -1,6 +1,6 @@
-import { Types } from "mongoose";
-import User from "../models/User";
-import { Role } from "../utils/types";
+import { Types } from "mongoose"
+import User from "../models/User"
+import { Role } from "../utils/types"
 
 export const getTraineesQuery = async (
   searchString: string,
@@ -56,9 +56,9 @@ export const getTraineesQuery = async (
     {
       $limit: traineesPerPage,
     },
-  ]);
-  return trainees;
-};
+  ])
+  return trainees
+}
 
 export const getTraineesForCoachQuery = async (
   coachId: Types.ObjectId,
@@ -116,6 +116,6 @@ export const getTraineesForCoachQuery = async (
     {
       $limit: traineesPerPage,
     },
-  ]);
-  return trainees;
-};
+  ])
+  return trainees
+}

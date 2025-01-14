@@ -1,10 +1,10 @@
-import { IForm } from "../../models/Form";
+import { IForm } from "../../models/Form"
 
 export const getCompleteForm = async (form: IForm) => {
   const { _id, name, description, type, questionIds } = await form.populate({
     path: "questionIds",
     select: "title type options",
-  });
+  })
 
   const questions = questionIds.map(
     ({ id, prompt, type, required, options }) => ({
@@ -13,8 +13,8 @@ export const getCompleteForm = async (form: IForm) => {
       type,
       required,
       options,
-    })
-  );
+    }),
+  )
 
-  return { _id, name, description, type, questions };
-};
+  return { _id, name, description, type, questions }
+}

@@ -1,5 +1,5 @@
-import Joi from "joi";
-import { QuestionType } from "../utils/types";
+import Joi from "joi"
+import { QuestionType } from "../utils/types"
 
 export const createQuestionValidation = Joi.object({
   prompt: Joi.string().min(3).max(100).required(),
@@ -7,7 +7,7 @@ export const createQuestionValidation = Joi.object({
     .valid(
       QuestionType.Text,
       QuestionType.SingleSelect,
-      QuestionType.MultiSelect
+      QuestionType.MultiSelect,
     )
     .required(),
   required: Joi.boolean(),
@@ -18,14 +18,14 @@ export const createQuestionValidation = Joi.object({
       then: Joi.array().items(Joi.string()).min(1).required(),
       otherwise: Joi.forbidden(),
     }),
-});
+})
 
 export const updateQuestionValidation = Joi.object({
   prompt: Joi.string().min(3).max(100),
   type: Joi.string().valid(
     QuestionType.Text,
     QuestionType.SingleSelect,
-    QuestionType.MultiSelect
+    QuestionType.MultiSelect,
   ),
   options: Joi.array()
     .items(Joi.string())
@@ -34,4 +34,4 @@ export const updateQuestionValidation = Joi.object({
       then: Joi.array().items(Joi.string()).min(1).required(),
       otherwise: Joi.array().items(Joi.string()).optional(),
     }),
-});
+})

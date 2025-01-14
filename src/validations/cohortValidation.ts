@@ -1,6 +1,6 @@
-import Joi from "joi";
-import { Decision } from "../utils/types";
-import { requiredMongodbIdValidation } from "./generalValidation";
+import Joi from "joi"
+import { Decision } from "../utils/types"
+import { requiredMongodbIdValidation } from "./generalValidation"
 
 export const createCohortValidation = Joi.object({
   name: Joi.string().min(3).max(100).required(),
@@ -10,7 +10,7 @@ export const createCohortValidation = Joi.object({
     .min(1)
     .message("Add at least 1 stage"),
   trainingStartDate: Joi.date().min("now").required(),
-});
+})
 
 export const updateCohortValidation = Joi.object({
   name: Joi.string().min(3).max(100),
@@ -24,9 +24,9 @@ export const updateCohortValidation = Joi.object({
         .optional(),
       name: Joi.string().min(1),
       description: Joi.string(),
-    })
+    }),
   ),
-});
+})
 
 export const decisionValidation = Joi.object({
   userId: Joi.string()
@@ -36,7 +36,7 @@ export const decisionValidation = Joi.object({
     .required(),
   decision: Joi.string().valid(Decision.Accepted, Decision.Rejected).required(),
   feedback: Joi.string().min(0).required(),
-});
+})
 
 export const addApplicantsSchema = Joi.object({
   prospectIds: Joi.array()
@@ -44,4 +44,4 @@ export const addApplicantsSchema = Joi.object({
     .min(1)
     .message("Add at least 1 participant")
     .required(),
-});
+})

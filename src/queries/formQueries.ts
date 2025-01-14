@@ -1,9 +1,9 @@
-import Cohort from "../models/Cohort";
-import { GetCohortDto } from "../utils/types";
+import Cohort from "../models/Cohort"
+import { GetCohortDto } from "../utils/types"
 
 export const getFormsQuery = async (
   searchString: string,
-  cohort: GetCohortDto
+  cohort: GetCohortDto,
 ) => {
   const cohorts = await Cohort.aggregate([
     {
@@ -71,6 +71,6 @@ export const getFormsQuery = async (
         },
       },
     },
-  ]);
-  return cohorts[0];
-};
+  ])
+  return cohorts[0]
+}

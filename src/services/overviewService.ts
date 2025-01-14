@@ -1,16 +1,16 @@
-import { getOverviewQuery } from "../queries/overviewQuery";
+import { getOverviewQuery } from "../queries/overviewQuery"
 
 export const getAllTraineesOverviewService = async (searchString: string) => {
-  const overview = await getOverviewQuery(searchString);
+  const overview = await getOverviewQuery(searchString)
 
-  return overview;
-};
+  return overview
+}
 
 export const getMyTraineesOverviewService = async (
   searchString: string,
-  coachId: string
+  coachId: string,
 ) => {
-  const overview = await getOverviewQuery(searchString, coachId);
+  const overview = await getOverviewQuery(searchString, coachId)
 
-  return overview;
-};
+  return overview
+}

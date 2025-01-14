@@ -1,35 +1,35 @@
-import { Document, Schema, model } from "mongoose";
-import { IForm } from "./Form";
-import { IUser } from "./User";
-import { IStage } from "../utils/types";
+import { Document, Schema, model } from "mongoose"
+import { IForm } from "./Form"
+import { IUser } from "./User"
+import { IStage } from "../utils/types"
 
 export interface IParticipant {
-  id: IUser["_id"];
-  passedStages: string[];
+  id: IUser["_id"]
+  passedStages: string[]
   droppedStage: {
-    id: string;
-    isConfirmed: boolean;
-  };
-  feedbacks: { stageId: string; text: string }[];
+    id: string
+    isConfirmed: boolean
+  }
+  feedbacks: { stageId: string; text: string }[]
 }
 
 export interface ICohort extends Document {
-  id: string;
-  name: string;
-  description: string;
-  isActive: boolean;
-  applicants: IParticipant[];
-  trainees: IParticipant[];
-  coaches: IUser["_id"][];
-  forms: IForm["_id"][];
+  id: string
+  name: string
+  description: string
+  isActive: boolean
+  applicants: IParticipant[]
+  trainees: IParticipant[]
+  coaches: IUser["_id"][]
+  forms: IForm["_id"][]
   applicationForm: {
-    id: IForm["_id"] | null;
-    startDate: Date;
-    endDate: Date;
-    stages: IStage[];
-  };
-  stages: IStage[];
-  trainingStartDate: Date;
+    id: IForm["_id"] | null
+    startDate: Date
+    endDate: Date
+    stages: IStage[]
+  }
+  stages: IStage[]
+  trainingStartDate: Date
 }
 
 const CohortSchema = new Schema(
@@ -136,9 +136,9 @@ const CohortSchema = new Schema(
       ],
     },
   },
-  { timestamps: {} }
-);
+  { timestamps: {} },
+)
 
-CohortSchema.index({ name: "text", description: "text" });
+CohortSchema.index({ name: "text", description: "text" })
 
-export default model<ICohort>("Cohort", CohortSchema);
+export default model<ICohort>("Cohort", CohortSchema)

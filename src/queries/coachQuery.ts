@@ -1,8 +1,8 @@
-import { ObjectId } from "mongodb";
-import Cohort from "../models/Cohort";
+import { ObjectId } from "mongodb"
+import Cohort from "../models/Cohort"
 
 export const getCoachesQuery = async (
-  cohortId: { _id: ObjectId } | { isActive: boolean } = { isActive: true }
+  cohortId: { _id: ObjectId } | { isActive: boolean } = { isActive: true },
 ) => {
   const cohort = await Cohort.aggregate([
     {
@@ -24,7 +24,7 @@ export const getCoachesQuery = async (
         coaches: 1,
       },
     },
-  ]);
+  ])
 
-  return cohort[0];
-};
+  return cohort[0]
+}

@@ -1,6 +1,6 @@
-import Cohort, { ICohort } from "../models/Cohort";
-import { FormType, ICohortOverviewRequest } from "../utils/types";
-import { ObjectId } from "mongodb";
+import Cohort, { ICohort } from "../models/Cohort"
+import { FormType, ICohortOverviewRequest } from "../utils/types"
+import { ObjectId } from "mongodb"
 
 export const getCohortsQuery = async (searchString: string) => {
   const cohorts: ICohort[] = await Cohort.aggregate([
@@ -20,9 +20,9 @@ export const getCohortsQuery = async (searchString: string) => {
         forms: { $size: "$forms" },
       },
     },
-  ]);
-  return cohorts;
-};
+  ])
+  return cohorts
+}
 
 export const getCohortOverviewQuery = async ({
   cohortId,
@@ -305,6 +305,6 @@ export const getCohortOverviewQuery = async ({
         responses: 0,
       },
     },
-  ]);
-  return overview[0];
-};
+  ])
+  return overview[0]
+}

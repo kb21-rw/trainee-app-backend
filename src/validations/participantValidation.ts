@@ -1,6 +1,6 @@
-import Joi from "joi";
-import { mongodbIdValidation } from "./generalValidation";
-import { Role } from "../utils/types";
+import Joi from "joi"
+import { mongodbIdValidation } from "./generalValidation"
+import { Role } from "../utils/types"
 
 export const updateParticipantSchema = Joi.object({
   name: Joi.string().min(3).max(30).trim().optional(),
@@ -10,4 +10,4 @@ export const updateParticipantSchema = Joi.object({
   role: Joi.string()
     .valid(Role.Admin, Role.Coach, Role.Trainee, Role.Applicant)
     .optional(),
-});
+})

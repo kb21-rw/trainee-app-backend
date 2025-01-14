@@ -1,12 +1,12 @@
-import CustomError from "../middlewares/customError";
-import Cohort, { ICohort } from "../models/Cohort";
-import Form, { IForm } from "../models/Form";
-import { getCohortsQuery } from "../queries/cohortQueries";
+import CustomError from "../middlewares/customError"
+import Cohort, { ICohort } from "../models/Cohort"
+import Form, { IForm } from "../models/Form"
+import { getCohortsQuery } from "../queries/cohortQueries"
 import {
   COHORT_NOT_FOUND,
   FORM_NOT_FOUND,
   NOT_ALLOWED,
-} from "../utils/errorCodes";
+} from "../utils/errorCodes"
 import {
   AddApplicantsDto,
   CreateCohortDto,
@@ -15,125 +15,125 @@ import {
   ICohortOverviewRequest,
   Role,
   UpdateCohortDto,
-} from "../utils/types";
+} from "../utils/types"
 import {
   acceptUserHandler,
   rejectUserHandler,
   updateStagesHandler,
-} from "../utils/helpers/cohort";
-import { createStagesHandler } from "../utils/helpers";
-import { getCompleteForm } from "../utils/helpers/forms";
-import { getUserFormResponses } from "../utils/helpers/response";
-import { getUserService, getUsersService } from "./userService";
-import { getCohortOverviewQuery } from "../queries/cohortQueries";
-import { getFormService } from "./formService";
-import User from "../models/User";
+} from "../utils/helpers/cohort"
+import { createStagesHandler } from "../utils/helpers"
+import { getCompleteForm } from "../utils/helpers/forms"
+import { getUserFormResponses } from "../utils/helpers/response"
+import { getUserService, getUsersService } from "./userService"
+import { getCohortOverviewQuery } from "../queries/cohortQueries"
+import { getFormService } from "./formService"
+import User from "../models/User"
 
 export const getCohortService = async (query: object) => {
-  const cohort = await Cohort.findOne<ICohort>(query);
+  const cohort = await Cohort.findOne<ICohort>(query)
   if (!cohort) {
-    throw new CustomError(COHORT_NOT_FOUND, "Cohort not found", 404);
+    throw new CustomError(COHORT_NOT_FOUND, "Cohort not found", 404)
   }
 
-  return cohort;
-};
+  return cohort
+}
 
 export const getCohortsService = async (searchString: string) => {
-  return await getCohortsQuery(searchString);
-};
+  return await getCohortsQuery(searchString)
+}
 
 export const createCohortService = async (cohortData: CreateCohortDto) => {
-  await Cohort.updateOne({ isActive: true }, { isActive: false });
+  await Cohort.updateOne({ isActive: true }, { isActive: false })
 
   const newCohort = await Cohort.create({
     ...cohortData,
     stages: createStagesHandler(cohortData.stages),
-  });
+  })
 
-  return newCohort;
-};
+  return newCohort
+}
 
 export const updateCohortService = async (
   cohortId: string,
-  formData: UpdateCohortDto
+  formData: UpdateCohortDto,
 ) => {
-  const { name, description, stages } = formData;
+  const { name, description, stages } = formData
 
-  const cohort = await Cohort.findById(cohortId);
+  const cohort = await Cohort.findById(cohortId)
   if (!cohort) {
-    throw new CustomError(COHORT_NOT_FOUND, "Cohort not found", 404);
+    throw new CustomError(COHORT_NOT_FOUND, "Cohort not found", 404)
   }
 
   if (name) {
-    cohort.name = name;
+    cohort.name = name
   }
 
   if (description) {
-    cohort.description = description;
+    cohort.description = description
   }
 
   if (stages) {
-    cohort.stages = updateStagesHandler(cohort.stages, stages);
+    cohort.stages = updateStagesHandler(cohort.stages, stages)
   }
 
-  return await cohort.save();
-};
+  return await cohort.save()
+}
 
 export const getApplicationFormService = async () => {
-  const currentCohort = await getCohortService({ isActive: true });
+  const currentCohort = await getCohortService({ isActive: true })
 
   if (!currentCohort.applicationForm.id) {
-    return null;
+    return null
   }
 
   const applicationForm = await Form.findById<IForm>(
-    currentCohort.applicationForm.id
-  );
+    currentCohort.applicationForm.id,
+  )
 
   if (!applicationForm) {
     throw new CustomError(
       FORM_NOT_FOUND,
       "Something wrong, our team is trying to fix it",
-      500
-    );
+      500,
+    )
   }
 
-  const { startDate, endDate, stages } = currentCohort.applicationForm;
+  const { startDate, endDate, stages } = currentCohort.applicationForm
 
-  const completeApplicationFrom = await getCompleteForm(applicationForm);
+  const completeApplicationFrom = await getCompleteForm(applicationForm)
 
-  return { ...completeApplicationFrom, startDate, endDate, stages };
-};
+  return { ...completeApplicationFrom, startDate, endDate, stages }
+}
 
 export const getMyApplicationService = async (loggedInUserId: string) => {
-  const currentCohort = await getCohortService({ isActive: true });
+  const currentCohort = await getCohortService({ isActive: true })
 
   if (!currentCohort.applicationForm.id) {
-    return null;
+    return null
   }
 
   const applicationForm = await getFormService({
     _id: currentCohort.applicationForm.id,
-  });
+  })
 
   const completeForm = await getUserFormResponses(
     applicationForm,
-    loggedInUserId
-  );
-  const { startDate, endDate } = currentCohort.applicationForm;
+    loggedInUserId,
+  )
+  const { startDate, endDate } = currentCohort.applicationForm
 
   return {
     ...completeForm,
     startDate,
     endDate,
     trainingStartDate: currentCohort.trainingStartDate,
-  };
-};
+  }
+}
 
 export const decisionService = async (body: DecisionDto) => {
-  const { userId, decision, feedback } = body;
-  const currentCohort = await getCohortService({ isActive: true });
-  const user = await getUserService({ _id: userId });
+  const { userId, decision, feedback } = body
+  const currentCohort = await getCohortService({ isActive: true })
+  const user = await getUserService({ _id: userId })
 
   if (decision === Decision.Accepted) {
     if (user.role === Role.Applicant) {
@@ -141,24 +141,24 @@ export const decisionService = async (body: DecisionDto) => {
         currentCohort,
         user,
         feedback,
-        "applicants"
-      );
+        "applicants",
+      )
     }
 
-    return await acceptUserHandler(currentCohort, user, feedback, "trainees");
+    return await acceptUserHandler(currentCohort, user, feedback, "trainees")
   } else {
     if (user.role === Role.Applicant) {
       return await rejectUserHandler(
         currentCohort,
         user,
         feedback,
-        "applicants"
-      );
+        "applicants",
+      )
     }
 
-    return await rejectUserHandler(currentCohort, user, feedback, "trainees");
+    return await rejectUserHandler(currentCohort, user, feedback, "trainees")
   }
-};
+}
 
 export const getCohortOverviewService = async ({
   cohortId,
@@ -169,18 +169,18 @@ export const getCohortOverviewService = async ({
     cohortId: cohortId ?? (await getCohortService({ isActive: true }))._id,
     overviewType,
     coachId,
-  });
+  })
 
-  return cohortOverview;
-};
+  return cohortOverview
+}
 
 export const addApplicantsService = async (body: AddApplicantsDto) => {
-  const { prospectIds } = body;
-  const currentCohort = await getCohortService({ isActive: true });
-  const users = await getUsersService({ _id: { $in: prospectIds } });
+  const { prospectIds } = body
+  const currentCohort = await getCohortService({ isActive: true })
+  const users = await getUsersService({ _id: { $in: prospectIds } })
 
   if (!currentCohort.applicationForm.id) {
-    throw new CustomError(FORM_NOT_FOUND, "Application form not found", 404);
+    throw new CustomError(FORM_NOT_FOUND, "Application form not found", 404)
   }
 
   users.forEach((user) => {
@@ -188,8 +188,8 @@ export const addApplicantsService = async (body: AddApplicantsDto) => {
       throw new CustomError(
         NOT_ALLOWED,
         "Only prospects can be added to a cohort",
-        403
-      );
+        403,
+      )
     }
 
     currentCohort.applicants.push({
@@ -200,13 +200,13 @@ export const addApplicantsService = async (body: AddApplicantsDto) => {
         isConfirmed: false,
       },
       feedbacks: [],
-    });
-  });
+    })
+  })
 
-  await currentCohort.save();
+  await currentCohort.save()
 
   return await User.updateMany(
     { _id: { $in: prospectIds } },
-    { role: Role.Applicant }
-  );
-};
+    { role: Role.Applicant },
+  )
+}
