@@ -29,10 +29,6 @@ export interface CreateApplicationFormDto {
   stages: Except<IStage, "id">[]
 }
 
-export type CreateFormDto =
-  | CreateApplicationFormDto
-  | CreateApplicantTraineeFormDto
-
 export interface CreateCohortDto {
   name: string
   description?: string
@@ -75,9 +71,7 @@ export interface CreateApplicationResponseDto {
   answer: string | string[]
 }
 
-export type IForm = CreateFormDto & MetaType
 export type IQuestion = CreateQuestionDto & MetaType
-export type IResponse = CreateResponseDto & MetaType
 
 export interface Search {
   searchString?: string

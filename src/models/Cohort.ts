@@ -22,12 +22,7 @@ export interface ICohort extends Document {
   trainees: IParticipant[]
   coaches: IUser["_id"][]
   forms: IForm["_id"][]
-  applicationForm: {
-    id: IForm["_id"] | null
-    startDate: Date
-    endDate: Date
-    stages: IStage[]
-  }
+  applicationForm: IForm["_id"] | null
   stages: IStage[]
   trainingStartDate: Date
 }
@@ -112,28 +107,10 @@ const CohortSchema = new Schema(
         ref: "User",
       },
     ],
-    applicationForm: {
-      id: {
-        type: Schema.Types.ObjectId,
-        ref: "Form",
-        default: null,
-      },
-      startDate: {
-        type: Date,
-        default: null,
-      },
-      endDate: {
-        type: Date,
-        default: null,
-      },
-      stages: [
-        {
-          id: { type: String, required: true },
-          name: { type: String, required: true },
-          description: { type: String, default: "" },
-          _id: false,
-        },
-      ],
+    applicationFormId: {
+      type: Schema.Types.ObjectId,
+      ref: "Form",
+      default: null,
     },
   },
   { timestamps: {} },

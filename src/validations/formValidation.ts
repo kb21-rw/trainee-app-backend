@@ -9,12 +9,18 @@ export const createFormValidation = Joi.object({
     .required(),
   startDate: Joi.when("type", {
     is: FormType.Application,
-    then: Joi.date().required(),
+    then: Joi.date()
+      .greater("now")
+      .message("Start date should be sometime after now")
+      .required(),
     otherwise: Joi.forbidden(),
   }),
   endDate: Joi.when("type", {
     is: FormType.Application,
-    then: Joi.date().required(),
+    then: Joi.date()
+      .greater(Joi.ref("startDate"))
+      .message("End date should be after start date")
+      .required(),
     otherwise: Joi.forbidden(),
   }),
   stages: Joi.when("type", {

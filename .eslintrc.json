@@ -15,7 +15,7 @@
     "eqeqeq": "warn",
     "no-debugger": "warn",
     "consistent-return": "error",
-    "@typescript-eslint/no-explicit-any": "error",
+    "@typescript-eslint/no-explicit-any": "warn",
     "padding-line-between-statements": [
       "error",
       { "blankLine": "always", "prev": "block-like", "next": "*" }

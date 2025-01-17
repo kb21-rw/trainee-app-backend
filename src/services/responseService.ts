@@ -14,11 +14,12 @@ import {
   APPLICATION_FORM_ERROR,
   RESPONSE_NOT_FOUND,
 } from "../utils/errorCodes"
-import Form, { IForm } from "../models/Form"
 import dayjs from "dayjs"
 import { getUserFormResponses, upsertResponse } from "../utils/helpers/response"
 import { getCohortService } from "./cohortService"
 import { isUserInCohort } from "../utils/helpers/cohort"
+import { getFormService } from "./formService"
+import { IApplicationForm } from "../models/Form"
 
 export const createCoachResponseService = async (
   loggedInUser: IUser,
@@ -89,23 +90,17 @@ export const createApplicantResponseService = async (
     )
   }
 
-  if (!currentCohort.applicationForm.id) {
+  if (!currentCohort.applicationForm) {
     throw new CustomError(NOT_ALLOWED, "There is no open application", 404)
   }
 
-  const applicationForm = await Form.findById<IForm>(
-    currentCohort.applicationForm.id,
-  )
-
-  if (!applicationForm) {
-    currentCohort.applicationForm.id = null
-    await currentCohort.save()
-    throw new CustomError(NOT_ALLOWED, "There is no open application", 404)
-  }
+  const applicationForm = (await getFormService({
+    _id: currentCohort.applicationForm,
+  })) as IApplicationForm
 
   const now = dayjs()
-  const applicationStartDate = dayjs(currentCohort.applicationForm.startDate)
-  const applicationEndDate = dayjs(currentCohort.applicationForm.endDate)
+  const applicationStartDate = dayjs(applicationForm.startDate)
+  const applicationEndDate = dayjs(applicationForm.endDate)
 
   if (now.isBefore(applicationStartDate)) {
     throw new CustomError(
@@ -187,7 +182,7 @@ export const createApplicantResponseService = async (
       id: loggedInUser.id,
       passedStages: [],
       droppedStage: {
-        id: currentCohort.applicationForm.stages[0].id,
+        id: applicationForm.stages[0].id,
         isConfirmed: false,
       },
       feedbacks: [],

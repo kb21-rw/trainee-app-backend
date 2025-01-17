@@ -20,7 +20,7 @@ export const register = async (req: any, res: Response, next: NextFunction) => {
     await registerSchema.validateAsync(body)
     const newUser = await registerService(user, body)
     return res.status(201).send(newUser)
-  } catch (error: any) {
+  } catch (error: unknown) {
     return next(error)
   }
 }
@@ -35,7 +35,7 @@ export const applicantRegister = async (
     await applicantRegisterSchema.validateAsync(body)
     const newUser = await applicantRegisterService(body)
     return res.status(201).send({ userId: newUser.userId })
-  } catch (error: any) {
+  } catch (error: unknown) {
     return next(error)
   }
 }
@@ -50,7 +50,7 @@ export const verifyApplicant = async (
     return res
       .status(201)
       .send({ userId: verifiedUser.userId, verified: verifiedUser.verified })
-  } catch (error: any) {
+  } catch (error: unknown) {
     return next(error)
   }
 }
@@ -85,7 +85,7 @@ export const resetPassword = async (
     await resetPasswordSchema.validateAsync(body)
     const userId = await resetPasswordService(req.body)
     return res.status(200).json({ userId })
-  } catch (error: any) {
+  } catch (error: unknown) {
     return next(error)
   }
 }

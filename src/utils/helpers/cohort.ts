@@ -10,6 +10,8 @@ import {
 import { IStage, Role } from "../types"
 import { SetOptional } from "type-fest"
 import { IUser } from "../../models/User"
+import { getFormService } from "../../services/formService"
+import { IApplicationForm } from "../../models/Form"
 
 export const getCurrentCohort = async () => {
   const currentCohort = await Cohort.findOne({ isActive: true })
@@ -70,10 +72,11 @@ export const acceptUserHandler = async (
   const participantIndex = indexOfParticipant(user.id, cohort[cohortProperty])
   const participant = cohort[cohortProperty][participantIndex]
   const droppedStageId = participant.droppedStage.id
+  const applicationForm = (await getFormService({
+    _id: cohort.applicationForm,
+  })) as IApplicationForm
   const stages =
-    cohortProperty === "applicants"
-      ? cohort.applicationForm.stages
-      : cohort.stages
+    cohortProperty === "applicants" ? applicationForm.stages : cohort.stages
   const numberOfStages = stages.length
 
   if (participant.droppedStage.isConfirmed) {

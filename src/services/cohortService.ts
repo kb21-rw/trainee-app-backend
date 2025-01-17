@@ -1,6 +1,5 @@
 import CustomError from "../middlewares/customError"
 import Cohort, { ICohort } from "../models/Cohort"
-import Form, { IForm } from "../models/Form"
 import { getCohortsQuery } from "../queries/cohortQueries"
 import {
   COHORT_NOT_FOUND,
@@ -28,6 +27,7 @@ import { getUserService, getUsersService } from "./userService"
 import { getCohortOverviewQuery } from "../queries/cohortQueries"
 import { getFormService } from "./formService"
 import User from "../models/User"
+import { IApplicationForm } from "../models/Form"
 
 export const getCohortService = async (query: object) => {
   const cohort = await Cohort.findOne<ICohort>(query)
@@ -82,50 +82,31 @@ export const updateCohortService = async (
 export const getApplicationFormService = async () => {
   const currentCohort = await getCohortService({ isActive: true })
 
-  if (!currentCohort.applicationForm.id) {
-    return null
-  }
+  const applicationForm = (await getFormService({
+    _id: currentCohort.applicationForm,
+  })) as IApplicationForm
 
-  const applicationForm = await Form.findById<IForm>(
-    currentCohort.applicationForm.id,
-  )
-
-  if (!applicationForm) {
-    throw new CustomError(
-      FORM_NOT_FOUND,
-      "Something wrong, our team is trying to fix it",
-      500,
-    )
-  }
-
-  const { startDate, endDate, stages } = currentCohort.applicationForm
-
-  const completeApplicationFrom = await getCompleteForm(applicationForm)
-
-  return { ...completeApplicationFrom, startDate, endDate, stages }
+  return await getCompleteForm(applicationForm)
 }
 
 export const getMyApplicationService = async (loggedInUserId: string) => {
   const currentCohort = await getCohortService({ isActive: true })
 
-  if (!currentCohort.applicationForm.id) {
+  if (!currentCohort.applicationForm) {
     return null
   }
 
   const applicationForm = await getFormService({
-    _id: currentCohort.applicationForm.id,
+    _id: currentCohort.applicationForm,
   })
 
   const completeForm = await getUserFormResponses(
     applicationForm,
     loggedInUserId,
   )
-  const { startDate, endDate } = currentCohort.applicationForm
 
   return {
     ...completeForm,
-    startDate,
-    endDate,
     trainingStartDate: currentCohort.trainingStartDate,
   }
 }
@@ -179,9 +160,13 @@ export const addApplicantsService = async (body: AddApplicantsDto) => {
   const currentCohort = await getCohortService({ isActive: true })
   const users = await getUsersService({ _id: { $in: prospectIds } })
 
-  if (!currentCohort.applicationForm.id) {
+  if (!currentCohort.applicationForm) {
     throw new CustomError(FORM_NOT_FOUND, "Application form not found", 404)
   }
+
+  const applicationForm = (await getFormService({
+    _id: currentCohort.applicationForm,
+  })) as IApplicationForm
 
   users.forEach((user) => {
     if (user.role !== Role.Prospect) {
@@ -196,7 +181,7 @@ export const addApplicantsService = async (body: AddApplicantsDto) => {
       id: user._id,
       passedStages: [],
       droppedStage: {
-        id: currentCohort.applicationForm.stages[0].id,
+        id: applicationForm.stages[0].id,
         isConfirmed: false,
       },
       feedbacks: [],

@@ -22,7 +22,7 @@ export const getProfile = async (
 }
 
 export const getUsersController = async (
-  req: any,
+  req: Request,
   res: Response,
   next: NextFunction,
 ) => {

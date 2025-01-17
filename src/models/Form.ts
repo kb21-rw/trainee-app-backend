@@ -1,8 +1,8 @@
 import { Document, Schema, model } from "mongoose"
-import { FormType } from "../utils/types"
+import { FormType, IStage } from "../utils/types"
 import { IQuestion } from "./Question"
 
-export interface IForm extends Document {
+export interface IBaseForm extends Document {
   _id: string
   name: string
   description: string
@@ -10,7 +10,20 @@ export interface IForm extends Document {
   questionIds: IQuestion["_id"][]
 }
 
-const FormSchema = new Schema(
+export interface IExtraApplicantFormFields {
+  type: FormType.Application
+  startDate: Date
+  endDate: Date
+  stages: IStage[]
+}
+
+export interface IApplicationForm
+  extends Omit<IBaseForm, "type">,
+    IExtraApplicantFormFields {}
+
+export type IForm = IBaseForm | IApplicationForm
+
+const FormSchema = new Schema<IForm>(
   {
     name: {
       type: String,
@@ -27,6 +40,21 @@ const FormSchema = new Schema(
       type: String,
       enum: FormType,
       required: true,
+    },
+    startDate: String,
+    endDate: String,
+    stages: {
+      type: [
+        {
+          id: { type: String, required: true },
+          name: { type: String, required: true },
+          description: { type: String, default: "" },
+          _id: false,
+        },
+      ],
+      required: function (this: IForm) {
+        return this.type === FormType.Application
+      },
     },
   },
   { timestamps: {} },
