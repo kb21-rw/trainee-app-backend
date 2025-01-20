@@ -107,7 +107,7 @@ const CohortSchema = new Schema(
         ref: "User",
       },
     ],
-    applicationFormId: {
+    applicationForm: {
       type: Schema.Types.ObjectId,
       ref: "Form",
       default: null,
