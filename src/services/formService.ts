@@ -1,5 +1,5 @@
 import CustomError from "../middlewares/customError"
-import Form, { IForm } from "../models/Form"
+import Form, { IApplicationForm, IForm } from "../models/Form"
 import Question from "../models/Question"
 import Response from "../models/Response"
 import { getFormsQuery } from "../queries/formQueries"
@@ -7,7 +7,6 @@ import {
   APPLICATION_FORM_ERROR,
   DUPLICATE_DOCUMENT,
   FORM_NOT_FOUND,
-  INVALID_MONGODB_ID,
   NOT_ALLOWED,
 } from "../utils/errorCodes"
 import { getCurrentCohort } from "../utils/helpers/cohort"
@@ -18,10 +17,8 @@ import {
   GetCohortDto,
   UpdateFormDto,
 } from "../utils/types"
-import mongoose from "mongoose"
 import { createStagesHandler } from "../utils/helpers"
-const { Types } = mongoose
-const { ObjectId } = Types
+import dayjs from "dayjs"
 
 export const getFormsService = async (
   searchString: string,
@@ -35,14 +32,8 @@ export const updateFormService = async (
   formData: UpdateFormDto,
 ) => {
   const { name, description } = formData
-  if (!ObjectId.isValid(formId)) {
-    throw new CustomError(INVALID_MONGODB_ID, "Invalid Document ID", 400)
-  }
 
-  const form = await Form.findById(formId)
-  if (!form) {
-    throw new CustomError(FORM_NOT_FOUND, "Form not found", 404)
-  }
+  const form = await getFormService({ _id: formId })
 
   if (name) {
     form.name = name
@@ -50,6 +41,21 @@ export const updateFormService = async (
 
   if (description) {
     form.description = description
+  }
+
+  if (form.type === FormType.Application) {
+    const applicationForm = form as IApplicationForm
+    if (formData.startDate) {
+      applicationForm.startDate = dayjs(formData.startDate).toISOString()
+    }
+
+    if (formData.endDate) {
+      applicationForm.endDate = dayjs(formData.endDate).toISOString()
+    }
+
+    if (formData.stages) {
+      // To be implemented
+    }
   }
 
   await form.save()
@@ -67,6 +73,11 @@ export const createFormService = async (
       "An application form already exists. Please edit the existing form.",
       409,
     )
+  }
+
+  if (formData.type === FormType.Application) {
+    formData.startDate = dayjs(formData.startDate).toISOString()
+    formData.endDate = dayjs(formData.endDate).toISOString()
   }
 
   if (formData.type !== FormType.Application) {

@@ -1,7 +1,7 @@
 import { NextFunction, Request, Response } from "express"
 import {
   createFormValidation,
-  editFormValidation,
+  updateFormValidation,
 } from "../validations/formValidation"
 import {
   getFormsService,
@@ -11,7 +11,10 @@ import {
   deleteFormService,
 } from "../services/formService"
 import { Types } from "mongoose"
-import { mongodbIdValidation } from "../validations/generalValidation"
+import {
+  mongodbIdValidation,
+  requiredMongodbIdValidation,
+} from "../validations/generalValidation"
 
 export const createFormController = async (
   req: Request,
@@ -59,7 +62,8 @@ export const updateFormController = async (
 ) => {
   try {
     const { formId } = req.params
-    await editFormValidation.validateAsync(req.body)
+    await requiredMongodbIdValidation.validateAsync(formId)
+    await updateFormValidation.validateAsync(req.body)
     const updatedForm = await updateFormService(formId, req.body)
     return res.status(200).json(updatedForm)
   } catch (error) {

@@ -36,8 +36,11 @@ export interface CreateCohortDto {
   trainingStartDate: Date
 }
 export interface UpdateFormDto {
-  name: string
-  description: string
+  name?: string
+  description?: string
+  startDate?: string
+  endDate?: string
+  stages?: Partial<IStage>[]
 }
 
 export interface UpdateCohortDto {

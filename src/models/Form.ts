@@ -12,8 +12,8 @@ export interface IBaseForm extends Document {
 
 export interface IExtraApplicantFormFields {
   type: FormType.Application
-  startDate: Date
-  endDate: Date
+  startDate: string
+  endDate: string
   stages: IStage[]
 }
 
