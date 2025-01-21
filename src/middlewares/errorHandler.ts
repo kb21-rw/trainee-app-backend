@@ -1,4 +1,4 @@
-import { Request, Response } from "express"
+import { NextFunction, Request, Response } from "express"
 
 import CustomError from "./customError"
 export interface ErrorObject {
@@ -58,6 +58,7 @@ export const errorHandler = (
   error: ErrorObject,
   req: Request,
   res: Response,
+  _next: NextFunction,
 ) => {
   // eslint-disable-next-line no-console
   console.log(error)
