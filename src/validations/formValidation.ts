@@ -41,7 +41,7 @@ export const createFormValidation = Joi.object({
 
 export const updateFormValidation = Joi.object({
   name: Joi.string().min(3).max(100),
-  description: Joi.string().min(3).max(100),
+  description: Joi.string().min(0).max(100),
   startDate: Joi.date()
     .greater("now")
     .message("Start date should be sometime after now"),

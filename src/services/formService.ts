@@ -39,7 +39,7 @@ export const updateFormService = async (
     form.name = name
   }
 
-  if (description) {
+  if (description !== undefined) {
     form.description = description
   }
 
