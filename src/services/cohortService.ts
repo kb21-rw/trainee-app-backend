@@ -155,6 +155,7 @@ export const acceptParticipantService = async (
         droppedStage: { id: cohort.stages[0].id, isConfirmed: false },
         feedbacks: [],
       })
+      cohort.stages[0].participantsCount += 1
       user.role = Role.Trainee
       await user.save()
     } else {
@@ -172,6 +173,16 @@ export const acceptParticipantService = async (
       (stage) => stage.id === droppedStageId,
     )
     participant.droppedStage.id = stages[currentStageIndex + 1].id
+
+    // updated then number of participants in the next stage
+    if (user.role === Role.Applicant) {
+      applicationForm.stages[currentStageIndex + 1].participantsCount += 1
+      await applicationForm.save()
+    }
+
+    if (user.role === Role.Trainee) {
+      cohort.stages[currentStageIndex + 1].participantsCount += 1
+    }
   }
 
   participant.passedStages.push(droppedStageId)

@@ -13,6 +13,7 @@ export interface IStage {
   id: string
   name: string
   description: string
+  participantsCount: number
 }
 export interface CreateApplicantTraineeFormDto {
   type: FormType.Applicant | FormType.Trainee
