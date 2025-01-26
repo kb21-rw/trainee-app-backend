@@ -1,10 +1,11 @@
 import CustomError from "../middlewares/customError"
-import Cohort, { ICohort } from "../models/Cohort"
+import Cohort, { ICohort, IParticipant } from "../models/Cohort"
 import { getCohortsQuery } from "../queries/cohortQueries"
 import {
   COHORT_NOT_FOUND,
   FORM_NOT_FOUND,
   NOT_ALLOWED,
+  USER_NOT_FOUND,
 } from "../utils/errorCodes"
 import {
   AddApplicantsDto,
@@ -15,18 +16,14 @@ import {
   Role,
   UpdateCohortDto,
 } from "../utils/types"
-import {
-  acceptUserHandler,
-  rejectUserHandler,
-  updateStagesHandler,
-} from "../utils/helpers/cohort"
+import { updateStagesHandler } from "../utils/helpers/cohort"
 import { createStagesHandler } from "../utils/helpers"
 import { getCompleteForm } from "../utils/helpers/forms"
 import { getUserFormResponses } from "../utils/helpers/response"
 import { getUserService, getUsersService } from "./userService"
 import { getCohortOverviewQuery } from "../queries/cohortQueries"
 import { getFormService } from "./formService"
-import User from "../models/User"
+import User, { IUser } from "../models/User"
 import { IApplicationForm } from "../models/Form"
 
 export const getCohortService = async (query: object) => {
@@ -111,6 +108,124 @@ export const getMyApplicationService = async (loggedInUserId: string) => {
   }
 }
 
+export const getParticipantIndex = (userId: string, users: IParticipant[]) => {
+  const userIndex = users.findIndex((user) => user.id.toString() === userId)
+
+  if (userIndex === -1) {
+    throw new CustomError(
+      USER_NOT_FOUND,
+      `Can't find that applicant/trainee in the current cohort`,
+      404,
+    )
+  }
+
+  return userIndex
+}
+
+export const acceptParticipantService = async (
+  cohort: ICohort,
+  user: IUser,
+  feedback: string,
+  cohortProperty: "trainees" | "applicants",
+) => {
+  const participantIndex = getParticipantIndex(user.id, cohort[cohortProperty])
+  const participant = cohort[cohortProperty][participantIndex]
+  const droppedStageId = participant.droppedStage.id
+  const applicationForm = (await getFormService({
+    _id: cohort.applicationForm,
+  })) as IApplicationForm
+  const stages =
+    cohortProperty === "applicants" ? applicationForm.stages : cohort.stages
+  const numberOfStages = stages.length
+
+  if (participant.droppedStage.isConfirmed) {
+    throw new CustomError(
+      NOT_ALLOWED,
+      `The ${user.name} was rejected already`,
+      403,
+    )
+  }
+
+  // If user is on the last stage
+  if (stages[numberOfStages - 1].id === droppedStageId) {
+    if (user.role === Role.Applicant) {
+      cohort.trainees.push({
+        id: user.id,
+        passedStages: [],
+        droppedStage: { id: cohort.stages[0].id, isConfirmed: false },
+        feedbacks: [],
+      })
+      user.role = Role.Trainee
+      await user.save()
+    } else {
+      // if participant is a trainee
+      if (participant.passedStages.includes(droppedStageId)) {
+        throw new CustomError(
+          NOT_ALLOWED,
+          `${user.name} had already passed the last stage of '${cohort.name}' cohort`,
+          403,
+        )
+      }
+    }
+  } else {
+    const currentStageIndex = stages.findIndex(
+      (stage) => stage.id === droppedStageId,
+    )
+    participant.droppedStage.id = stages[currentStageIndex + 1].id
+  }
+
+  participant.passedStages.push(droppedStageId)
+  participant.feedbacks.push({ stageId: droppedStageId, text: feedback })
+
+  cohort[cohortProperty][participantIndex] = participant
+
+  await cohort.save()
+
+  return {
+    user: user.id,
+    message: `${user.name} was accepted successfully!`,
+  }
+}
+
+export const rejectParticipantService = async (
+  cohort: ICohort,
+  user: IUser,
+  feedback: string,
+  cohortProperty: "trainees" | "applicants",
+) => {
+  const participantIndex = getParticipantIndex(user.id, cohort[cohortProperty])
+  const participant = cohort[cohortProperty][participantIndex]
+  const droppedStageId = participant.droppedStage.id
+
+  if (participant.droppedStage.isConfirmed) {
+    throw new CustomError(
+      NOT_ALLOWED,
+      `The ${user.name} was rejected already`,
+      403,
+    )
+  }
+
+  if (participant.passedStages.includes(droppedStageId)) {
+    throw new CustomError(
+      NOT_ALLOWED,
+      `${user.name} had already passed the last stage of '${cohort.name}' cohort`,
+      403,
+    )
+  }
+
+  participant.droppedStage.isConfirmed = true
+  participant.feedbacks.push({ stageId: droppedStageId, text: feedback })
+
+  cohort[cohortProperty][participantIndex] = participant
+
+  await cohort.save()
+
+  return {
+    user: user.id,
+    message: `${user.name} was rejected successfully!`,
+  }
+}
+
 export const decisionService = async (body: DecisionDto) => {
   const { userId, decision, feedback } = body
   const currentCohort = await getCohortService({ isActive: true })
@@ -118,7 +233,7 @@ export const decisionService = async (body: DecisionDto) => {
 
   if (decision === Decision.Accepted) {
     if (user.role === Role.Applicant) {
-      return await acceptUserHandler(
+      return await acceptParticipantService(
         currentCohort,
         user,
         feedback,
@@ -126,10 +241,15 @@ export const decisionService = async (body: DecisionDto) => {
       )
     }
 
-    return await acceptUserHandler(currentCohort, user, feedback, "trainees")
+    return await acceptParticipantService(
+      currentCohort,
+      user,
+      feedback,
+      "trainees",
+    )
   } else {
     if (user.role === Role.Applicant) {
-      return await rejectUserHandler(
+      return await rejectParticipantService(
         currentCohort,
         user,
         feedback,
@@ -137,7 +257,12 @@ export const decisionService = async (body: DecisionDto) => {
       )
     }
 
-    return await rejectUserHandler(currentCohort, user, feedback, "trainees")
+    return await rejectParticipantService(
+      currentCohort,
+      user,
+      feedback,
+      "trainees",
+    )
   }
 }
 
