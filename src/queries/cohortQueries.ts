@@ -47,7 +47,7 @@ export const getCohortOverviewQuery = async ({
       $set: {
         forms: {
           $concatArrays: [
-            overviewType === FormType.Applicant ? ["$applicationForm.id"] : [],
+            overviewType === FormType.Applicant ? ["$applicationForm"] : [],
             "$forms",
           ],
         },

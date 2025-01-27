@@ -65,7 +65,7 @@ export const updateCohortService = async (
     cohort.name = name
   }
 
-  if (description) {
+  if (description !== undefined) {
     cohort.description = description
   }
 
