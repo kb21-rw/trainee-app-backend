@@ -18,8 +18,7 @@ import dayjs from "dayjs"
 import { getUserFormResponses, upsertResponse } from "../utils/helpers/response"
 import { getCohortService } from "./cohortService"
 import { isUserInCohort } from "../utils/helpers/cohort"
-import { getFormService } from "./formService"
-import { IApplicationForm } from "../models/Form"
+import Form, { IApplicationForm } from "../models/Form"
 
 export const createCoachResponseService = async (
   loggedInUser: IUser,
@@ -94,9 +93,9 @@ export const createApplicantResponseService = async (
     throw new CustomError(NOT_ALLOWED, "There is no open application", 404)
   }
 
-  const applicationForm = (await getFormService({
-    _id: currentCohort.applicationForm,
-  })) as IApplicationForm
+  const applicationForm = (await Form.findById(
+    currentCohort.applicationForm,
+  )) as IApplicationForm
 
   const now = dayjs()
   const applicationStartDate = dayjs(applicationForm.startDate)

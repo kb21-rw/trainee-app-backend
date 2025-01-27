@@ -19,12 +19,12 @@ import {
 import { updateStagesHandler } from "../utils/helpers/cohort"
 import { createStagesHandler } from "../utils/helpers"
 import { getCompleteForm } from "../utils/helpers/forms"
-import { getUserFormResponses } from "../utils/helpers/response"
 import { getUserService, getUsersService } from "./userService"
 import { getCohortOverviewQuery } from "../queries/cohortQueries"
 import { getFormService } from "./formService"
 import User, { IUser } from "../models/User"
 import { IApplicationForm } from "../models/Form"
+import { getUserFormResponsesQuery } from "../queries/responseQueries"
 
 export const getCohortService = async (query: object) => {
   const cohort = await Cohort.findOne<ICohort>(query)
@@ -97,8 +97,8 @@ export const getMyApplicationService = async (loggedInUserId: string) => {
     _id: currentCohort.applicationForm,
   })
 
-  const completeForm = await getUserFormResponses(
-    applicationForm,
+  const completeForm = await getUserFormResponsesQuery(
+    applicationForm.id,
     loggedInUserId,
   )
 
