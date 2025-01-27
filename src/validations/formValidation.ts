@@ -46,13 +46,13 @@ export const updateFormValidation = Joi.object({
     .greater("now")
     .message("Start date should be sometime after now"),
   endDate: Joi.date()
-    .greater(Joi.ref("startDate"))
-    .message("End date should be after start date"),
+    .greater("now")
+    .message("End date should be after today's date"),
   stages: Joi.array().items(
     Joi.object({
       id: mongodbIdValidation,
       name: Joi.string().min(1).required(),
-      description: Joi.string(),
+      description: Joi.string().min(0),
     }),
   ),
 })
