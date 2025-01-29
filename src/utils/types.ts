@@ -48,6 +48,7 @@ export interface UpdateCohortDto {
   name?: string
   description?: string
   stages?: SetOptional<IStage, "id">[]
+  trainingStartDate?: string
 }
 
 export interface CreateQuestionDto {

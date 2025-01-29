@@ -24,7 +24,7 @@ export interface ICohort extends Document {
   forms: IForm["_id"][]
   applicationForm: IForm["_id"] | null
   stages: IStage[]
-  trainingStartDate: Date
+  trainingStartDate: string
 }
 
 const CohortSchema = new Schema(

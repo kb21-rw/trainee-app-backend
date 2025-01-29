@@ -1,6 +1,9 @@
 import Joi from "joi"
 import { Decision } from "../utils/types"
-import { requiredMongodbIdValidation } from "./generalValidation"
+import {
+  mongodbIdValidation,
+  requiredMongodbIdValidation,
+} from "./generalValidation"
 
 export const createCohortValidation = Joi.object({
   name: Joi.string().min(3).max(100).required(),
@@ -15,13 +18,12 @@ export const createCohortValidation = Joi.object({
 export const updateCohortValidation = Joi.object({
   name: Joi.string().min(3).max(100),
   description: Joi.string().min(3).max(100),
+  trainingStartDate: Joi.date()
+    .min("now")
+    .message("Training start date must be in the future"),
   stages: Joi.array().items(
     Joi.object({
-      id: Joi.string()
-        .hex()
-        .length(24)
-        .message("stageId is not valid")
-        .optional(),
+      id: mongodbIdValidation,
       name: Joi.string().min(1),
       description: Joi.string(),
     }),

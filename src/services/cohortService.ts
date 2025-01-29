@@ -25,6 +25,7 @@ import { getFormService } from "./formService"
 import User, { IUser } from "../models/User"
 import { IApplicationForm } from "../models/Form"
 import { getUserFormResponsesQuery } from "../queries/responseQueries"
+import dayjs from "dayjs"
 
 export const getCohortService = async (query: object) => {
   const cohort = await Cohort.findOne<ICohort>(query)
@@ -54,7 +55,7 @@ export const updateCohortService = async (
   cohortId: string,
   formData: UpdateCohortDto,
 ) => {
-  const { name, description, stages } = formData
+  const { name, description, stages, trainingStartDate } = formData
 
   const cohort = await Cohort.findById(cohortId)
   if (!cohort) {
@@ -67,6 +68,10 @@ export const updateCohortService = async (
 
   if (description !== undefined) {
     cohort.description = description
+  }
+
+  if (trainingStartDate) {
+    cohort.trainingStartDate = dayjs(trainingStartDate).toISOString()
   }
 
   if (stages) {
