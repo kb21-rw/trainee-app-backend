@@ -11,9 +11,10 @@ export const getCohortsQuery = async (searchString: string) => {
     {
       $project: {
         name: 1,
-        description: 1,
+        stages: 1,
         isActive: 1,
-        stages: { $size: "$stages" },
+        description: 1,
+        trainingStartDate: 1,
         applicants: { $size: "$applicants" },
         trainees: { $size: "$trainees" },
         coaches: { $size: "$coaches" },
