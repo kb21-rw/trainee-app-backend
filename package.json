@@ -34,6 +34,7 @@
     "swagger-ui-express": "^5.0.1",
     "ts-node": "^10.9.1",
     "type-fest": "^4.26.0",
+    "typescript": "^5.7.3",
     "yamljs": "^0.3.0"
   },
   "devDependencies": {
