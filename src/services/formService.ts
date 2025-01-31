@@ -19,6 +19,7 @@ import {
 } from "../utils/types"
 import { createStagesHandler } from "../utils/helpers"
 import dayjs from "dayjs"
+import { updateStagesService } from "./generalService"
 
 export const getFormsService = async (
   searchString: string,
@@ -54,7 +55,10 @@ export const updateFormService = async (
     }
 
     if (formData.stages) {
-      // To be implemented
+      applicationForm.stages = updateStagesService(
+        applicationForm.stages,
+        formData.stages,
+      )
     }
   }
 

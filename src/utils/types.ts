@@ -41,7 +41,7 @@ export interface UpdateFormDto {
   description?: string
   startDate?: string
   endDate?: string
-  stages?: Partial<IStage>[]
+  stages?: StageDto[]
 }
 
 export interface UpdateCohortDto {

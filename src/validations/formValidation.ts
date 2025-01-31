@@ -1,6 +1,6 @@
 import Joi from "joi"
 import { FormType } from "../utils/types"
-import { mongodbIdValidation } from "./generalValidation"
+import { stageValidation } from "./generalValidation"
 
 export const createFormValidation = Joi.object({
   name: Joi.string().min(3).max(100).required(),
@@ -48,11 +48,5 @@ export const updateFormValidation = Joi.object({
   endDate: Joi.date()
     .greater("now")
     .message("End date should be after today's date"),
-  stages: Joi.array().items(
-    Joi.object({
-      id: mongodbIdValidation,
-      name: Joi.string().min(1).required(),
-      description: Joi.string().min(0),
-    }),
-  ),
+  stages: Joi.array().items(stageValidation),
 })
