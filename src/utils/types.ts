@@ -132,3 +132,8 @@ export interface RegisterUserDto {
 export interface AddApplicantsDto {
   prospectIds: string[]
 }
+
+export interface StageDto {
+  name: string
+  description: string
+}

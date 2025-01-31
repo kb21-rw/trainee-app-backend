@@ -16,7 +16,6 @@ import {
   Role,
   UpdateCohortDto,
 } from "../utils/types"
-import { updateStagesHandler } from "../utils/helpers/cohort"
 import { createStagesHandler } from "../utils/helpers"
 import { getCompleteForm } from "../utils/helpers/forms"
 import { getUserService, getUsersService } from "./userService"
@@ -26,6 +25,7 @@ import User, { IUser } from "../models/User"
 import { IApplicationForm } from "../models/Form"
 import { getUserFormResponsesQuery } from "../queries/responseQueries"
 import dayjs from "dayjs"
+import { updateStagesService } from "./generalService"
 
 export const getCohortService = async (query: object) => {
   const cohort = await Cohort.findOne<ICohort>(query)
@@ -75,7 +75,7 @@ export const updateCohortService = async (
   }
 
   if (stages) {
-    cohort.stages = updateStagesHandler(cohort.stages, stages)
+    cohort.stages = updateStagesService(cohort.stages, stages)
   }
 
   return await cohort.save()

@@ -1,8 +1,8 @@
 import Joi from "joi"
 import { Decision } from "../utils/types"
 import {
-  mongodbIdValidation,
   requiredMongodbIdValidation,
+  stageValidation,
 } from "./generalValidation"
 
 export const createCohortValidation = Joi.object({
@@ -21,13 +21,7 @@ export const updateCohortValidation = Joi.object({
   trainingStartDate: Joi.date()
     .min("now")
     .message("Training start date must be in the future"),
-  stages: Joi.array().items(
-    Joi.object({
-      id: mongodbIdValidation,
-      name: Joi.string().min(1),
-      description: Joi.string(),
-    }),
-  ),
+  stages: Joi.array().items(stageValidation),
 })
 
 export const decisionValidation = Joi.object({

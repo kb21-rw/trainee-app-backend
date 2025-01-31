@@ -10,3 +10,8 @@ export const requiredMongodbIdValidation = Joi.string()
   .length(24)
   .message("Invalid document Id")
   .required()
+
+export const stageValidation = Joi.object({
+  name: Joi.string().min(1).required(),
+  description: Joi.string().min(0).required(),
+})
