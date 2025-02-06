@@ -13,6 +13,10 @@ import { ACCESS_TOKEN_EXPIRATION, secret } from "../constants"
 import jwt from "jsonwebtoken"
 import { RegisterUserDto, Role } from "../utils/types"
 import { generateUserIdService, getUserService } from "./userService"
+import { OAuth2Client } from "google-auth-library"
+import { googleClientId } from "../constants"
+
+const client = new OAuth2Client(googleClientId)
 
 export const registerService = async (
   loggedInUser: IUser,
@@ -125,4 +129,44 @@ export const resetPasswordService = async (body: any) => {
   await user.save()
   await sendEmail(user.email, { name: user.name, password })
   return user._id
+}
+
+export const googleAuthService = async (token: string) => {
+  const ticket = await client.verifyIdToken({
+    idToken: token,
+    audience: googleClientId,
+  })
+  const payload = ticket.getPayload()
+
+  const user = await User.findOne<IUser>({ email: payload?.email })
+
+  if (user) {
+    if (user.role === Role.Trainee) {
+      throw new CustomError(
+        NOT_ALLOWED,
+        "Trainees are not allowed to login yet",
+        409,
+      )
+    }
+
+    const accessToken = jwt.sign({ id: user._id }, secret, {
+      expiresIn: ACCESS_TOKEN_EXPIRATION,
+    })
+    return accessToken
+  }
+
+  const createdUser = await User.create({
+    userId: await generateUserIdService(),
+    name: payload?.name ?? "",
+    email: payload?.email ?? "",
+    verified: true,
+    googleId: payload?.sub ?? "",
+    role: Role.Prospect,
+  })
+
+  const accessToken = jwt.sign({ id: createdUser._id }, secret, {
+    expiresIn: ACCESS_TOKEN_EXPIRATION,
+  })
+
+  return accessToken
 }

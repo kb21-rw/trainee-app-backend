@@ -18,6 +18,7 @@ import swaggerUI from "swagger-ui-express"
 import YAML from "yamljs"
 import { htmlDocumentationResponse } from "./utils/helpers/htmlDocumentationResponse"
 import morgan from "morgan"
+import { frontendUrl } from "./constants"
 
 const swaggerDocumentation = YAML.load("./swagger.yaml")
 
@@ -40,7 +41,7 @@ app.get("/", (_req: Request, res: Response) => {
 })
 app.use("/api-docs", swaggerUI.serve, swaggerUI.setup(swaggerDocumentation))
 
-app.use(cors({ origin: "*", credentials: true }))
+app.use(cors({ origin: frontendUrl, credentials: true }))
 app.use(express.json())
 app.use("/auth", authRoute)
 app.use("/users", userRoute)
