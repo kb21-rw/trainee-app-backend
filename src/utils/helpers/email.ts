@@ -1,16 +1,16 @@
-import nodeMailer from "nodemailer";
-import dotenv from "dotenv";
+import nodeMailer from "nodemailer"
+import dotenv from "dotenv"
 
-dotenv.config();
+dotenv.config()
 
-const user = process.env.NODEMAIL_EMAIL;
-const pass = process.env.NODEMAIL_PASSWORD;
+const user = process.env.NODEMAIL_EMAIL
+const pass = process.env.NODEMAIL_PASSWORD
 
 const generateRegisterMessage = (
   name: string,
   email: string,
   role: string,
-  password: string
+  password: string,
 ) => {
   const html = `<html>
       <head>
@@ -38,9 +38,9 @@ const generateRegisterMessage = (
           </div>
       </body>
       </html>
-      `;
-  return html;
-};
+      `
+  return html
+}
 
 const generateVerificationMessage = (name: string, userId: string) => {
   const html = `<html>
@@ -58,19 +58,19 @@ const generateVerificationMessage = (name: string, userId: string) => {
           </div>
       </body>
       </html>
-      `;
-  return html;
-};
+      `
+  return html
+}
 
 export const sendEmail = async (
   emailTo: string,
   data:
     | { name: string; email: string; role: string; password: string }
     | { name: string; userId: string }
-    | { name: string; password: string }
+    | { name: string; password: string },
 ) => {
-  const subject = "Welcome " + data.name;
-  let message = "";
+  const subject = "Welcome " + data.name
+  let message = ""
   if (
     "name" in data &&
     "email" in data &&
@@ -81,16 +81,16 @@ export const sendEmail = async (
       data.name,
       data.email,
       data.role,
-      data.password
-    );
+      data.password,
+    )
   }
 
   if ("name" in data && "userId" in data) {
-    message = generateVerificationMessage(data.name, data.userId);
+    message = generateVerificationMessage(data.name, data.userId)
   }
 
   if ("name" in data && "password" in data) {
-    message = generateResetPasswordMessage(data.name, data.password);
+    message = generateResetPasswordMessage(data.name, data.password)
   }
 
   const transporter = nodeMailer.createTransport({
@@ -99,18 +99,18 @@ export const sendEmail = async (
       user,
       pass,
     },
-  });
+  })
   await transporter.sendMail({
     from: `The GYM <thegym@gmail.com>`,
     to: emailTo,
     subject,
     html: message,
-  });
-};
+  })
+}
 
 export const generateResetPasswordMessage = (
   name: string,
-  password: string
+  password: string,
 ) => {
   const html = `<html>
       <head>
@@ -125,6 +125,6 @@ export const generateResetPasswordMessage = (
           </div>
       </body>
       </html>
-      `;
-  return html;
-};
+      `
+  return html
+}

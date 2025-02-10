@@ -1,34 +1,30 @@
-import { Document, Schema, model } from "mongoose";
-import { IForm } from "./Form";
-import { IUser } from "./User";
-import { IStage } from "../utils/types";
+import { Document, Schema, model } from "mongoose"
+import { IForm } from "./Form"
+import { IUser } from "./User"
+import { IStage } from "../utils/types"
 
 export interface IParticipant {
-  id: IUser["_id"];
-  passedStages: string[];
+  id: IUser["_id"]
+  passedStages: string[]
   droppedStage: {
-    id: string;
-    isConfirmed: boolean;
-  };
-  feedbacks: { stageId: string; text: string }[];
+    id: string
+    isConfirmed: boolean
+  }
+  feedbacks: { stageId: string; text: string }[]
 }
 
 export interface ICohort extends Document {
-  id: string;
-  name: string;
-  description: string;
-  isActive: boolean;
-  applicants: IParticipant[];
-  trainees: IParticipant[];
-  coaches: IUser["_id"][];
-  forms: IForm["_id"][];
-  applicationForm: {
-    id: IForm["_id"];
-    startDate: Date;
-    endDate: Date;
-    stages: IStage[];
-  };
-  stages: IStage[];
+  id: string
+  name: string
+  description: string
+  isActive: boolean
+  applicants: IParticipant[]
+  trainees: IParticipant[]
+  coaches: IUser["_id"][]
+  forms: IForm["_id"][]
+  applicationForm: IForm["_id"] | null
+  stages: IStage[]
+  trainingStartDate: string
 }
 
 const CohortSchema = new Schema(
@@ -52,9 +48,14 @@ const CohortSchema = new Schema(
         id: { type: String, required: true },
         name: { type: String, required: true },
         description: { type: String, default: "" },
+        participantsCount: { type: Number, default: 0 },
         _id: false,
       },
     ],
+    trainingStartDate: {
+      type: Date,
+      require: true,
+    },
     forms: [
       {
         type: Schema.Types.ObjectId,
@@ -75,7 +76,7 @@ const CohortSchema = new Schema(
         feedbacks: [
           {
             stageId: { type: String, required: true },
-            text: { type: String, required: true },
+            text: { type: String },
           },
         ],
         _id: false,
@@ -95,7 +96,7 @@ const CohortSchema = new Schema(
         feedbacks: [
           {
             stageId: { type: String, required: true },
-            text: { type: String, required: true },
+            text: { type: String },
           },
         ],
         _id: false,
@@ -108,32 +109,14 @@ const CohortSchema = new Schema(
       },
     ],
     applicationForm: {
-      id: {
-        type: Schema.Types.ObjectId,
-        ref: "Form",
-        default: null,
-      },
-      startDate: {
-        type: Date,
-        default: null,
-      },
-      endDate: {
-        type: Date,
-        default: null,
-      },
-      stages: [
-        {
-          id: { type: String, required: true },
-          name: { type: String, required: true },
-          description: { type: String, default: "" },
-          _id: false,
-        },
-      ],
+      type: Schema.Types.ObjectId,
+      ref: "Form",
+      default: null,
     },
   },
-  { timestamps: {} }
-);
+  { timestamps: {} },
+)
 
-CohortSchema.index({ name: "text", description: "text" });
+CohortSchema.index({ name: "text", description: "text" })
 
-export default model<ICohort>("Cohort", CohortSchema);
+export default model<ICohort>("Cohort", CohortSchema)

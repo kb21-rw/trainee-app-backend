@@ -1,49 +1,30 @@
-import User from "../models/User";
-import { Role } from "../utils/types";
+import { ObjectId } from "mongodb"
+import Cohort from "../models/Cohort"
 
 export const getCoachesQuery = async (
-  searchString: string,
-  sortBy: string,
-  coachesPerPage: number,
+  cohortId: { _id: ObjectId } | { isActive: boolean } = { isActive: true },
 ) => {
-  const coaches = await User.aggregate([
+  const cohort = await Cohort.aggregate([
     {
-      $match: {
-        $or: [
-          { name: { $regex: new RegExp(searchString, "i") } },
-          { email: { $regex: new RegExp(searchString, "i") } },
-        ],
-        role: { $in: [Role.Admin, Role.Coach] },
-      },
+      $match: cohortId,
     },
     {
       $lookup: {
         from: "users",
-        localField: "_id",
-        foreignField: "coach",
-        as: "trainees",
+        localField: "coaches",
+        foreignField: "_id",
+        as: "coaches",
       },
     },
     {
       $project: {
         _id: 1,
         name: 1,
-        email: 1,
-        role: 1,
-        trainees: {
-          _id: 1,
-          name: 1,
-          email: 1,
-          role: 1,
-        },
+        isActive: 1,
+        coaches: 1,
       },
     },
-    {
-      $sort: { [sortBy]: 1 },
-    },
-    {
-      $limit: coachesPerPage,
-    },
-  ]);
-  return coaches;
-};
+  ])
+
+  return cohort[0]
+}
