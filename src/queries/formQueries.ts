@@ -1,10 +1,9 @@
-import Cohort from "../models/Cohort";
-import Form from "../models/Form";
-import { GetCohortDto } from "../utils/types";
+import Cohort from "../models/Cohort"
+import { GetCohortDto } from "../utils/types"
 
 export const getFormsQuery = async (
   searchString: string,
-  cohort: GetCohortDto
+  cohort: GetCohortDto,
 ) => {
   const cohorts = await Cohort.aggregate([
     {
@@ -28,7 +27,7 @@ export const getFormsQuery = async (
       $addFields: {
         formsMatching: {
           $regexMatch: {
-            input: "$forms.title",
+            input: "$forms.name",
             regex: searchString,
             options: "i",
           },
@@ -61,7 +60,7 @@ export const getFormsQuery = async (
             as: "form",
             in: {
               _id: "$$form._id",
-              title: "$$form.title",
+              name: "$$form.name",
               description: "$$form.description",
               type: "$$form.type",
               questions: {
@@ -72,11 +71,6 @@ export const getFormsQuery = async (
         },
       },
     },
-  ]);
-  return cohorts[0];
-};
-
-export const getFormQuery = async (formId: string) => {
-  const forms: any = await Form.findById(formId).populate("questionIds").exec();
-  return forms;
-};
+  ])
+  return cohorts[0]
+}

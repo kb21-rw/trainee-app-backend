@@ -1,10 +1,25 @@
-# Trainee App (Backend)
+# Trainee App Backend
 
-Welcome to the trainee app 🤗. This is the backend documentation for the Trainee App, which is a web application designed to streamline the process of collecting and managing trainee information for coaches.
+## Overview
+The Trainee App backend is a RESTful API that powers the training management system. It handles user authentication, data persistence, cohort management, and feedback evaluation. The backend supports role-based access for Prospects, Applicants, Trainees, Coaches, and Admins, ensuring secure and efficient data management.
 
-## Project Overview
+## Key Features
+1. Role-Based Management:
+   - Admins can manage users, forms, cohorts, and feedback.
+   - Coaches can evaluate participants and view feedback.
+   - Prospects, Applicants, and Trainees have restricted access based on their roles.
+2. Stage Management: Tracks participants' progress through application and training stages.
+3. Data Persistence: Retains user data (even for rejected participants) for future analysis.
+4. API Documentation: Swagger documentation for all API endpoints.
+5. Email Notifications: Uses NodeMailer to send emails to users.
 
-This project is a monorepo that contains two parts: the backend and frontend. The backend is built using Node.js with Express, and it's written in TypeScript. It uses the MongoDB database to store data.
+## Technologies Used
+1. Express (with TypeScript) - Server framework.
+2. MongoDB - NoSQL database for data storage.
+3. Jest - Testing framework.
+4. Joi - Data validation library.
+5. Swagger - API documentation.
+6. NodeMailer - Email service.
 
 ## Getting Started
 
@@ -15,28 +30,23 @@ These instructions will help you get a copy of the backend up and running on you
 1. Clone the repository:
 
 ```bash
-git clone https://github.com/NNesta/trainee-app.git
+git clone https://github.com/kb21-rw/trainee-app-backend.git
 ```
 
-2. Navigate to the repository
+2. Navigate to the project directory:
 
 ```bash
-cd trainee-app
+cd trainee-app-backend
 ```
 
-### Navigate to the project directory to the backend:
-
-```shell
-cd backend
-```
-
-### Install dependencies for the backend:
+3.  Install dependencies:
 
 ```shell
 npm install
 ```
+4. Get `.env` file
 
-### run backend:
+5. Start the development server:
 
 ```shell
 npm run dev

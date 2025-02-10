@@ -1,9 +1,9 @@
-import Form from "../models/Form";
-import { ObjectId } from "mongodb";
+import Form from "../models/Form"
+import { ObjectId } from "mongodb"
 
 export const getOverviewQuery = async (
   searchString: string,
-  coachId?: string
+  coachId?: string,
 ) => {
   const overview = await Form.aggregate([
     {
@@ -147,6 +147,6 @@ export const getOverviewQuery = async (
         },
       },
     },
-  ]);
-  return overview;
-};
+  ])
+  return overview
+}

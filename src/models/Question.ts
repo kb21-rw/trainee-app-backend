@@ -1,14 +1,14 @@
-import { Document, Schema, model } from "mongoose";
-import { IResponse } from "./Response";
-import { QuestionType } from "../utils/types";
+import { Document, Schema, model } from "mongoose"
+import { IResponse } from "./Response"
+import { QuestionType } from "../utils/types"
 
 export interface IQuestion extends Document {
-  id: string;
-  prompt: string;
-  type: QuestionType;
-  required: boolean;
-  options: string[];
-  responseIds: IResponse["_id"][];
+  id: string
+  prompt: string
+  type: QuestionType
+  required: boolean
+  options: string[]
+  responseIds: IResponse["_id"][]
 }
 
 const QuestionSchema = new Schema(
@@ -41,9 +41,9 @@ const QuestionSchema = new Schema(
     },
   },
 
-  { timestamps: {} }
-);
+  { timestamps: {} },
+)
 
-QuestionSchema.index({ title: "text" });
+QuestionSchema.index({ title: "text" })
 
-export default model("Question", QuestionSchema);
+export default model("Question", QuestionSchema)
