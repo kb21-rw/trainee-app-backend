@@ -34,10 +34,6 @@ const UserSchema = new Schema(
       type: Boolean,
       default: false,
     },
-    applied: {
-      type: Boolean,
-      default: false,
-    },
     password: {
       type: String,
     },

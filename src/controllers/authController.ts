@@ -1,6 +1,7 @@
 import { NextFunction, Request, Response } from "express"
 import {
   applicantRegisterService,
+  googleAuthService,
   loginService,
   registerService,
   resetPasswordService,
@@ -86,6 +87,27 @@ export const resetPassword = async (
     const userId = await resetPasswordService(req.body)
     return res.status(200).json({ userId })
   } catch (error: unknown) {
+    return next(error)
+  }
+}
+
+export const googleAuthController = async (
+  req: Request,
+  res: Response,
+  next: NextFunction,
+) => {
+  const { token } = req.body
+
+  try {
+    const accessToken = await googleAuthService(token)
+    return res
+      .status(200)
+      .cookie("access_token", accessToken, {
+        httpOnly: true,
+        secure: process.env.NODE_ENV === "production",
+      })
+      .json({ accessToken })
+  } catch (error) {
     return next(error)
   }
 }

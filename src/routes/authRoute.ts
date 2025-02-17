@@ -1,6 +1,7 @@
 import { Router } from "express"
 import {
   applicantRegister,
+  googleAuthController,
   login,
   register,
   resetPassword,
@@ -18,5 +19,7 @@ router.post("/reset-password", resetPassword)
 // Applicant
 router.post("/register/applicant", applicantRegister)
 router.patch("/applicant/verify", verifyApplicant)
+
+router.post("/google", googleAuthController)
 
 export default router

@@ -14,6 +14,7 @@ export const verifyJWT = (req: any, res: Response, next: NextFunction) => {
   }
 
   const token = authHeader.split(" ")[1]
+
   return verify(token, accessKey, async (err: any, decoded: any) => {
     if (err) {
       return res.status(403).json({
@@ -22,7 +23,11 @@ export const verifyJWT = (req: any, res: Response, next: NextFunction) => {
       })
     }
 
-    req.user = await getUserService({ _id: decoded.id })
-    return next()
+    try {
+      req.user = await getUserService({ _id: decoded.id })
+      return next()
+    } catch (err) {
+      return next(err)
+    }
   })
 }
