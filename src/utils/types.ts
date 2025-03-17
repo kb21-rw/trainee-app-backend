@@ -137,3 +137,14 @@ export interface StageDto {
   name: string
   description: string
 }
+
+// responses left in lowercase for smoother integration with Apps Script
+export interface JoinWaitListDto {
+  respondentEmail: string
+  timestamp: string
+  responses: {
+    email: string
+    firstname: string
+    lastname: string
+  }
+}
