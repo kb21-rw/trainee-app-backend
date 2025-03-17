@@ -41,6 +41,7 @@
   "devDependencies": {
     "@commitlint/cli": "^19.6.1",
     "@commitlint/config-conventional": "^19.6.0",
+    "@ngrok/ngrok": "^1.4.1",
     "@types/bcryptjs": "^2.4.4",
     "@types/cors": "^2.8.14",
     "@types/jest": "^29.5.12",
