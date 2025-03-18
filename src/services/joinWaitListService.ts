@@ -12,7 +12,7 @@ const joinWaitListService = async (joinWaitListData: JoinWaitListDto) => {
   if (prospect) {
     const addedProspect = await addProspectToTheWaitList(email)
 
-    io.to(email).emit("join", { email })
+    io.to(email).emit("joinedTheWaitList", { email })
 
     return addedProspect
   }
