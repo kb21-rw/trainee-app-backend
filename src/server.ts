@@ -2,8 +2,10 @@ import cors from "cors"
 import express, { Request, Response } from "express"
 
 import ngrok from "@ngrok/ngrok"
+import http from "http"
 import mongoose from "mongoose"
 import morgan from "morgan"
+import { Server } from "socket.io"
 import swaggerUI from "swagger-ui-express"
 import YAML from "yamljs"
 import CustomError from "./middlewares/customError"
@@ -27,11 +29,32 @@ const swaggerDocumentation = YAML.load("./swagger.yaml")
 const PORT = process.env.PORT || 3000
 const mongodb_url = process.env.MONGODB_URL || ""
 const app = express()
+const server = http.createServer(app)
+
+export const io = new Server(server, {
+  cors: {
+    origin: ["http://localhost:5173"],
+    // credentials: true,
+  },
+})
+
+io.on("connection", (socket) => {
+  console.log("Client connected:", socket.id)
+
+  socket.on("join-room", (email) => {
+    console.log("Received: " + email)
+    socket.join(email)
+  })
+
+  socket.on("disconnect", () => {
+    console.log("Client disconnected:", socket.id)
+  })
+})
 
 mongoose.connect(mongodb_url)
 
 mongoose.connection.once("open", () => {
-  app.listen(PORT, () => {
+  server.listen(PORT, () => {
     // eslint-disable-next-line no-console
     console.log(`The app is running on port ${PORT}`)
 
