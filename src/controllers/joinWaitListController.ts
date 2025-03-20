@@ -10,11 +10,11 @@ export const joinWaitListController = async (
   try {
     await joinWaitListFormValidation.validateAsync(req.body)
 
-    const joinWaitListForm = await joinWaitListService(req.body)
+    const addedProspect = await joinWaitListService(req.body)
 
     return res.status(201).json({
       message: "You've been added to the waitlist!",
-      user: joinWaitListForm,
+      user: addedProspect,
     })
   } catch (error) {
     return next(error)
