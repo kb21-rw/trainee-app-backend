@@ -6,7 +6,7 @@ import { USER_NOT_FOUND } from "../utils/errorCodes"
 import { JoinWaitListDto } from "../utils/types"
 
 const joinWaitListService = async (joinWaitListData: JoinWaitListDto) => {
-  const joinRoom = room[0]
+  const recipient = room[0]
   const email = joinWaitListData.responses.email
 
   const prospect = await getProspect(email)
@@ -14,11 +14,11 @@ const joinWaitListService = async (joinWaitListData: JoinWaitListDto) => {
   if (prospect && !prospect.isOnWaitList) {
     const addedProspect = await addProspectToTheWaitList(email)
 
-    io.to(joinRoom).emit("joinedTheWaitList", { email })
+    io.to(recipient).emit("joinedTheWaitList", { email })
 
     return addedProspect
   } else {
-    io.to(joinRoom).emit("waitListError", {
+    io.to(recipient).emit("waitListError", {
       errorMessage:
         "Provide the email you used while registering into the app!",
     })

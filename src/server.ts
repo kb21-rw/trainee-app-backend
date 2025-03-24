@@ -2,7 +2,6 @@
 import cors from "cors"
 import express, { Request, Response } from "express"
 
-import ngrok from "@ngrok/ngrok"
 import http from "http"
 import mongoose from "mongoose"
 import morgan from "morgan"
@@ -62,14 +61,16 @@ mongoose.connection.once("open", () => {
   server.listen(PORT, () => {
     console.log(`The app is running on port ${PORT}`)
 
-    ngrok
-      .connect({
-        addr: PORT,
-        authtoken: "2uOZibDF8YnCasNRyS5YtdDCrlA_7oH8Ptgu3FcjGNxy94bmy",
-      })
-      .then((listener) =>
-        console.log(`Ingress established at: ${listener.url()}`),
-      )
+    // Keep this block of code for development
+
+    // ngrok
+    //   .connect({
+    //     addr: PORT,
+    //     authtoken: "2uOZibDF8YnCasNRyS5YtdDCrlA_7oH8Ptgu3FcjGNxy94bmy",
+    //   })
+    //   .then((listener) =>
+    //     console.log(`Ingress established at: ${listener.url()}`),
+    //   )
   })
 })
 
