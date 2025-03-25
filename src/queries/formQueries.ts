@@ -14,12 +14,26 @@ export const getFormsQuery = async (
         from: "forms",
         localField: "forms",
         foreignField: "_id",
-        as: "forms",
+        as: "cohortForms",
+      },
+    },
+    {
+      $lookup: {
+        from: "forms",
+        localField: "applicationForm",
+        foreignField: "_id",
+        as: "applicationFormDetails",
       },
     },
     {
       $unwind: {
-        path: "$forms",
+        path: "$cohortForms",
+        preserveNullAndEmptyArrays: true,
+      },
+    },
+    {
+      $unwind: {
+        path: "$applicationFormDetails",
         preserveNullAndEmptyArrays: true,
       },
     },
@@ -27,7 +41,7 @@ export const getFormsQuery = async (
       $addFields: {
         formsMatching: {
           $regexMatch: {
-            input: "$forms.name",
+            input: "$cohortForms.name",
             regex: searchString,
             options: "i",
           },
@@ -38,12 +52,13 @@ export const getFormsQuery = async (
       $group: {
         _id: "$_id",
         name: { $first: "$name" },
-        description: { $first: "description" },
+        description: { $first: "$description" },
+        applicationForm: { $first: "$applicationFormDetails" },
         forms: {
           $push: {
             $cond: {
-              if: "$formsMatching",
-              then: "$forms",
+              if: "$cohortForms",
+              then: "$cohortForms",
               else: "$$REMOVE",
             },
           },
@@ -56,13 +71,22 @@ export const getFormsQuery = async (
         description: 1,
         forms: {
           $map: {
-            input: "$forms",
+            input: {
+              $concatArrays: ["$forms", ["$applicationForm"]],
+            },
             as: "form",
             in: {
               _id: "$$form._id",
               name: "$$form.name",
               description: "$$form.description",
               type: "$$form.type",
+              isApplicationForm: {
+                $cond: [
+                  { $eq: ["$$form._id", "$applicationForm._id"] },
+                  true,
+                  false,
+                ],
+              },
               questions: {
                 $size: "$$form.questionIds",
               },
@@ -72,5 +96,6 @@ export const getFormsQuery = async (
       },
     },
   ])
+
   return cohorts[0]
 }
