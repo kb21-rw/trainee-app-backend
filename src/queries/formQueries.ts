@@ -1,76 +1,63 @@
 import Cohort from "../models/Cohort"
+import Form from "../models/Form"
 import { GetCohortDto } from "../utils/types"
 
 export const getFormsQuery = async (
   searchString: string,
   cohort: GetCohortDto,
 ) => {
-  const cohorts = await Cohort.aggregate([
-    {
-      $match: cohort,
-    },
-    {
-      $lookup: {
-        from: "forms",
-        localField: "forms",
-        foreignField: "_id",
-        as: "forms",
-      },
-    },
-    {
-      $unwind: {
-        path: "$forms",
-        preserveNullAndEmptyArrays: true,
-      },
-    },
-    {
-      $addFields: {
-        formsMatching: {
-          $regexMatch: {
-            input: "$forms.name",
-            regex: searchString,
-            options: "i",
-          },
-        },
-      },
-    },
-    {
-      $group: {
-        _id: "$_id",
-        name: { $first: "$name" },
-        description: { $first: "description" },
-        forms: {
-          $push: {
-            $cond: {
-              if: "$formsMatching",
-              then: "$forms",
-              else: "$$REMOVE",
-            },
-          },
-        },
-      },
-    },
-    {
-      $project: {
-        name: 1,
-        description: 1,
-        forms: {
-          $map: {
-            input: "$forms",
-            as: "form",
-            in: {
-              _id: "$$form._id",
-              name: "$$form.name",
-              description: "$$form.description",
-              type: "$$form.type",
-              questions: {
-                $size: "$$form.questionIds",
-              },
-            },
-          },
-        },
-      },
-    },
-  ])
-  return cohorts[0]
+  const cohortData = await Cohort.findOne(cohort).lean().exec()
+
+  if (!cohortData) {
+    return null
+  }
+
+  const searchCriteria = searchString
+    ? { name: { $regex: searchString, $options: "i" } }
+    : {}
+
+  const formIds = cohortData.forms || []
+  const formsQuery = {
+    _id: { $in: formIds },
+    ...searchCriteria,
+  }
+
+  const forms = await Form.find(formsQuery).lean().exec()
+
+  let applicationForm = null
+  if (cohortData.applicationForm) {
+    const appFormQuery = {
+      _id: cohortData.applicationForm,
+      ...(searchString ? searchCriteria : {}),
+    }
+
+    applicationForm = await Form.findOne(appFormQuery).lean().exec()
+  }
+
+  const formattedForms = forms.map((form) => ({
+    _id: form._id,
+    name: form.name,
+    description: form.description,
+    type: form.type,
+    isApplicationForm: false,
+    questions: form.questionIds?.length || 0,
+  }))
+
+  if (applicationForm) {
+    formattedForms.push({
+      _id: applicationForm._id,
+      name: applicationForm.name,
+      description: applicationForm.description,
+      type: applicationForm.type,
+      isApplicationForm: true,
+      questions: applicationForm.questionIds?.length || 0,
+    })
+  }
+
+  return {
+    _id: cohortData._id,
+    name: cohortData.name,
+    description: cohortData.description,
+    forms: formattedForms,
+  }
 }
