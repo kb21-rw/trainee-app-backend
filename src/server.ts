@@ -10,6 +10,7 @@ import morgan from "morgan"
 import { Server } from "socket.io"
 import swaggerUI from "swagger-ui-express"
 import YAML from "yamljs"
+import { frontendUrl } from "./constants"
 import CustomError from "./middlewares/customError"
 import { errorHandler } from "./middlewares/errorHandler"
 import authRoute from "./routes/authRoute"
@@ -37,7 +38,7 @@ export const room: string[] = []
 
 export const io = new Server(server, {
   cors: {
-    origin: ["http://localhost:5173"],
+    origin: frontendUrl,
     credentials: true,
   },
 })
