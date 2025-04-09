@@ -24,3 +24,6 @@ export const updateUserSchema = Joi.object({
     .valid(Role.Admin, Role.Coach, Role.Prospect, Role.Trainee, Role.Applicant)
     .optional(),
 })
+export const toggleActiveStatusSchema = Joi.object({
+  active: Joi.boolean().required(),
+})
