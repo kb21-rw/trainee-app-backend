@@ -13,6 +13,7 @@ export interface IUser extends Document {
   coach?: string
   googleId: null | string
   isOnWaitList?: boolean
+  active: boolean
 }
 
 const UserSchema = new Schema(
@@ -55,6 +56,10 @@ const UserSchema = new Schema(
       type: Boolean,
       default: false,
       required: false,
+    },
+    active: {
+      type: Boolean,
+      default: true,
     },
   },
   { timestamps: {} },
