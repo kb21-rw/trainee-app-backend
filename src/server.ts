@@ -1,16 +1,13 @@
 /* eslint-disable no-console */
+import ngrok from "@ngrok/ngrok"
 import cors from "cors"
 import express, { Request, Response } from "express"
-
-// Uncomment this import statement for development
-// import ngrok from "@ngrok/ngrok"
 import http from "http"
 import mongoose from "mongoose"
 import morgan from "morgan"
 import { Server } from "socket.io"
 import swaggerUI from "swagger-ui-express"
 import YAML from "yamljs"
-import { frontendUrl } from "./constants"
 import CustomError from "./middlewares/customError"
 import { errorHandler } from "./middlewares/errorHandler"
 import authRoute from "./routes/authRoute"
@@ -38,7 +35,7 @@ export const room: string[] = []
 
 export const io = new Server(server, {
   cors: {
-    origin: frontendUrl,
+    origin: process.env.FRONTEND_URL,
     credentials: true,
   },
 })
@@ -64,16 +61,16 @@ mongoose.connection.once("open", () => {
   server.listen(PORT, () => {
     console.log(`The app is running on port ${PORT}`)
 
-    // Keep this block of code for development
-
-    // ngrok
-    //   .connect({
-    //     addr: PORT,
-    //     authtoken: "2uOZibDF8YnCasNRyS5YtdDCrlA_7oH8Ptgu3FcjGNxy94bmy",
-    //   })
-    //   .then((listener) =>
-    //     console.log(`Ingress established at: ${listener.url()}`),
-    //   )
+    if (process.env.NODE_ENV === "development") {
+      ngrok
+        .connect({
+          addr: PORT,
+          authtoken: process.env.NGROK_TOKEN,
+        })
+        .then((listener) =>
+          console.log(`Ingress established at: ${listener.url()}`),
+        )
+    }
   })
 })
 

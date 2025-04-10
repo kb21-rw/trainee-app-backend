@@ -17,18 +17,17 @@ const joinWaitListService = async (joinWaitListData: JoinWaitListDto) => {
     io.to(recipient).emit("joinedTheWaitList", { email })
 
     return addedProspect
-  } else {
-    io.to(recipient).emit("waitListError", {
-      errorMessage:
-        "Provide the email you used while registering into the app!",
-    })
-
-    throw new CustomError(
-      USER_NOT_FOUND,
-      "Provide the email you used for signing up on this app!",
-      500,
-    )
   }
+
+  io.to(recipient).emit("waitListError", {
+    errorMessage: "Provide the email you used while registering into the app!",
+  })
+
+  throw new CustomError(
+    USER_NOT_FOUND,
+    "Provide the email you used for signing up on this app!",
+    500,
+  )
 }
 
 export { joinWaitListService }
