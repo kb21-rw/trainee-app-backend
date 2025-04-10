@@ -12,6 +12,7 @@ export interface IUser extends Document {
   role: Role
   coach?: string
   googleId: null | string
+  isOnWaitList?: boolean
 }
 
 const UserSchema = new Schema(
@@ -49,6 +50,11 @@ const UserSchema = new Schema(
     googleId: {
       type: String,
       default: null,
+    },
+    isOnWaitList: {
+      type: Boolean,
+      default: false,
+      required: false,
     },
   },
   { timestamps: {} },

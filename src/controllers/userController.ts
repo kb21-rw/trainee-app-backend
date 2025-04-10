@@ -1,5 +1,9 @@
 import { NextFunction, Request, Response } from "express"
-import { getUsersSchema, ProfileSchema } from "../validations/userValidation"
+import {
+  getUsersSchema,
+  ProfileSchema,
+  updateUserSchema,
+} from "../validations/userValidation"
 import {
   deleteUserService,
   getUserService,
@@ -46,6 +50,23 @@ export const updateProfile = async (
     await ProfileSchema.validateAsync(req.body)
 
     const user = await updateUserService(userId, req.body)
+    return res.status(200).send(user)
+  } catch (error) {
+    return next(error)
+  }
+}
+
+export const updateUser = async (
+  req: Request,
+  res: Response,
+  next: NextFunction,
+) => {
+  try {
+    const userId = req.params.userId
+    const { name, role } = req.body
+    await updateUserSchema.validateAsync({ name, role })
+
+    const user = await updateUserService(userId, { name, role })
     return res.status(200).send(user)
   } catch (error) {
     return next(error)
