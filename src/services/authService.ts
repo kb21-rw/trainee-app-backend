@@ -123,6 +123,8 @@ export const loginService = async (body: any) => {
     throw new CustomError(INVALID_CREDENTIAL, "Invalid credential", 401)
   }
 
+  console.log("ACCESS_TOKEN_KEY: ", secret)
+
   const accessToken = jwt.sign({ id: user._id }, secret, {
     expiresIn: ACCESS_TOKEN_EXPIRATION,
   })
