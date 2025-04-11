@@ -110,7 +110,7 @@ export const loginService = async (body: any) => {
     )
   }
 
-  if (user.active === false) {
+  if (!user.active) {
     throw new CustomError(
       NOT_ALLOWED,
       "Account was deactivated, please consult the admin for more information",
@@ -122,8 +122,6 @@ export const loginService = async (body: any) => {
   if (!match) {
     throw new CustomError(INVALID_CREDENTIAL, "Invalid credential", 401)
   }
-
-  console.log("ACCESS_TOKEN_KEY: ", secret)
 
   const accessToken = jwt.sign({ id: user._id }, secret, {
     expiresIn: ACCESS_TOKEN_EXPIRATION,
@@ -161,7 +159,7 @@ export const googleAuthService = async (token: string) => {
       )
     }
 
-    if (user.active === false) {
+    if (!user.active) {
       throw new CustomError(
         NOT_ALLOWED,
         "Account was deactivated, please consult the admin for more information",

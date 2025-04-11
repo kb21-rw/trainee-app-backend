@@ -2,6 +2,7 @@ import { NextFunction, Request, Response } from "express"
 import {
   getUsersSchema,
   ProfileSchema,
+  toggleActiveStatusSchema,
   updateUserSchema,
 } from "../validations/userValidation"
 import {
@@ -97,11 +98,7 @@ export const toggleUserActiveStatus = async (
     const userId = req.params.userId
     const { active } = req.body
 
-    if (typeof active !== "boolean") {
-      return res.status(400).json({
-        message: "Active status must be a boolean",
-      })
-    }
+    await toggleActiveStatusSchema.validateAsync({ active })
 
     // Get the user to check if they're an admin
     const targetUser = await getUserService({ _id: userId })
