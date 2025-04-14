@@ -2,7 +2,6 @@ import { NextFunction, Request, Response } from "express"
 import {
   getUsersSchema,
   ProfileSchema,
-  toggleActiveStatusSchema,
   updateUserSchema,
 } from "../validations/userValidation"
 import {
@@ -96,9 +95,6 @@ export const toggleUserActiveStatus = async (
 ) => {
   try {
     const userId = req.params.userId
-    const { active } = req.body
-
-    await toggleActiveStatusSchema.validateAsync({ active })
 
     // Get the user to check if they're an admin
     const targetUser = await getUserService({ _id: userId })
@@ -108,8 +104,11 @@ export const toggleUserActiveStatus = async (
       })
     }
 
-    const user = await updateUserService(userId, { active })
-    return res.status(200).send(user)
+    const updatedUser = await updateUserService(userId, {
+      active: !targetUser.active,
+    })
+
+    return res.status(200).send(updatedUser)
   } catch (error) {
     return next(error)
   }
