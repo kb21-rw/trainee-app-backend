@@ -115,7 +115,10 @@ export interface DecisionDto {
 }
 
 export type updateUserDto = Partial<
-  Pick<IUser, "name" | "email" | "verified" | "password" | "role" | "coach">
+  Pick<
+    IUser,
+    "name" | "email" | "verified" | "password" | "role" | "coach" | "active"
+  >
 >
 export interface ICohortOverviewRequest {
   cohortId?: string

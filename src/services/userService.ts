@@ -19,7 +19,7 @@ export const getUsersService = async (search?: object) => {
 
 export const updateUserService = async (
   id: string,
-  { name, email, verified, password, role, coach }: updateUserDto,
+  { name, email, verified, password, role, coach, active }: updateUserDto,
 ) => {
   const user = await getUserService({ _id: id })
 
@@ -46,6 +46,10 @@ export const updateUserService = async (
   if (password) {
     const hashedPassword = await hash(password, 10)
     user.password = hashedPassword
+  }
+
+  if (active !== undefined) {
+    user.active = active
   }
 
   await user.save()

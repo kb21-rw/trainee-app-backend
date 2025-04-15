@@ -15,6 +15,7 @@ export class User {
   public readonly role?: Role
   public readonly coach?: string
   public readonly googleId?: null | string
+  public readonly active?: boolean
 
   public constructor(data: PartialIUserWithRequiredId) {
     this.id = data.id
@@ -25,6 +26,7 @@ export class User {
     this.role = data.role
     this.coach = data.coach
     this.googleId = data.googleId
+    this.active = data.active
   }
 }
 
@@ -41,6 +43,7 @@ export class UserBuilder extends Builder<
     password: "$2a$10$qMiI0IyA/BCuHyjgqn/f8.IDjrqn7rMrHoH4LZmYoYdXlhWI8QGiu",
     role: Role.Trainee,
     coach: "My coach",
+    active: true,
   }
 
   constructor() {
@@ -91,6 +94,11 @@ export class UserBuilder extends Builder<
 
   public withCoach(coach: string): this {
     this.properties.coach = coach
+    return this
+  }
+
+  public withActive(active: boolean): this {
+    this.properties.active = active
     return this
   }
 
