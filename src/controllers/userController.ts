@@ -96,7 +96,7 @@ export const toggleUserActiveStatus = async (
   try {
     const userId = req.params.userId
 
-    // Get the user to check if they're an admin
+    // Get the user to check if they're admin or coach
     const targetUser = await getUserService({ _id: userId })
     if (targetUser.role !== Role.Admin && targetUser.role !== Role.Coach) {
       return res.status(403).json({
