@@ -53,10 +53,10 @@ export const generateCohortIdService = async () => {
 export const createCohortService = async (cohortData: CreateCohortDto) => {
   await Cohort.updateOne({ isActive: true }, { isActive: false })
 
-  const cohortID = await generateCohortIdService()
+  const cohortId = await generateCohortIdService()
   const newCohort = await Cohort.create({
     ...cohortData,
-    cohortID,
+    cohortId,
     stages: createStagesHandler(cohortData.stages),
   })
 
