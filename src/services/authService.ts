@@ -40,6 +40,7 @@ export const registerService = async (
     name,
     password: hashedPassword,
     verified: true,
+    active: true,
   })
 
   await sendEmail(createdUser.email, {
@@ -65,6 +66,7 @@ export const applicantRegisterService = async (body: any) => {
     name,
     userId: await generateUserIdService(),
     password: hashedPassword,
+    active: true,
   })
 
   await sendEmail(createdUser.email, {
@@ -105,6 +107,14 @@ export const loginService = async (body: any) => {
       NOT_ALLOWED,
       "Trainees are not allowed to login yet",
       409,
+    )
+  }
+
+  if (!user.active) {
+    throw new CustomError(
+      NOT_ALLOWED,
+      "Account was deactivated, please consult the admin for more information",
+      403,
     )
   }
 
@@ -149,6 +159,14 @@ export const googleAuthService = async (token: string) => {
       )
     }
 
+    if (!user.active) {
+      throw new CustomError(
+        NOT_ALLOWED,
+        "Account was deactivated, please consult the admin for more information",
+        403,
+      )
+    }
+
     const accessToken = jwt.sign({ id: user._id }, secret, {
       expiresIn: ACCESS_TOKEN_EXPIRATION,
     })
@@ -162,6 +180,7 @@ export const googleAuthService = async (token: string) => {
     verified: true,
     googleId: payload?.sub ?? "",
     role: Role.Prospect,
+    active: true,
   })
 
   const accessToken = jwt.sign({ id: createdUser._id }, secret, {

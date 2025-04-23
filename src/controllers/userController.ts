@@ -10,6 +10,7 @@ import {
   getUsersService,
   updateUserService,
 } from "../services/userService"
+import { Role } from "../utils/types"
 
 export const getProfile = async (
   req: any,
@@ -82,6 +83,32 @@ export const deleteUser = async (
     const userId = req.params.userId
     await deleteUserService(userId)
     return res.status(200).send("User deleted successfully")
+  } catch (error) {
+    return next(error)
+  }
+}
+
+export const toggleUserActiveStatus = async (
+  req: Request,
+  res: Response,
+  next: NextFunction,
+) => {
+  try {
+    const userId = req.params.userId
+
+    // Get the user to check if they're an admin
+    const targetUser = await getUserService({ _id: userId })
+    if (targetUser.role !== Role.Admin) {
+      return res.status(403).json({
+        message: "You can only activate/deactivate admin users",
+      })
+    }
+
+    const updatedUser = await updateUserService(userId, {
+      active: !targetUser.active,
+    })
+
+    return res.status(200).send(updatedUser)
   } catch (error) {
     return next(error)
   }

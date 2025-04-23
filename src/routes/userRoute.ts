@@ -5,6 +5,7 @@ import {
   deleteUser,
   getUsersController,
   updateUser,
+  toggleUserActiveStatus,
 } from "../controllers/userController"
 import { verifyJWT } from "../middlewares/authenticate"
 import { isAdmin } from "../middlewares/authorization"
@@ -16,5 +17,6 @@ router.get("/my-profile", verifyJWT, getProfile)
 router.patch("/my-profile", verifyJWT, updateProfile)
 router.patch("/:userId", verifyJWT, isAdmin, updateUser)
 router.delete("/:userId", deleteUser)
+router.patch("/:userId/status", verifyJWT, isAdmin, toggleUserActiveStatus)
 
 export default router

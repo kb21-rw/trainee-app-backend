@@ -24,7 +24,18 @@ export const verifyJWT = (req: any, res: Response, next: NextFunction) => {
     }
 
     try {
-      req.user = await getUserService({ _id: decoded.id })
+      const user = await getUserService({ _id: decoded.id })
+
+      // Check if user is active
+      if (!user.active) {
+        return res.status(403).json({
+          type: "DeactivatedAccount",
+          errorMessage:
+            "Account was deactivated, please consult the admin for more information",
+        })
+      }
+
+      req.user = user
       return next()
     } catch (err) {
       return next(err)
