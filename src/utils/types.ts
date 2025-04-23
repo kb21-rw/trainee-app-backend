@@ -35,6 +35,7 @@ export interface CreateCohortDto {
   description?: string
   stages: Except<IStage, "id">[]
   trainingStartDate: Date
+  cohortId: string
 }
 export interface UpdateFormDto {
   name?: string
