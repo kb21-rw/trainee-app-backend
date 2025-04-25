@@ -99,6 +99,7 @@ const CohortSchema = new Schema(
             text: { type: String },
           },
         ],
+        coach: { type: Schema.Types.ObjectId, ref: "User", default: null },
         _id: false,
       },
     ],

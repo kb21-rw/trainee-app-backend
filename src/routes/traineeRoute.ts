@@ -7,7 +7,7 @@ import {
 import { verifyJWT } from "../middlewares/authenticate"
 
 const router = Router()
-router.get("/", verifyJWT, getTrainees)
+router.get("/:cohortId", verifyJWT, getTrainees)
 router.get("/my-trainees", verifyJWT, getTraineesForCoach)
 router.patch("/:id", verifyJWT, updateTrainee)
 export default router
