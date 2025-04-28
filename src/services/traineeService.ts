@@ -11,13 +11,19 @@ import { updateUserDto } from "../utils/types"
 
 export const getTraineesService = async ({
   cohortId,
+  sortBy,
+  traineesPerPage,
 }: {
   cohortId: string
   searchString: string
   sortBy: string
   traineesPerPage: number
 }) => {
-  const trainees = getTraineesWithDetailsQuery(cohortId)
+  const trainees = getTraineesWithDetailsQuery(
+    cohortId,
+    sortBy,
+    traineesPerPage,
+  )
   return trainees
 }
 

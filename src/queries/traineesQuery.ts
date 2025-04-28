@@ -61,17 +61,21 @@ export const getTraineesQuery = async (
   return trainees
 }
 
-export const getTraineesWithDetailsQuery = async (cohortId: string) => {
+export const getTraineesWithDetailsQuery = async (
+  cohortId: string,
+  sortBy: string,
+  traineesPerPage: number,
+) => {
   const trainees = await Cohort.aggregate([
     {
       $match: { _id: new mongoose.Types.ObjectId(cohortId) },
     },
     {
-      $unwind: "$trainees",
+      $unwind: "$trainees", // Flatten the trainees array
     },
     {
       $lookup: {
-        from: "users",
+        from: "users", // Join with the User collection to get trainee details
         localField: "trainees.id",
         foreignField: "_id",
         as: "traineeDetails",
@@ -79,7 +83,7 @@ export const getTraineesWithDetailsQuery = async (cohortId: string) => {
     },
     {
       $lookup: {
-        from: "users",
+        from: "users", // Join with the User collection to get coach details
         localField: "trainees.coach",
         foreignField: "_id",
         as: "coachDetails",
@@ -91,20 +95,45 @@ export const getTraineesWithDetailsQuery = async (cohortId: string) => {
         coachDetails: {
           $cond: {
             if: { $eq: [{ $size: "$coachDetails" }, 0] },
-            then: null,
-            else: { $arrayElemAt: ["$coachDetails", 0] },
+            then: null, // Set coach to null if no matching coach details
+            else: { $arrayElemAt: ["$coachDetails", 0] }, // Otherwise, extract the first element
           },
         },
         currentStage: {
-          $cond: {
-            if: {
-              $and: [
-                { $ne: ["$trainees.droppedStage.id", null] },
-                { $eq: ["$trainees.droppedStage.isConfirmed", true] },
+          $ifNull: [
+            {
+              $arrayElemAt: [
+                {
+                  $filter: {
+                    input: "$stages", // Iterate over the cohort's stages
+                    as: "stage",
+                    cond: {
+                      $eq: ["$$stage.id", "$trainees.droppedStage.id"], // the dropped stage is the current stage whether confirmed or not
+                    },
+                  },
+                },
+                0,
               ],
             },
-            then: "$trainees.droppedStage.id",
-            else: { $arrayElemAt: ["$trainees.passedStages", -1] },
+            { name: "No current stage" }, // Default value if no stage is found
+          ],
+        },
+        passedStages: {
+          $map: {
+            input: "$trainees.passedStages",
+            as: "passedStageId",
+            in: {
+              $arrayElemAt: [
+                {
+                  $filter: {
+                    input: "$stages",
+                    as: "stage",
+                    cond: { $eq: ["$$stage.id", "$$passedStageId"] },
+                  },
+                },
+                0,
+              ],
+            },
           },
         },
         isActive: {
@@ -115,34 +144,28 @@ export const getTraineesWithDetailsQuery = async (cohortId: string) => {
                 { $eq: ["$trainees.droppedStage.isConfirmed", true] },
               ],
             },
-            then: false,
-            else: true,
+            then: false, // Not active if dropped stage is confirmed
+            else: true, // Active otherwise
           },
         },
       },
     },
+
     {
       $project: {
         id: "$traineeDetails._id",
         name: "$traineeDetails.name",
         coach: "$coachDetails.name",
-        stage: "$currentStage",
-        isActive: { $ifNull: ["$isActive", 1] },
+        stage: "$currentStage.name",
+        passedStages: "$passedStages",
+        isActive: { $ifNull: ["$isActive", true] },
       },
     },
     {
-      $group: {
-        _id: "$_id",
-        trainees: {
-          $push: {
-            id: "$id",
-            name: "$name",
-            coach: "$coach",
-            stage: "$currentStage",
-            isActive: "$isActive",
-          },
-        },
-      },
+      $sort: { [sortBy]: 1 },
+    },
+    {
+      $limit: traineesPerPage,
     },
   ])
 
