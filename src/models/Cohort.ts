@@ -15,6 +15,7 @@ export interface IParticipant {
 
 export interface ICohort extends Document {
   id: string
+  cohortId: string
   name: string
   description: string
   isActive: boolean
@@ -42,6 +43,11 @@ const CohortSchema = new Schema(
       type: Boolean,
       required: true,
       default: true,
+    },
+    cohortId: {
+      type: String,
+      unique: true,
+      required: true,
     },
     stages: [
       {

@@ -40,11 +40,23 @@ export const getCohortsService = async (searchString: string) => {
   return await getCohortsQuery(searchString)
 }
 
+export const generateCohortIdService = async () => {
+  let cohortId = 1
+  const lastCohort = await Cohort.findOne().sort({ cohortId: -1 })
+  if (lastCohort?.cohortId) {
+    cohortId = parseInt(lastCohort.cohortId, 10) + 1
+  }
+
+  return String(cohortId).padStart(6, "0")
+}
+
 export const createCohortService = async (cohortData: CreateCohortDto) => {
   await Cohort.updateOne({ isActive: true }, { isActive: false })
 
+  const cohortId = await generateCohortIdService()
   const newCohort = await Cohort.create({
     ...cohortData,
+    cohortId,
     stages: createStagesHandler(cohortData.stages),
   })
 
