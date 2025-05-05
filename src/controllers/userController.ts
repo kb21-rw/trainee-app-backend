@@ -96,11 +96,11 @@ export const toggleUserActiveStatus = async (
   try {
     const userId = req.params.userId
 
-    // Get the user to check if they're an admin
+    // Get the user to check if they're admin or coach
     const targetUser = await getUserService({ _id: userId })
-    if (targetUser.role !== Role.Admin) {
+    if (![Role.Admin, Role.Coach].includes(targetUser.role)) {
       return res.status(403).json({
-        message: "You can only activate/deactivate admin users",
+        message: "You can only activate/deactivate admin and coach users",
       })
     }
 
