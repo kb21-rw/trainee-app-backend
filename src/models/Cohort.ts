@@ -15,7 +15,7 @@ export interface IParticipant {
 
 export interface ICohort extends Document {
   id: string
-  cohortId: string
+  cohortNumber: string
   name: string
   description: string
   isActive: boolean
