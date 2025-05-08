@@ -64,12 +64,12 @@ export const createCohortService = async (cohortData: CreateCohortDto) => {
 }
 
 export const updateCohortService = async (
-  cohortId: string,
+  cohortNumber: string,
   formData: UpdateCohortDto,
 ) => {
   const { name, description, stages, trainingStartDate } = formData
 
-  const cohort = await Cohort.findById(cohortId)
+  const cohort = await Cohort.findOne({ cohortNumber })
   if (!cohort) {
     throw new CustomError(COHORT_NOT_FOUND, "Cohort not found", 404)
   }
