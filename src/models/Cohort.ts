@@ -60,7 +60,7 @@ const CohortSchema = new Schema(
     ],
     trainingStartDate: {
       type: Date,
-      require: true,
+      required: true,
     },
     forms: [
       {
