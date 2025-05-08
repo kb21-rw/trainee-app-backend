@@ -44,7 +44,7 @@ const CohortSchema = new Schema(
       required: true,
       default: true,
     },
-    cohortId: {
+    cohortNumber: {
       type: String,
       unique: true,
       required: true,
