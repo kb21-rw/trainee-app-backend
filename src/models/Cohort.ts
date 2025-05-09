@@ -15,7 +15,7 @@ export interface IParticipant {
 
 export interface ICohort extends Document {
   id: string
-  cohortId: string
+  cohortNumber: string
   name: string
   description: string
   isActive: boolean
@@ -44,7 +44,7 @@ const CohortSchema = new Schema(
       required: true,
       default: true,
     },
-    cohortId: {
+    cohortNumber: {
       type: String,
       unique: true,
       required: true,
@@ -60,7 +60,7 @@ const CohortSchema = new Schema(
     ],
     trainingStartDate: {
       type: Date,
-      require: true,
+      required: true,
     },
     forms: [
       {
