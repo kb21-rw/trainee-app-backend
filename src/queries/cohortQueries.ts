@@ -19,6 +19,7 @@ export const getCohortsQuery = async (searchString: string) => {
         trainees: { $size: "$trainees" },
         coaches: { $size: "$coaches" },
         forms: { $size: "$forms" },
+        cohortNumber: "$cohortNumber",
       },
     },
   ])

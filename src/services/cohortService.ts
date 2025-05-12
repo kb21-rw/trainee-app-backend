@@ -40,11 +40,23 @@ export const getCohortsService = async (searchString: string) => {
   return await getCohortsQuery(searchString)
 }
 
+export const generateCohortIdService = async () => {
+  let cohortNumber = 1
+  const lastCohort = await Cohort.findOne().sort({ cohortNumber: -1 })
+  if (lastCohort?.cohortNumber) {
+    cohortNumber = parseInt(lastCohort.cohortNumber, 10) + 1
+  }
+
+  return String(cohortNumber).padStart(6, "0")
+}
+
 export const createCohortService = async (cohortData: CreateCohortDto) => {
   await Cohort.updateOne({ isActive: true }, { isActive: false })
 
+  const cohortNumber = await generateCohortIdService()
   const newCohort = await Cohort.create({
     ...cohortData,
+    cohortNumber,
     stages: createStagesHandler(cohortData.stages),
   })
 
@@ -52,12 +64,12 @@ export const createCohortService = async (cohortData: CreateCohortDto) => {
 }
 
 export const updateCohortService = async (
-  cohortId: string,
+  cohortNumber: string,
   formData: UpdateCohortDto,
 ) => {
   const { name, description, stages, trainingStartDate } = formData
 
-  const cohort = await Cohort.findById(cohortId)
+  const cohort = await Cohort.findOne({ cohortNumber })
   if (!cohort) {
     throw new CustomError(COHORT_NOT_FOUND, "Cohort not found", 404)
   }
