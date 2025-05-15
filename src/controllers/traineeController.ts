@@ -12,10 +12,11 @@ export const getTrainees = async (
   next: NextFunction,
 ) => {
   const searchString = String(req.query.searchString || "")
-  const traineesPerPage = Number(req.query.coachesPerPage) || 10
+  const traineesPerPage = Number(req.query.traineesPerPage) || 10
   const sortBy = String(req.query.sortBy || "entry")
   try {
     const trainees = await getTraineesService({
+      cohortId: String(req.params.cohortId),
       searchString,
       sortBy,
       traineesPerPage,
