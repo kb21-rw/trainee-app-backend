@@ -3,27 +3,22 @@ import User from "../models/User"
 import { USER_NOT_FOUND } from "../utils/errorCodes"
 import {
   getTraineesForCoachQuery,
-  getTraineesWithDetailsQuery,
+  getTraineesQuery,
 } from "../queries/traineesQuery"
 import { getCohortService } from "./cohortService"
 import { updateUserService } from "./userService"
 import { updateUserDto } from "../utils/types"
 
 export const getTraineesService = async ({
-  cohortId,
+  searchString,
   sortBy,
   traineesPerPage,
 }: {
-  cohortId: string
   searchString: string
   sortBy: string
   traineesPerPage: number
 }) => {
-  const trainees = getTraineesWithDetailsQuery(
-    cohortId,
-    sortBy,
-    traineesPerPage,
-  )
+  const trainees = getTraineesQuery(searchString, sortBy, traineesPerPage)
   return trainees
 }
 
