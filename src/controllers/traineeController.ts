@@ -16,7 +16,6 @@ export const getTrainees = async (
   const sortBy = String(req.query.sortBy || "entry")
   try {
     const trainees = await getTraineesService({
-      cohortId: String(req.params.cohortId),
       searchString,
       sortBy,
       traineesPerPage,
