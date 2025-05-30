@@ -27,7 +27,7 @@ router.get(
   isAuthorized([Role.Prospect, Role.Applicant]),
   getMyApplicationController,
 )
-router.get("/", verifyJWT, isAdmin, getCohortsController)
+router.get("/", verifyJWT, isAdminOrCoach, getCohortsController)
 router.get("/overview", verifyJWT, isAdminOrCoach, getCohortOverviewController)
 router.get("/:cohortId", verifyJWT, isAdmin, getCohortController)
 
