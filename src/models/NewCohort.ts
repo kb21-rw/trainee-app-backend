@@ -55,6 +55,7 @@ const NewCohortSchema = new Schema(
         id: { type: String, required: true },
         name: { type: String, enum: Object.values(StageName), required: true },
         order: { type: Number, required: true },
+        participantsCount: { type: Number, default: 0 },
         isPreselection: { type: Boolean, default: false },
         isCurrent: { type: Boolean, default: false },
       },

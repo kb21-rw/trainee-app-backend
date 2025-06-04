@@ -30,6 +30,7 @@ export interface INewStage {
   name: StageName
   id: string
   order: number
+  participantsCount: number
   isPreselection: boolean
   isCurrent: boolean
 }
@@ -62,6 +63,15 @@ export interface CreateCohortDto {
   trainingStartDate: Date
   cohortId: string
 }
+export interface NewCreateCohortDto {
+  name: string
+  description?: string
+  stages: Except<INewStage, "id">[]
+  startDate: Date
+  endDate: Date
+  cohortNumber: string
+}
+
 export interface UpdateFormDto {
   name?: string
   description?: string
@@ -75,6 +85,14 @@ export interface UpdateCohortDto {
   description?: string
   stages?: SetOptional<IStage, "id">[]
   trainingStartDate?: string
+}
+
+export interface NewUpdateCohortDto {
+  name?: string
+  description?: string
+  stages?: SetOptional<INewStage, "id">[]
+  startDate?: string
+  endDate?: string
 }
 
 export interface CreateQuestionDto {
@@ -165,6 +183,11 @@ export interface AddApplicantsDto {
 export interface StageDto {
   name: string
   description: string
+}
+
+export interface NewStageDto {
+  name: StageName
+  order: number
 }
 
 // responses left in lowercase for smoother integration with Apps Script
