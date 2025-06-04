@@ -15,6 +15,31 @@ export interface IStage {
   description: string
   participantsCount: number
 }
+
+export enum StageName {
+  InterviewOne = "Interview One",
+  InterviewTwo = "Interview Two",
+  JSFundamentals = "JS Fundamentals",
+  JSDOM = "JS DOM",
+  ES6 = "ES6",
+  React = "React",
+  AsynchronousJS = "Asynchronous JS",
+}
+
+export interface INewStage {
+  name: StageName
+  id: string
+  order: number
+  isPreselection: boolean
+  isCurrent: boolean
+}
+
+export interface ICoach {
+  id: string
+  userId: IUser["_id"]
+  applicants: IUser["_id"][] // refer to applicants IDs in the trainees model
+  trainees: IUser["_id"][] // refer to trainees IDs in the trainees model
+}
 export interface CreateApplicantTraineeFormDto {
   type: FormType.Applicant | FormType.Trainee
   name: string
