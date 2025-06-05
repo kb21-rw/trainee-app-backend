@@ -187,6 +187,8 @@ export interface StageDto {
 export interface NewStageDto {
   name: StageName
   order: number
+  isCurrent: boolean
+  isPreselection: boolean
 }
 
 // responses left in lowercase for smoother integration with Apps Script
