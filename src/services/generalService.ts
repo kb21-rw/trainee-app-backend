@@ -62,7 +62,12 @@ export const updateNewStagesService = (
   currentStages: INewStage[],
   receivedStages: NewStageDto[],
 ) => {
-  if (!currentStages) {
+  const existingStageOrders = currentStages.map((stage) => stage.order)
+  const highestOrder = Math.max(...existingStageOrders)
+
+  const lastStage = currentStages.find((stage) => stage.order === highestOrder)
+
+  if (lastStage?.participantsCount !== 0) {
     throw new CustomError(
       NOT_ALLOWED,
       "You can't updated stages, there're participants on the last stage already.",
@@ -74,10 +79,20 @@ export const updateNewStagesService = (
     receivedStages.map((stage) => stage.name),
   )
 
+  const uniqueReceivedStageOrders = new Set(
+    receivedStages.map((stage) => stage.order),
+  )
+
   if (uniqueReceivedStageNames.size !== receivedStages.length)
     throw new CustomError(
       DUPLICATE_DOCUMENT,
       "Duplicate stage names are not allowed",
+      400,
+    )
+  if (uniqueReceivedStageOrders.size !== receivedStages.length)
+    throw new CustomError(
+      DUPLICATE_DOCUMENT,
+      "Duplicate stage order are not allowed",
       400,
     )
 

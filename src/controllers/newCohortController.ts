@@ -1,17 +1,15 @@
 import { NextFunction, Request, Response } from "express"
 import {
   createNewCohortValidation,
-  decisionValidation,
   updateCohortValidation,
 } from "../validations/newCohortValidation"
+import { mongodbIdValidation } from "../validations/generalValidation"
 import {
   createCohortService,
-  decisionService,
   getCohortService,
   getCohortsService,
   updateCohortService,
-} from "../services/cohortService"
-import { mongodbIdValidation } from "../validations/generalValidation"
+} from "../services/newCohortService"
 
 export const createCohortController = async (
   req: Request,
@@ -68,21 +66,6 @@ export const updateCohortController = async (
     const updatedCohort = await updateCohortService(cohortId, req.body)
     return res.status(200).json(updatedCohort)
   } catch (error) {
-    return next(error)
-  }
-}
-
-export const decisionController = async (
-  req: Request,
-  res: Response,
-  next: NextFunction,
-) => {
-  try {
-    const body = req.body
-    await decisionValidation.validateAsync(body)
-    const decision = await decisionService(body)
-    return res.status(201).send(decision)
-  } catch (error: any) {
     return next(error)
   }
 }

@@ -14,9 +14,8 @@ export const createNewCohortValidation = Joi.object({
       }),
     )
     .min(1)
-    .message("Add at least 1 stage"),
-  cohortNumber: Joi.string().min(1).max(100).required(),
-  isActive: Joi.boolean().required(),
+    .message("Add at least 1 stage")
+    .required(),
   startDate: Joi.date().min("now").required(),
   endDate: Joi.date().min(Joi.ref("startDate")).required(),
 })
@@ -30,7 +29,16 @@ export const updateCohortValidation = Joi.object({
   endDate: Joi.date()
     .min(Joi.ref("startDate"))
     .message("Training end date must be after start date"),
-  currentStage: Joi.string().min(1).max(100),
+  stages: Joi.array()
+    .items(
+      Joi.object({
+        name: Joi.string().min(1),
+        order: Joi.number().required(),
+        isPreselection: Joi.boolean().required(),
+        isCurrent: Joi.boolean().required(),
+      }),
+    )
+    .min(1),
 })
 
 export const decisionValidation = Joi.object({

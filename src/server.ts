@@ -13,6 +13,7 @@ import { errorHandler } from "./middlewares/errorHandler"
 import authRoute from "./routes/authRoute"
 import coachRoute from "./routes/coachRoute"
 import cohortRoutes from "./routes/cohortRoutes"
+import newCohortRoutes from "./routes/newCohortRoute"
 import formRoute from "./routes/formRoute"
 import joinWaitListRoute from "./routes/joinWaitListRoute"
 import overviewRoute from "./routes/overviewRoute"
@@ -89,6 +90,7 @@ app.use("/trainees", traineeRoute)
 app.use("/participants", participantRoutes)
 app.use("/coaches", coachRoute)
 app.use("/cohorts", cohortRoutes)
+app.use("/new-cohorts", newCohortRoutes)
 app.use("/forms", formRoute)
 app.use("/questions", questionRoute)
 app.use("/responses", responseRoute)

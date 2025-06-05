@@ -69,7 +69,6 @@ export interface NewCreateCohortDto {
   stages: Except<INewStage, "id">[]
   startDate: Date
   endDate: Date
-  cohortNumber: string
 }
 
 export interface UpdateFormDto {
