@@ -13,6 +13,7 @@ export interface INewCohort extends Document {
   coaches: ICoach[] // refer to coach IDs
   trainees: IUser["_id"][] // refer to trainee IDs in trainees model
   stages: INewStage[]
+  applicationForm: IForm["_id"] | null
   cohortNumber: string
   forms: IForm["_id"][]
 }
@@ -68,6 +69,11 @@ const NewCohortSchema = new Schema(
       type: String,
       unique: true,
       required: true,
+    },
+    applicationForm: {
+      type: Schema.Types.ObjectId,
+      ref: "Form",
+      default: null,
     },
     forms: [{ type: Schema.Types.ObjectId, ref: "Form" }],
   },

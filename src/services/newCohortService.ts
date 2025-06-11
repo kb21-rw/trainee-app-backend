@@ -95,3 +95,13 @@ export const updateCohortService = async (
 
   return await cohort.save()
 }
+
+export const getApplicationFormService = async () => {
+  const currentCohort = await getCohortService({ isActive: true })
+
+  if (!currentCohort.applicationForm) {
+    return null
+  }
+
+  return currentCohort.applicationForm
+}

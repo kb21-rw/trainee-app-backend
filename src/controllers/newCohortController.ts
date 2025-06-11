@@ -6,6 +6,7 @@ import {
 import { mongodbIdValidation } from "../validations/generalValidation"
 import {
   createCohortService,
+  getApplicationFormService,
   getCohortService,
   getCohortsService,
   updateCohortService,
@@ -65,6 +66,19 @@ export const updateCohortController = async (
     await updateCohortValidation.validateAsync(req.body)
     const updatedCohort = await updateCohortService(cohortId, req.body)
     return res.status(200).json(updatedCohort)
+  } catch (error) {
+    return next(error)
+  }
+}
+
+export const getApplicationFormController = async (
+  _req: Request,
+  res: Response,
+  next: NextFunction,
+) => {
+  try {
+    const form = await getApplicationFormService()
+    return res.status(200).json(form)
   } catch (error) {
     return next(error)
   }
