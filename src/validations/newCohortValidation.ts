@@ -8,9 +8,8 @@ export const createNewCohortValidation = Joi.object({
     .items(
       Joi.object({
         name: Joi.string().min(1),
-        order: Joi.number().required(),
+        description: Joi.string().min(3).max(100).optional(),
         isPreselection: Joi.boolean().required(),
-        isCurrent: Joi.boolean().required(),
       }),
     )
     .min(1)
@@ -33,9 +32,8 @@ export const updateCohortValidation = Joi.object({
     .items(
       Joi.object({
         name: Joi.string().min(1),
-        order: Joi.number().required(),
+        description: Joi.string().min(3).max(100).optional(),
         isPreselection: Joi.boolean().required(),
-        isCurrent: Joi.boolean().required(),
       }),
     )
     .min(1),

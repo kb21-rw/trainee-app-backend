@@ -58,7 +58,7 @@ const NewCohortSchema = new Schema(
           required: true,
           unique: true,
         },
-        order: { type: Number, required: true, unique: true },
+        description: { type: String },
         participantsCount: { type: Number, default: 0 },
         isPreselection: { type: Boolean, default: false },
         isCurrent: { type: Boolean, default: false },

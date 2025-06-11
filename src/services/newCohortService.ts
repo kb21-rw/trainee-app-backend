@@ -35,7 +35,6 @@ export const createCohortService = async (cohortData: NewCreateCohortDto) => {
   await NewCohort.updateOne({ isActive: true }, { isActive: false })
 
   const cohortNumber = await generateCohortIdService()
-  console.log("service")
   const newCohort = await NewCohort.create({
     ...cohortData,
     cohortNumber,

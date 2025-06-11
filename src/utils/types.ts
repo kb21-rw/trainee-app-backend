@@ -29,7 +29,7 @@ export enum StageName {
 export interface INewStage {
   name: StageName
   id: string
-  order: number
+  description?: string
   participantsCount: number
   isPreselection: boolean
   isCurrent: boolean
@@ -186,7 +186,7 @@ export interface StageDto {
 
 export interface NewStageDto {
   name: StageName
-  order: number
+  description?: string
   isCurrent: boolean
   isPreselection: boolean
 }

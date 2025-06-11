@@ -2,6 +2,7 @@ import { Types } from "mongoose"
 import CustomError from "../middlewares/customError"
 import { DUPLICATE_DOCUMENT, NOT_ALLOWED } from "../utils/errorCodes"
 import { INewStage, IStage, NewStageDto, StageDto } from "../utils/types"
+import { validatePreselectionStages } from "../utils/helpers"
 
 export const updateStagesService = (
   currentStages: IStage[],
@@ -64,7 +65,7 @@ export const updateNewStagesService = (
 ) => {
   //check if received stages are unique
   const receivedStageNames = receivedStages.map((stage) => stage.name)
-  const receivedStageOrders = receivedStages.map((stage) => stage.order)
+
   const uniqueReceivedStageNames = new Set(receivedStageNames)
   if (uniqueReceivedStageNames.size !== receivedStages.length) {
     throw new CustomError(
@@ -74,64 +75,28 @@ export const updateNewStagesService = (
     )
   }
 
-  //check if received order are unique
-  const uniqueReceivedStageOrders = new Set(receivedStageOrders)
-  if (uniqueReceivedStageOrders.size !== receivedStages.length) {
-    throw new CustomError(
-      DUPLICATE_DOCUMENT,
-      "Duplicate stage orders are not allowed",
-      400,
-    )
+  const currentStageIndex = currentStages.findIndex((stage) => stage.isCurrent)
+  if (receivedStages.length < currentStageIndex + 1) {
+    throw new CustomError(NOT_ALLOWED, "You can't delete a passed stage", 403)
   }
 
-  //check if received stages are in current stages
-
-  // filter stages with participants count
-  const currentStagesWithParticipants = currentStages.filter(
-    (stage) => stage.participantsCount !== 0,
-  )
-
-  const currentStageOrderWithParticipants = currentStagesWithParticipants.map(
-    (stage) => stage.order,
-  )
-
-  // check if the received stages are in current stages that have participants and throw error if they are
-  if (currentStageOrderWithParticipants.length > 0) {
-    const hasParticipantsInUpdatedStages = receivedStages.find((stage) =>
-      currentStageOrderWithParticipants.includes(stage.order),
-    )
-    if (hasParticipantsInUpdatedStages) {
-      throw new CustomError(
-        NOT_ALLOWED,
-        "You can't update the order of stages with participants",
-        403,
-      )
-    }
-  }
-
-  // check if minimum stage order  is being updated before the highest order of current stages with participants if there are any throw error
-  const minUpdatedStageOrder = Math.min(...receivedStageOrders)
-  const maxCurrentStageOrderWithParticipants =
-    currentStagesWithParticipants.length > 0
-      ? Math.max(...currentStageOrderWithParticipants)
-      : 0
-
-  if (minUpdatedStageOrder < maxCurrentStageOrderWithParticipants) {
-    throw new CustomError(NOT_ALLOWED, "You can't update the order of", 403)
-  }
-
-  const unUpdatedStages = currentStages.filter(
-    (stage) =>
-      !receivedStageNames.includes(stage.name) &&
-      !receivedStageOrders.includes(stage.order),
-  )
-
-  return {
-    ...unUpdatedStages,
-    ...receivedStages.map((stage) => ({
+  validatePreselectionStages(receivedStages)
+  const updatedStages = currentStages
+    .slice(0, currentStageIndex + 1)
+    .map((stage, i) => ({
       ...stage,
-      id: new Types.ObjectId().toString(),
-      participantsCount: 0,
-    })),
-  }
+      name: receivedStages[i].name,
+      description: receivedStages[i].description,
+      isPreselection: stage.isPreselection,
+    }))
+
+  const afterCurrentStages = receivedStages.slice(currentStageIndex + 1)
+  const addedStages = afterCurrentStages.map((stage) => ({
+    ...stage,
+    id: new Types.ObjectId().toString(),
+    participantsCount: 0,
+    isCurrent: false,
+  }))
+
+  return [...updatedStages, ...addedStages]
 }
