@@ -7,6 +7,8 @@ import { createNewStagesHandler } from "../utils/helpers"
 import dayjs from "dayjs"
 import { updateNewStagesService } from "./generalService"
 import { getCohortsQuery } from "../queries/newCohortQueries"
+import { getUserFormResponsesQuery } from "../queries/responseQueries"
+import { getFormService } from "./formService"
 
 export const getCohortService = async (query: object) => {
   const cohort = await NewCohort.findOne<INewCohort>(query)
@@ -104,4 +106,26 @@ export const getApplicationFormService = async () => {
   }
 
   return currentCohort.applicationForm
+}
+
+export const getMyApplicationFormService = async (loggedInUserId: string) => {
+  const currentCohort = await getCohortService({ isActive: true })
+
+  if (!currentCohort.applicationForm) {
+    return null
+  }
+
+  const applicationForm = await getFormService({
+    _id: currentCohort.applicationForm,
+  })
+
+  const completeForm = await getUserFormResponsesQuery(
+    applicationForm.id,
+    loggedInUserId,
+  )
+
+  return {
+    ...completeForm,
+    trainingStartDate: currentCohort.startDate,
+  }
 }

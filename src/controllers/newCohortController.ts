@@ -9,6 +9,7 @@ import {
   getApplicationFormService,
   getCohortService,
   getCohortsService,
+  getMyApplicationFormService,
   updateCohortService,
 } from "../services/newCohortService"
 
@@ -79,6 +80,35 @@ export const getApplicationFormController = async (
   try {
     const form = await getApplicationFormService()
     return res.status(200).json(form)
+  } catch (error) {
+    return next(error)
+  }
+}
+
+// export const getMyApplicationFormController = async (
+//   req: Request,
+//   res: Response,
+//   next: NextFunction,
+// ) => {
+//   try {
+//     const { user } = req
+//     const { id: userId } = user
+//     const applicationForm = await getMyApplicationFormService(userId)
+//     return res.status(200).json(applicationForm)
+//   } catch (error) {
+//     return next(error)
+//   }
+// }
+
+export const getMyApplicationController = async (
+  req: any,
+  res: Response,
+  next: NextFunction,
+) => {
+  const { user } = req
+  try {
+    const application = await getMyApplicationFormService(user.id)
+    return res.status(200).json(application)
   } catch (error) {
     return next(error)
   }

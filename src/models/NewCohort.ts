@@ -57,7 +57,6 @@ const NewCohortSchema = new Schema(
           type: String,
           enum: Object.values(StageName),
           required: true,
-          unique: true,
         },
         description: { type: String },
         participantsCount: { type: Number, default: 0 },
@@ -81,5 +80,5 @@ const NewCohortSchema = new Schema(
 )
 
 export const NewCohort = model<INewCohort>("NewCohort", NewCohortSchema)
-// Exporting the model allows it to be used in other parts of the application
+
 export default NewCohort
