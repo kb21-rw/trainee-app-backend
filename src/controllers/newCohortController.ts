@@ -85,21 +85,6 @@ export const getApplicationFormController = async (
   }
 }
 
-// export const getMyApplicationFormController = async (
-//   req: Request,
-//   res: Response,
-//   next: NextFunction,
-// ) => {
-//   try {
-//     const { user } = req
-//     const { id: userId } = user
-//     const applicationForm = await getMyApplicationFormService(userId)
-//     return res.status(200).json(applicationForm)
-//   } catch (error) {
-//     return next(error)
-//   }
-// }
-
 export const getMyApplicationController = async (
   req: any,
   res: Response,
