@@ -1,6 +1,7 @@
 import { Date, Types } from "mongoose"
 import { Except, SetOptional } from "type-fest"
 import { IUser } from "../models/User"
+import { INewUser } from "../models/NewUser"
 
 interface MetaType {
   _id: string
@@ -152,3 +153,27 @@ export interface JoinWaitListDto {
     lastname: string
   }
 }
+
+// New types for New User model
+export enum NewRole {
+  Admin = "Admin",
+  Coach = "Coach",
+  Trainee = "Trainee",
+}
+
+export enum UserStatus {
+  NOT_REGISTERED = "NOT_REGISTERED",
+  ON_WAIT_LIST = "ON_WAIT_LIST",
+  APPLIED = "APPLIED",
+  ENROLLED = "ENROLLED",
+  DROPPED_OUT = "DROPPED_OUT",
+  REJECTED = "REJECTED",
+  GRADUATED = "GRADUATED",
+}
+
+export type newUpdateUserDto = Partial<
+  Pick<
+    INewUser,
+    "fullName" | "email" | "verified" | "password" | "role" | "active"
+  >
+>
