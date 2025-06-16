@@ -22,13 +22,6 @@ export const validatePreselectionStages = (uniqueStages: NewStageDto[]) => {
   const preselectionStages = uniqueStages.filter(
     (stage) => stage.isPreselection,
   )
-  if (preselectionStages.length > 3) {
-    throw new CustomError(
-      COHORT_BAD_REQUEST,
-      "You can not have more than 3 preselection stages",
-      400,
-    )
-  }
 
   if (preselectionStages.length === 0) {
     throw new CustomError(
