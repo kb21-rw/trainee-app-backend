@@ -12,3 +12,5 @@ export const URL_NOT_FOUND = "ULRN068"
 export const QUESTION_NOT_FOUND = "!F_0404"
 export const NOT_ALLOWED = "!KL_0404"
 export const APPLICATION_FORM_ERROR = "APP_FORM_ERROR"
+
+export const COHORT_BAD_REQUEST = "COHORT400"

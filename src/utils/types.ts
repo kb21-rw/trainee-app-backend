@@ -15,6 +15,32 @@ export interface IStage {
   description: string
   participantsCount: number
 }
+
+export enum StageName {
+  InterviewOne = "Interview One",
+  InterviewTwo = "Interview Two",
+  JSFundamentals = "JS Fundamentals",
+  JSDOM = "JS DOM",
+  ES6 = "ES6",
+  React = "React",
+  AsynchronousJS = "Asynchronous JS",
+}
+
+export interface INewStage {
+  name: StageName
+  id: string
+  description?: string
+  participantsCount: number
+  isPreselection: boolean
+  isCurrent: boolean
+}
+
+export interface ICoach {
+  id: string
+  userId: IUser["_id"]
+  applicants: IUser["_id"][] // refer to applicants IDs in the trainees model
+  trainees: IUser["_id"][] // refer to trainees IDs in the trainees model
+}
 export interface CreateApplicantTraineeFormDto {
   type: FormType.Applicant | FormType.Trainee
   name: string
@@ -37,6 +63,14 @@ export interface CreateCohortDto {
   trainingStartDate: Date
   cohortId: string
 }
+export interface NewCreateCohortDto {
+  name: string
+  description?: string
+  stages: Except<INewStage, "id">[]
+  startDate: Date
+  endDate: Date
+}
+
 export interface UpdateFormDto {
   name?: string
   description?: string
@@ -50,6 +84,14 @@ export interface UpdateCohortDto {
   description?: string
   stages?: SetOptional<IStage, "id">[]
   trainingStartDate?: string
+}
+
+export interface NewUpdateCohortDto {
+  name?: string
+  description?: string
+  stages?: SetOptional<INewStage, "id">[]
+  startDate?: string
+  endDate?: string
 }
 
 export interface CreateQuestionDto {
@@ -140,6 +182,13 @@ export interface AddApplicantsDto {
 export interface StageDto {
   name: string
   description: string
+}
+
+export interface NewStageDto {
+  name: StageName
+  description?: string
+  isCurrent: boolean
+  isPreselection: boolean
 }
 
 // responses left in lowercase for smoother integration with Apps Script

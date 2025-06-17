@@ -1,6 +1,8 @@
 import { Except } from "type-fest"
-import { IStage } from "../types"
+import { INewStage, IStage, NewStageDto } from "../types"
 import { Types } from "mongoose"
+import CustomError from "../../middlewares/customError"
+import { COHORT_BAD_REQUEST } from "../errorCodes"
 
 export const createStagesHandler = (stages: Except<IStage, "id">[]) => {
   const stageTitles = stages.map((stage) => stage.name)
@@ -9,6 +11,51 @@ export const createStagesHandler = (stages: Except<IStage, "id">[]) => {
   const uniqueStages = uniqueStageTitles.map(
     (stageTitle) => stages.find((stage) => stage.name === stageTitle)!,
   )
+
+  return uniqueStages.map((stage) => ({
+    ...stage,
+    id: new Types.ObjectId().toString(),
+  }))
+}
+
+export const validatePreselectionStages = (uniqueStages: NewStageDto[]) => {
+  const preselectionStages = uniqueStages.filter(
+    (stage) => stage.isPreselection,
+  )
+
+  if (preselectionStages.length === 0) {
+    throw new CustomError(
+      COHORT_BAD_REQUEST,
+      "You must have at least 1 preselection stage",
+      400,
+    )
+  }
+
+  const lastPreselectionIndex = uniqueStages.findLastIndex(
+    (stage) => stage.isPreselection,
+  )
+
+  if (lastPreselectionIndex >= preselectionStages.length) {
+    throw new CustomError(
+      COHORT_BAD_REQUEST,
+      "Preselection stage cannot be after a non preselection one",
+      400,
+    )
+  }
+}
+
+export const createNewStagesHandler = (stages: Except<INewStage, "id">[]) => {
+  const stageTitles = stages.map((stage) => stage.name)
+  const uniqueStageTitles = [...new Set(stageTitles)]
+
+  const uniqueStages = uniqueStageTitles.map(
+    (stageTitle) => stages.find((stage) => stage.name === stageTitle)!,
+  )
+
+  validatePreselectionStages(uniqueStages)
+
+  const currentStage = { ...uniqueStages[0], isCurrent: true }
+  uniqueStages[0] = currentStage // Set the first stage as current
 
   return uniqueStages.map((stage) => ({
     ...stage,
