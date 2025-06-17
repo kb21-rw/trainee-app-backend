@@ -17,12 +17,8 @@ import { Role } from "../utils/types"
 
 const router = Router()
 
-router.get("/", verifyJWT, isAdminOrCoach, getCohortsController)
-router.get("/:cohortId", verifyJWT, isAdmin, getCohortController)
-
 router.post("/", verifyJWT, isAdmin, createCohortController)
-
-router.patch("/:cohortId", verifyJWT, isAdmin, updateCohortController)
+router.get("/", verifyJWT, isAdminOrCoach, getCohortsController)
 router.get("/application", verifyJWT, isAdmin, getApplicationFormController)
 router.get(
   "/my-application",
@@ -30,5 +26,7 @@ router.get(
   isAuthorized([Role.Applicant, Role.Prospect]),
   getMyApplicationController,
 )
+router.get("/:cohortId", verifyJWT, isAdmin, getCohortController)
+router.patch("/:cohortId", verifyJWT, isAdmin, updateCohortController)
 
 export default router
