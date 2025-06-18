@@ -1,0 +1,190 @@
+import { compare, hash } from "bcryptjs"
+import { OAuth2Client } from "google-auth-library"
+import jwt from "jsonwebtoken"
+import { ACCESS_TOKEN_EXPIRATION, googleClientId, secret } from "../constants"
+import CustomError from "../middlewares/customError"
+import NewUser, { INewUser } from "../models/NewUser"
+import {
+  DUPLICATE_USER,
+  INVALID_CREDENTIAL,
+  NOT_ALLOWED,
+  USER_NOT_FOUND,
+} from "../utils/errorCodes"
+import { sendEmail } from "../utils/helpers/email"
+import { generateRandomPassword } from "../utils/helpers/password"
+import { NewRole, RegisterUserDto, Role } from "../utils/types"
+import { generateUserIdService, getUserService } from "./newUserService"
+
+const client = new OAuth2Client(googleClientId)
+
+export const registerService = async (
+  loggedInUser: INewUser,
+  body: RegisterUserDto,
+) => {
+  if (loggedInUser.role !== NewRole.Admin) {
+    throw new CustomError(NOT_ALLOWED, "Only admins can register users", 403)
+  }
+
+  if (await NewUser.findOne({ email: body.email })) {
+    throw new CustomError(DUPLICATE_USER, "Email is already in use", 409)
+  }
+
+  const name = body.name.trim().replace(/\s+/g, " ") // Remove unnecessary extra spaces in names
+  const password: string = generateRandomPassword(10)
+  const hashedPassword = await hash(password, 10)
+
+  const createdUser = await NewUser.create({
+    ...body,
+    userId: await generateUserIdService(),
+    name,
+    password: hashedPassword,
+    verified: true,
+    active: true,
+  })
+
+  await sendEmail(createdUser.email, {
+    name: createdUser.name,
+    email: createdUser.email,
+    role: createdUser.role,
+    password,
+  })
+
+  return createdUser
+}
+
+export const applicantRegisterService = async (body: any) => {
+  if (await NewUser.findOne({ email: body.email })) {
+    throw new CustomError(DUPLICATE_USER, "NewUser already exists", 409)
+  }
+
+  const name = body.name.trim().replace(/\s+/g, " ") // Remove unnecessary extra spaces in names
+  const hashedPassword = await hash(body.password, 10)
+
+  const createdUser = await NewUser.create({
+    ...body,
+    name,
+    userId: await generateUserIdService(),
+    password: hashedPassword,
+    active: true,
+  })
+
+  await sendEmail(createdUser.email, {
+    name: createdUser.name,
+    userId: createdUser.id,
+  })
+
+  return createdUser
+}
+
+export const verifyApplicantService = async (userId: string) => {
+  const user = await NewUser.findByIdAndUpdate(
+    userId,
+    { verified: true },
+    { new: true },
+  )
+  if (!user) throw new CustomError(USER_NOT_FOUND, "NewUser not found!", 404)
+  return user
+}
+
+export const loginService = async (body: any) => {
+  const { email, password } = body
+  const user: any = await NewUser.findOne({ email })
+  if (!user) {
+    throw new CustomError(USER_NOT_FOUND, "NewUser not found", 404)
+  }
+
+  if (!user.verified) {
+    throw new CustomError(
+      NOT_ALLOWED,
+      "Please verify your email before logging in ",
+      401,
+    )
+  }
+
+  if (user.role === Role.Trainee) {
+    throw new CustomError(
+      NOT_ALLOWED,
+      "Trainees are not allowed to login yet",
+      409,
+    )
+  }
+
+  if (!user.active) {
+    throw new CustomError(
+      NOT_ALLOWED,
+      "Account was deactivated, please consult the admin for more information",
+      403,
+    )
+  }
+
+  const match = await compare(password, user.password)
+  if (!match) {
+    throw new CustomError(INVALID_CREDENTIAL, "Invalid credential", 401)
+  }
+
+  const accessToken = jwt.sign({ id: user._id }, secret, {
+    expiresIn: ACCESS_TOKEN_EXPIRATION,
+  })
+  return accessToken
+}
+
+export const resetPasswordService = async (body: any) => {
+  const { email } = body
+  const user = await getUserService({ email })
+
+  const password = generateRandomPassword(10)
+  const hashedPassword = await hash(password, 10)
+  user.password = hashedPassword
+  await user.save()
+  await sendEmail(user.email, { name: user.name, password })
+  return user._id
+}
+
+export const googleAuthService = async (token: string) => {
+  const ticket = await client.verifyIdToken({
+    idToken: token,
+    audience: googleClientId,
+  })
+  const payload = ticket.getPayload()
+
+  const user = await NewUser.findOne<INewUser>({ email: payload?.email })
+
+  if (user) {
+    if (user.role === NewRole.Trainee) {
+      throw new CustomError(
+        NOT_ALLOWED,
+        "Trainees are not allowed to login yet",
+        409,
+      )
+    }
+
+    if (!user.active) {
+      throw new CustomError(
+        NOT_ALLOWED,
+        "Account was deactivated, please consult the admin for more information",
+        403,
+      )
+    }
+
+    const accessToken = jwt.sign({ id: user._id }, secret, {
+      expiresIn: ACCESS_TOKEN_EXPIRATION,
+    })
+    return accessToken
+  }
+
+  const createdUser = await NewUser.create({
+    userId: await generateUserIdService(),
+    name: payload?.name ?? "",
+    email: payload?.email ?? "",
+    verified: true,
+    googleId: payload?.sub ?? "",
+    role: Role.Prospect,
+    active: true,
+  })
+
+  const accessToken = jwt.sign({ id: createdUser._id }, secret, {
+    expiresIn: ACCESS_TOKEN_EXPIRATION,
+  })
+
+  return accessToken
+}

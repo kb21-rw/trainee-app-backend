@@ -20,12 +20,12 @@ export const getUsersService = async (search?: object) => {
 
 export const updateUserService = async (
   id: string,
-  { fullName, email, verified, password, role, active }: newUpdateUserDto,
+  { name, email, verified, password, role, active }: newUpdateUserDto,
 ) => {
   const user = await getUserService({ _id: id })
 
-  if (fullName) {
-    user.fullName = fullName
+  if (name) {
+    user.name = name
   }
 
   if (email) {
