@@ -10,6 +10,7 @@ import swaggerUI from "swagger-ui-express"
 import YAML from "yamljs"
 import CustomError from "./middlewares/customError"
 import { errorHandler } from "./middlewares/errorHandler"
+import newAuthRoute from "./routes/newAuthRoute"
 import authRoute from "./routes/authRoute"
 import coachRoute from "./routes/coachRoute"
 import cohortRoutes from "./routes/cohortRoutes"
@@ -20,6 +21,7 @@ import participantRoutes from "./routes/participantRoutes"
 import questionRoute from "./routes/questionRoute"
 import responseRoute from "./routes/responseRoute"
 import traineeRoute from "./routes/traineeRoute"
+import newUserRoute from "./routes/newUserRoute"
 import userRoute from "./routes/userRoute"
 import { URL_NOT_FOUND } from "./utils/errorCodes"
 import { htmlDocumentationResponse } from "./utils/helpers/htmlDocumentationResponse"
@@ -83,8 +85,10 @@ app.use("/api-docs", swaggerUI.serve, swaggerUI.setup(swaggerDocumentation))
 
 app.use(cors({ origin: "*", credentials: true }))
 app.use(express.json())
+app.use("/new-auth", newAuthRoute)
 app.use("/auth", authRoute)
 app.use("/users", userRoute)
+app.use("/new-users", newUserRoute)
 app.use("/trainees", traineeRoute)
 app.use("/participants", participantRoutes)
 app.use("/coaches", coachRoute)
