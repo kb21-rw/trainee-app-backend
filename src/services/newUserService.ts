@@ -1,6 +1,5 @@
 import { hash } from "bcryptjs"
 import CustomError from "../middlewares/customError"
-// import User, { IUser } from "../models/User"
 import User, { INewUser } from "../models/NewUser"
 import { USER_NOT_FOUND } from "../utils/errorCodes"
 import { newUpdateUserDto } from "../utils/types"

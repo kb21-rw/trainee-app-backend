@@ -1,10 +1,12 @@
 import { Document, Schema, Types, model } from "mongoose"
+import { TraineeStatus } from "../utils/types"
 
 export interface ITrainee extends Document {
   userId: Types.ObjectId
   cohortId: Types.ObjectId
   coachId: Types.ObjectId | string
   stage: string
+  traineeStatus: TraineeStatus
 }
 
 const TraineeSchema = new Schema({
@@ -26,6 +28,11 @@ const TraineeSchema = new Schema({
   stage: {
     type: String,
     required: true,
+  },
+  traineeStatus: {
+    type: TraineeStatus,
+    required: true,
+    default: TraineeStatus.NOT_REGISTERED,
   },
 })
 

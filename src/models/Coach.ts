@@ -4,6 +4,7 @@ export interface ICoach extends Document {
   userId: Types.ObjectId
   cohortId: Types.ObjectId
   trainees: Types.ObjectId[]
+  applicants: Types.ObjectId[]
 }
 
 const CoachSchema = new Schema({
@@ -18,6 +19,11 @@ const CoachSchema = new Schema({
     required: true,
   },
   trainees: {
+    type: [Types.ObjectId],
+    ref: "Trainee",
+    default: [],
+  },
+  applicants: {
     type: [Types.ObjectId],
     ref: "Trainee",
     default: [],

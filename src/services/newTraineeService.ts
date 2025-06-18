@@ -1,14 +1,13 @@
 import CustomError from "../middlewares/customError"
 import User from "../models/NewUser"
 import Trainee from "../models/Trainee"
-import { USER_NOT_FOUND } from "../utils/errorCodes"
 import {
   getTraineesForCoachQuery,
   getTraineesQuery,
 } from "../queries/traineesQuery"
-import { getCohortService } from "./cohortService"
-import { updateUserService } from "./userService"
+import { USER_NOT_FOUND } from "../utils/errorCodes"
 import { updateUserDto } from "../utils/types"
+import { updateUserService } from "./userService"
 
 export const getTraineesService = async ({
   searchString,
@@ -45,11 +44,7 @@ export const updateTraineeService = async (
   traineeId: string,
   updates: updateUserDto,
 ) => {
-  const currentCohort = await getCohortService({ isActive: true })
-  const applicant = currentCohort.applicants.find(
-    (applicant) => applicant.id.toString() === traineeId,
-  )
-
+  // To be worked on when new trainee services are implemented
   const trainee = await Trainee.findById(traineeId)
 
   if (!trainee) {
@@ -63,28 +58,6 @@ export const updateTraineeService = async (
   if (updates.coach) {
     trainee.coachId = updates.coach
     await trainee.save()
-  }
-
-  if (!applicant) {
-    throw new CustomError(
-      USER_NOT_FOUND,
-      "Applicant not found in the current cohort",
-      404,
-    )
-  }
-
-  if (updates.coach) {
-    const coach = currentCohort.coaches.find(
-      (coach) => coach.toString() === coach,
-    )
-
-    if (!coach) {
-      throw new CustomError(
-        USER_NOT_FOUND,
-        "Coach not found in the current cohort",
-        404,
-      )
-    }
   }
 
   return updateUserService(traineeId, updates)

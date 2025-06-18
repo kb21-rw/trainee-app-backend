@@ -161,7 +161,7 @@ export enum NewRole {
   Trainee = "Trainee",
 }
 
-export enum UserStatus {
+export enum TraineeStatus {
   NOT_REGISTERED = "NOT_REGISTERED",
   ON_WAIT_LIST = "ON_WAIT_LIST",
   APPLIED = "APPLIED",
