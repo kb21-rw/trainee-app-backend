@@ -7,8 +7,8 @@ import {
   resetPassword,
   verifyApplicant,
 } from "../controllers/newAuthController"
-import { verifyJWT } from "../middlewares/authenticate"
-import { isAdmin } from "../middlewares/authorization"
+import { verifyJWT } from "../middlewares/newAuthenticate"
+import { isAdmin } from "../middlewares/newAuthorization"
 
 const router = Router()
 
