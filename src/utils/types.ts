@@ -172,8 +172,5 @@ export enum UserStatus {
 }
 
 export type newUpdateUserDto = Partial<
-  Pick<
-    INewUser,
-    "fullName" | "email" | "verified" | "password" | "role" | "active"
-  >
+  Pick<INewUser, "name" | "email" | "verified" | "password" | "role" | "active">
 >

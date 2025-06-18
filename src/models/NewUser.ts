@@ -3,7 +3,7 @@ import { NewRole, UserStatus } from "../utils/types"
 
 export interface INewUser extends Document {
   userNumber: string
-  fullName: string
+  name: string
   email: string
   verified: boolean
   password: string
@@ -15,9 +15,9 @@ export interface INewUser extends Document {
   updatedAt: Date
 }
 
-const UserSchema = new Schema(
+const NewUserSchema = new Schema(
   {
-    fullName: {
+    name: {
       type: String,
       required: true,
     },
@@ -36,6 +36,7 @@ const UserSchema = new Schema(
     },
     googleId: {
       type: String,
+      default: null,
     },
     role: {
       type: String,
@@ -54,6 +55,6 @@ const UserSchema = new Schema(
   },
   { timestamps: {} },
 )
-UserSchema.index({ fullName: "text" })
+NewUserSchema.index({ name: "text" })
 
-export default model<INewUser>("User", UserSchema)
+export default model<INewUser>("NewUser", NewUserSchema)
