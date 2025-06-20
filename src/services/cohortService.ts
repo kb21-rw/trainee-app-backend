@@ -8,7 +8,7 @@ import dayjs from "dayjs"
 import { updateNewStagesService } from "./generalService"
 import { getUserFormResponsesQuery } from "../queries/responseQueries"
 import { getFormService } from "./formService"
-import { getCohortsQuery } from "../queries/cohortQueries"
+import { getCohortsQuery } from "../queries/CohortQueries"
 
 export const getCohortService = async (query: object) => {
   const cohort = await NewCohort.findOne<ICohort>(query)

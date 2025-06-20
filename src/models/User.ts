@@ -7,7 +7,7 @@ export interface IUser extends Document {
   email: string
   verified: boolean
   password: string
-  googleId: string
+  googleId: string | null
   role: Role
   status: TraineeStatus
   active: boolean
