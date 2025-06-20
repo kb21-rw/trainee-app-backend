@@ -1,4 +1,3 @@
-import { Role } from "../utils/types"
 import CustomError from "../middlewares/customError"
 import User from "../models/User"
 import { getCoachesQuery } from "../queries/coachQuery"
@@ -7,6 +6,7 @@ import {
   NOT_ALLOWED,
   USER_NOT_FOUND,
 } from "../utils/errorCodes"
+import { Role } from "../utils/types"
 import { getCohortService } from "./cohortService"
 import { getUserService } from "./userService"
 import { ObjectId } from "mongodb"

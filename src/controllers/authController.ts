@@ -1,5 +1,11 @@
 import { NextFunction, Request, Response } from "express"
 import {
+  registerSchema,
+  loginSchema,
+  resetPasswordSchema,
+  applicantRegisterSchema,
+} from "../validations/authValidation"
+import {
   applicantRegisterService,
   googleAuthService,
   loginService,
@@ -7,12 +13,6 @@ import {
   resetPasswordService,
   verifyApplicantService,
 } from "../services/authService"
-import {
-  registerSchema,
-  loginSchema,
-  resetPasswordSchema,
-  applicantRegisterSchema,
-} from "../validations/authValidation"
 
 export const register = async (req: any, res: Response, next: NextFunction) => {
   try {
@@ -35,7 +35,7 @@ export const applicantRegister = async (
     const body = req.body
     await applicantRegisterSchema.validateAsync(body)
     const newUser = await applicantRegisterService(body)
-    return res.status(201).send({ userId: newUser.userId })
+    return res.status(201).send({ userId: newUser._id })
   } catch (error: unknown) {
     return next(error)
   }
@@ -50,7 +50,7 @@ export const verifyApplicant = async (
     const verifiedUser = await verifyApplicantService(String(req.query.userId))
     return res
       .status(201)
-      .send({ userId: verifiedUser.userId, verified: verifiedUser.verified })
+      .send({ userId: verifiedUser._id, verified: verifiedUser.verified })
   } catch (error: unknown) {
     return next(error)
   }

@@ -30,8 +30,8 @@ const TraineeSchema = new Schema({
     required: true,
   },
   traineeStatus: {
-    type: TraineeStatus,
-    required: true,
+    type: String,
+    enum: Object.values(TraineeStatus),
     default: TraineeStatus.NOT_REGISTERED,
   },
 })

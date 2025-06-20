@@ -6,35 +6,27 @@ import {
   isAuthorized,
 } from "../middlewares/authorization"
 import {
-  addApplicantsController,
   createCohortController,
-  decisionController,
   getApplicationFormController,
   getCohortController,
-  getCohortOverviewController,
   getCohortsController,
   getMyApplicationController,
   updateCohortController,
-} from "../controllers/cohortControllers"
+} from "../controllers/cohortController"
 import { Role } from "../utils/types"
 
 const router = Router()
 
+router.post("/", verifyJWT, isAdmin, createCohortController)
+router.get("/", verifyJWT, isAdminOrCoach, getCohortsController)
 router.get("/application", verifyJWT, isAdmin, getApplicationFormController)
 router.get(
   "/my-application",
   verifyJWT,
-  isAuthorized([Role.Prospect, Role.Applicant]),
+  isAuthorized([Role.Prospect]),
   getMyApplicationController,
 )
-router.get("/", verifyJWT, isAdminOrCoach, getCohortsController)
-router.get("/overview", verifyJWT, isAdminOrCoach, getCohortOverviewController)
 router.get("/:cohortId", verifyJWT, isAdmin, getCohortController)
-
-router.post("/", verifyJWT, isAdmin, createCohortController)
-
-router.patch("/decision", verifyJWT, isAdmin, decisionController)
-router.patch("/add-applicants", verifyJWT, isAdmin, addApplicantsController)
 router.patch("/:cohortId", verifyJWT, isAdmin, updateCohortController)
 
 export default router

@@ -10,17 +10,12 @@ export const ProfileSchema = Joi.object({
 export const editUserSchema = Joi.object({
   name: Joi.string().min(3).max(30).trim().optional(),
   email: Joi.string().email().optional(),
-  coach: Joi.string().optional(),
 })
 
 export const getUsersSchema = Joi.object({
-  role: Joi.string()
-    .valid(Role.Prospect, Role.Applicant, Role.Trainee, Role.Coach, Role.Admin)
-    .optional(),
+  role: Joi.string().valid(Role.Trainee, Role.Coach, Role.Admin).optional(),
 })
 export const updateUserSchema = Joi.object({
   name: Joi.string().min(3).max(30).trim().optional(),
-  role: Joi.string()
-    .valid(Role.Admin, Role.Coach, Role.Prospect, Role.Trainee, Role.Applicant)
-    .optional(),
+  role: Joi.string().valid(Role.Trainee, Role.Coach, Role.Admin).optional(),
 })

@@ -1,7 +1,6 @@
 import { Date, Types } from "mongoose"
 import { Except, SetOptional } from "type-fest"
 import { IUser } from "../models/User"
-import { INewUser } from "../models/NewUser"
 
 interface MetaType {
   _id: string
@@ -37,7 +36,7 @@ export interface INewStage {
 }
 
 export interface ICoach {
-  id: string
+  _id: string
   userId: IUser["_id"]
   applicants: IUser["_id"][] // refer to applicants IDs in the trainees model
   trainees: IUser["_id"][] // refer to trainees IDs in the trainees model
@@ -134,13 +133,6 @@ export enum FormType {
   Applicant = "Applicant",
   Trainee = "Trainee",
 }
-export enum Role {
-  Admin = "Admin",
-  Coach = "Coach",
-  Trainee = "Trainee",
-  Applicant = "Applicant",
-  Prospect = "Prospect",
-}
 
 export enum Decision {
   Accepted = "Accepted",
@@ -159,10 +151,7 @@ export interface DecisionDto {
 }
 
 export type updateUserDto = Partial<
-  Pick<
-    IUser,
-    "name" | "email" | "verified" | "password" | "role" | "coach" | "active"
-  >
+  Pick<IUser, "name" | "email" | "verified" | "password" | "role" | "active">
 >
 export interface ICohortOverviewRequest {
   cohortId?: string
@@ -173,7 +162,7 @@ export interface ICohortOverviewRequest {
 export interface RegisterUserDto {
   name: string
   email: string
-  role: Exclude<Role, Role.Applicant | Role.Trainee>
+  role: Exclude<Role, Role.Trainee>
 }
 
 export interface AddApplicantsDto {
@@ -204,7 +193,8 @@ export interface JoinWaitListDto {
 }
 
 // New types for New User model
-export enum NewRole {
+export enum Role {
+  Prospect = "Prospect",
   Admin = "Admin",
   Coach = "Coach",
   Trainee = "Trainee",
@@ -221,5 +211,5 @@ export enum TraineeStatus {
 }
 
 export type newUpdateUserDto = Partial<
-  Pick<INewUser, "name" | "email" | "verified" | "password" | "role" | "active">
+  Pick<IUser, "name" | "email" | "verified" | "password" | "role" | "active">
 >

@@ -1,16 +1,16 @@
 import { NextFunction, Request, Response } from "express"
 import {
-  getUsersSchema,
-  ProfileSchema,
-  updateUserSchema,
-} from "../validations/userValidation"
-import {
   deleteUserService,
   getUserService,
   getUsersService,
   updateUserService,
 } from "../services/userService"
 import { Role } from "../utils/types"
+import {
+  getUsersSchema,
+  ProfileSchema,
+  updateUserSchema,
+} from "../validations/userValidation"
 
 export const getProfile = async (
   req: any,

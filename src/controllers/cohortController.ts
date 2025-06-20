@@ -1,23 +1,17 @@
 import { NextFunction, Request, Response } from "express"
 import {
-  addApplicantsSchema,
-  createCohortValidation,
-  decisionValidation,
+  createNewCohortValidation,
   updateCohortValidation,
 } from "../validations/cohortValidation"
+import { mongodbIdValidation } from "../validations/generalValidation"
 import {
-  addApplicantsService,
   createCohortService,
-  decisionService,
   getApplicationFormService,
-  getCohortOverviewService,
   getCohortService,
   getCohortsService,
-  getMyApplicationService,
+  getMyApplicationFormService,
   updateCohortService,
 } from "../services/cohortService"
-import { mongodbIdValidation } from "../validations/generalValidation"
-import { FormType } from "../utils/types"
 
 export const createCohortController = async (
   req: Request,
@@ -25,7 +19,7 @@ export const createCohortController = async (
   next: NextFunction,
 ) => {
   try {
-    await createCohortValidation.validateAsync(req.body)
+    await createNewCohortValidation.validateAsync(req.body)
     const createdCohort = await createCohortService(req.body)
     return res.status(201).json(createdCohort)
   } catch (error) {
@@ -98,58 +92,8 @@ export const getMyApplicationController = async (
 ) => {
   const { user } = req
   try {
-    const application = await getMyApplicationService(user.id)
+    const application = await getMyApplicationFormService(user.id)
     return res.status(200).json(application)
-  } catch (error) {
-    return next(error)
-  }
-}
-
-export const decisionController = async (
-  req: Request,
-  res: Response,
-  next: NextFunction,
-) => {
-  try {
-    const body = req.body
-    await decisionValidation.validateAsync(body)
-    const decision = await decisionService(body)
-    return res.status(201).send(decision)
-  } catch (error: any) {
-    return next(error)
-  }
-}
-
-export const addApplicantsController = async (
-  req: Request,
-  res: Response,
-  next: NextFunction,
-) => {
-  try {
-    const { body } = req
-    await addApplicantsSchema.validateAsync(body)
-    await addApplicantsService(body)
-    return res.status(201).json("Successfully added applicants")
-  } catch (error: any) {
-    return next(error)
-  }
-}
-
-export const getCohortOverviewController = async (
-  req: Request<any, any, any, { cohortId: string; type: FormType }>,
-  res: Response,
-  next: NextFunction,
-) => {
-  try {
-    const { cohortId, type } = req.query
-    const overviewType =
-      type === FormType.Trainee ? FormType.Trainee : FormType.Applicant
-    cohortId && (await mongodbIdValidation.validateAsync(cohortId))
-    const overview = await getCohortOverviewService({
-      cohortId,
-      overviewType,
-    })
-    return res.status(200).json(overview)
   } catch (error) {
     return next(error)
   }

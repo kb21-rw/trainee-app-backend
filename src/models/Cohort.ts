@@ -1,34 +1,24 @@
-import { Document, Schema, model } from "mongoose"
+import { Document, model, Schema } from "mongoose"
 import { IForm } from "./Form"
+import { ICoach, INewStage, StageName } from "../utils/types"
 import { IUser } from "./User"
-import { IStage } from "../utils/types"
-
-export interface IParticipant {
-  id: IUser["_id"]
-  passedStages: string[]
-  droppedStage: {
-    id: string
-    isConfirmed: boolean
-  }
-  feedbacks: { stageId: string; text: string }[]
-}
 
 export interface ICohort extends Document {
   id: string
-  cohortNumber: string
   name: string
   description: string
   isActive: boolean
-  applicants: IParticipant[]
-  trainees: IParticipant[]
-  coaches: IUser["_id"][]
-  forms: IForm["_id"][]
+  startDate: string
+  endDate: string
+  coaches: ICoach["_id"][] // refer to coach IDs
+  trainees: IUser["_id"][] // refer to trainee IDs in trainees model
+  stages: INewStage[]
   applicationForm: IForm["_id"] | null
-  stages: IStage[]
-  trainingStartDate: string
+  cohortNumber: string
+  forms: IForm["_id"][]
 }
 
-const CohortSchema = new Schema(
+const NewCohortSchema = new Schema(
   {
     name: {
       type: String,
@@ -44,85 +34,51 @@ const CohortSchema = new Schema(
       required: true,
       default: true,
     },
+    startDate: {
+      type: Date,
+      required: true,
+    },
+    endDate: {
+      type: Date,
+      required: true,
+    },
+    coaches: [
+      {
+        id: { type: String, required: true },
+        userId: { type: Schema.Types.ObjectId, ref: "User", required: true },
+        applicants: [{ type: Schema.Types.ObjectId, ref: "User" }],
+        trainees: [{ type: Schema.Types.ObjectId, ref: "User" }],
+      },
+    ],
+    trainees: [{ type: Schema.Types.ObjectId, ref: "User" }],
+    stages: [
+      {
+        name: {
+          type: String,
+          enum: Object.values(StageName),
+          required: true,
+        },
+        description: { type: String },
+        participantsCount: { type: Number, default: 0 },
+        isPreselection: { type: Boolean, default: false },
+        isCurrent: { type: Boolean, default: false },
+      },
+    ],
     cohortNumber: {
       type: String,
       unique: true,
       required: true,
     },
-    stages: [
-      {
-        id: { type: String, required: true },
-        name: { type: String, required: true },
-        description: { type: String, default: "" },
-        participantsCount: { type: Number, default: 0 },
-        _id: false,
-      },
-    ],
-    trainingStartDate: {
-      type: Date,
-      required: true,
-    },
-    forms: [
-      {
-        type: Schema.Types.ObjectId,
-        ref: "Form",
-      },
-    ],
-    applicants: [
-      {
-        id: { type: Schema.Types.ObjectId, ref: "User" },
-        passedStages: [{ type: String }],
-        droppedStage: {
-          id: { type: String, default: null },
-          isConfirmed: {
-            type: Boolean,
-            default: false,
-          },
-        },
-        feedbacks: [
-          {
-            stageId: { type: String, required: true },
-            text: { type: String },
-          },
-        ],
-        _id: false,
-      },
-    ],
-    trainees: [
-      {
-        id: { type: Schema.Types.ObjectId, ref: "User" },
-        passedStages: [{ type: String }],
-        droppedStage: {
-          id: { type: String, default: null },
-          isConfirmed: {
-            type: Boolean,
-            default: false,
-          },
-        },
-        feedbacks: [
-          {
-            stageId: { type: String, required: true },
-            text: { type: String },
-          },
-        ],
-        _id: false,
-      },
-    ],
-    coaches: [
-      {
-        type: Schema.Types.ObjectId,
-        ref: "User",
-      },
-    ],
     applicationForm: {
       type: Schema.Types.ObjectId,
       ref: "Form",
       default: null,
     },
+    forms: [{ type: Schema.Types.ObjectId, ref: "Form" }],
   },
-  { timestamps: {} },
+  { timestamps: true },
 )
 
-CohortSchema.index({ name: "text", description: "text" })
+export const Cohort = model<ICohort>("NewCohort", NewCohortSchema)
 
-export default model<ICohort>("Cohort", CohortSchema)
+export default Cohort

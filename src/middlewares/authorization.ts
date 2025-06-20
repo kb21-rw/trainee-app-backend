@@ -32,7 +32,7 @@ export const isAdminOrCoach = (req: any, res: Response, next: () => void) => {
 
 export const isApplicant = (req: any, res: Response, next: () => void) => {
   const { role } = req.user
-  if (role !== Role.Applicant) {
+  if (role !== Role.Trainee) {
     return res.status(401).json({ message: "Only applicants are allowed" })
   }
 
@@ -41,7 +41,7 @@ export const isApplicant = (req: any, res: Response, next: () => void) => {
 
 export const isProspect = (req: any, res: Response, next: () => void) => {
   const { role } = req.user
-  if (role !== Role.Prospect) {
+  if (role !== Role.Trainee) {
     return res.status(401).json({ message: "Only prospects are allowed" })
   }
 
