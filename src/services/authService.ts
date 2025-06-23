@@ -3,7 +3,7 @@ import { OAuth2Client } from "google-auth-library"
 import jwt from "jsonwebtoken"
 import { ACCESS_TOKEN_EXPIRATION, googleClientId, secret } from "../constants"
 import CustomError from "../middlewares/customError"
-import NewUser, { IUser } from "../models/User"
+import User, { IUser } from "../models/User"
 import {
   DUPLICATE_USER,
   INVALID_CREDENTIAL,
@@ -25,7 +25,7 @@ export const registerService = async (
     throw new CustomError(NOT_ALLOWED, "Only admins can register users", 403)
   }
 
-  if (await NewUser.findOne({ email: body.email })) {
+  if (await User.findOne({ email: body.email })) {
     throw new CustomError(DUPLICATE_USER, "Email is already in use", 409)
   }
 
@@ -33,7 +33,7 @@ export const registerService = async (
   const password: string = generateRandomPassword(10)
   const hashedPassword = await hash(password, 10)
 
-  const createdUser = await NewUser.create({
+  const createdUser = await User.create({
     ...body,
     userId: await generateUserIdService(),
     name,
@@ -53,14 +53,14 @@ export const registerService = async (
 }
 
 export const applicantRegisterService = async (body: any) => {
-  if (await NewUser.findOne({ email: body.email })) {
-    throw new CustomError(DUPLICATE_USER, "NewUser already exists", 409)
+  if (await User.findOne({ email: body.email })) {
+    throw new CustomError(DUPLICATE_USER, "User already exists", 409)
   }
 
   const name = body.name.trim().replace(/\s+/g, " ") // Remove unnecessary extra spaces in names
   const hashedPassword = await hash(body.password, 10)
 
-  const createdUser = await NewUser.create({
+  const createdUser = await User.create({
     ...body,
     name,
     userId: await generateUserIdService(),
@@ -77,20 +77,20 @@ export const applicantRegisterService = async (body: any) => {
 }
 
 export const verifyApplicantService = async (userId: string) => {
-  const user = await NewUser.findByIdAndUpdate(
+  const user = await User.findByIdAndUpdate(
     userId,
     { verified: true },
     { new: true },
   )
-  if (!user) throw new CustomError(USER_NOT_FOUND, "NewUser not found!", 404)
+  if (!user) throw new CustomError(USER_NOT_FOUND, "User not found!", 404)
   return user
 }
 
 export const loginService = async (body: any) => {
   const { email, password } = body
-  const user: any = await NewUser.findOne({ email })
+  const user: any = await User.findOne({ email })
   if (!user) {
-    throw new CustomError(USER_NOT_FOUND, "NewUser not found", 404)
+    throw new CustomError(USER_NOT_FOUND, "User not found", 404)
   }
 
   if (!user.verified) {
@@ -147,7 +147,7 @@ export const googleAuthService = async (token: string) => {
   })
   const payload = ticket.getPayload()
 
-  const user = await NewUser.findOne<IUser>({ email: payload?.email })
+  const user = await User.findOne<IUser>({ email: payload?.email })
 
   if (user) {
     if (user.role === Role.Trainee) {
@@ -172,7 +172,7 @@ export const googleAuthService = async (token: string) => {
     return accessToken
   }
 
-  const createdUser = await NewUser.create({
+  const createdUser = await User.create({
     userId: await generateUserIdService(),
     name: payload?.name ?? "",
     email: payload?.email ?? "",

@@ -13,7 +13,7 @@ export interface IUser extends Document {
   active: boolean
 }
 
-const NewUserSchema = new Schema(
+const UserSchema = new Schema(
   {
     name: {
       type: String,
@@ -53,6 +53,6 @@ const NewUserSchema = new Schema(
   },
   { timestamps: {} },
 )
-NewUserSchema.index({ name: "text" })
+UserSchema.index({ name: "text" })
 
-export default model<IUser>("NewUser", NewUserSchema)
+export default model<IUser>("user", UserSchema)

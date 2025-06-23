@@ -18,7 +18,7 @@ export interface ICohort extends Document {
   forms: IForm["_id"][]
 }
 
-const NewCohortSchema = new Schema(
+const CohortSchema = new Schema(
   {
     name: {
       type: String,
@@ -79,6 +79,6 @@ const NewCohortSchema = new Schema(
   { timestamps: true },
 )
 
-export const Cohort = model<ICohort>("NewCohort", NewCohortSchema)
+export const Cohort = model<ICohort>("cohort", CohortSchema)
 
 export default Cohort
