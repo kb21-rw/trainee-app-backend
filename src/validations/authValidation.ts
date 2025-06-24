@@ -4,7 +4,7 @@ import { Role } from "../utils/types"
 export const registerSchema = Joi.object({
   name: Joi.string().min(3).max(30).required(),
   email: Joi.string().email().required(),
-  role: Joi.string().valid(Role.Admin, Role.Coach, Role.Prospect).required(),
+  role: Joi.string().valid(Role.Admin, Role.Coach, Role.Trainee).required(),
 })
 
 export const applicantRegisterSchema = Joi.object({

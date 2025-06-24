@@ -19,12 +19,11 @@ export class User {
 
   public constructor(data: PartialIUserWithRequiredId) {
     this.id = data.id
-    this.userId = data.userId
+    this.userId = data.userNumber
     this.name = data.name
     this.email = data.email
     this.password = data.password
     this.role = data.role
-    this.coach = data.coach
     this.googleId = data.googleId
     this.active = data.active
   }
@@ -36,13 +35,12 @@ export class UserBuilder extends Builder<
 > {
   protected readonly properties: PartialIUserWithRequiredId = {
     id: "66203fa2a3465a4a588d12u1",
-    userId: "000001",
+    userNumber: "000001",
     googleId: null,
     name: "trainee name",
     email: "trainee@gmail.com",
     password: "$2a$10$qMiI0IyA/BCuHyjgqn/f8.IDjrqn7rMrHoH4LZmYoYdXlhWI8QGiu",
     role: Role.Trainee,
-    coach: "My coach",
     active: true,
   }
 
@@ -89,11 +87,6 @@ export class UserBuilder extends Builder<
 
   public withRole(role: Role): this {
     this.properties.role = role
-    return this
-  }
-
-  public withCoach(coach: string): this {
-    this.properties.coach = coach
     return this
   }
 

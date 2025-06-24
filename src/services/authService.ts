@@ -1,5 +1,9 @@
 import { compare, hash } from "bcryptjs"
+import { OAuth2Client } from "google-auth-library"
+import jwt from "jsonwebtoken"
+import { ACCESS_TOKEN_EXPIRATION, googleClientId, secret } from "../constants"
 import CustomError from "../middlewares/customError"
+import User, { IUser } from "../models/User"
 import {
   DUPLICATE_USER,
   INVALID_CREDENTIAL,
@@ -8,13 +12,8 @@ import {
 } from "../utils/errorCodes"
 import { sendEmail } from "../utils/helpers/email"
 import { generateRandomPassword } from "../utils/helpers/password"
-import User, { IUser } from "../models/User"
-import { ACCESS_TOKEN_EXPIRATION, secret } from "../constants"
-import jwt from "jsonwebtoken"
-import { RegisterUserDto, Role } from "../utils/types"
+import { Role, RegisterUserDto } from "../utils/types"
 import { generateUserIdService, getUserService } from "./userService"
-import { OAuth2Client } from "google-auth-library"
-import { googleClientId } from "../constants"
 
 const client = new OAuth2Client(googleClientId)
 

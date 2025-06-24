@@ -1,11 +1,11 @@
 import { Router } from "express"
 import {
-  getProfile,
-  updateProfile,
   deleteUser,
+  getProfile,
   getUsersController,
-  updateUser,
   toggleUserActiveStatus,
+  updateProfile,
+  updateUser,
 } from "../controllers/userController"
 import { verifyJWT } from "../middlewares/authenticate"
 import { isAdmin } from "../middlewares/authorization"

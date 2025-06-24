@@ -1,9 +1,9 @@
 import { Types } from "mongoose"
 import CustomError from "../../middlewares/customError"
-import Cohort, { ICohort } from "../../models/Cohort"
 import { COHORT_NOT_FOUND, DUPLICATE_DOCUMENT } from "../errorCodes"
-import { IStage, Role } from "../types"
+import { IStage } from "../types"
 import { SetOptional } from "type-fest"
+import Cohort from "../../models/Cohort"
 
 export const getCurrentCohort = async () => {
   const currentCohort = await Cohort.findOne({ isActive: true })
@@ -55,27 +55,27 @@ export const updateStagesHandler = (
   return updatedCohortStages
 }
 
-export const isUserInCohort = (cohort: ICohort, userId: string, role: Role) => {
-  if (role === Role.Applicant) {
-    return (
-      cohort.applicants.find(
-        (applicant) => applicant.id.toString() === userId,
-      ) ?? false
-    )
-  }
+// export const isUserInCohort = (cohort: ICohort, userId: string, role: Role) => {
+//   if (role === Role.Applicant) {
+//     return (
+//       cohort.applicants.find(
+//         (applicant) => applicant.id.toString() === userId,
+//       ) ?? false
+//     )
+//   }
 
-  if (role === Role.Trainee) {
-    return (
-      cohort.trainees.find((trainee) => trainee.id.toString() === userId) ??
-      false
-    )
-  }
+//   if (role === Role.Trainee) {
+//     return (
+//       cohort.trainees.find((trainee) => trainee.id.toString() === userId) ??
+//       false
+//     )
+//   }
 
-  if (role === Role.Coach) {
-    return (
-      cohort.coaches.find((coachId) => coachId.toString() === userId) ?? false
-    )
-  }
+//   if (role === Role.Coach) {
+//     return (
+//       cohort.coaches.find((coachId) => coachId.toString() === userId) ?? false
+//     )
+//   }
 
-  return false
-}
+//   return false
+// }

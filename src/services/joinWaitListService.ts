@@ -11,7 +11,7 @@ const joinWaitListService = async (joinWaitListData: JoinWaitListDto) => {
 
   const prospect = await getProspect(email)
 
-  if (prospect && !prospect.isOnWaitList) {
+  if (prospect) {
     const addedProspect = await addProspectToTheWaitList(email)
 
     io.to(recipient).emit("joinedTheWaitList", { email })

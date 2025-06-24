@@ -1,36 +1,28 @@
 import { Document, Schema, model } from "mongoose"
-import { Role } from "../utils/types"
+import { Role, TraineeStatus } from "../utils/types"
 
 export interface IUser extends Document {
-  id: string
-  userId: string
+  userNumber: string
   name: string
   email: string
   verified: boolean
-  applied: boolean
   password: string
+  googleId: string | null
   role: Role
-  coach?: string
-  googleId: null | string
-  isOnWaitList?: boolean
+  status: TraineeStatus
   active: boolean
 }
 
 const UserSchema = new Schema(
   {
-    userId: {
-      type: String,
-      unique: true,
-      required: true,
-    },
     name: {
       type: String,
       required: true,
     },
     email: {
       type: String,
-      unique: true,
       required: true,
+      unique: true,
     },
     verified: {
       type: Boolean,
@@ -38,24 +30,21 @@ const UserSchema = new Schema(
     },
     password: {
       type: String,
-    },
-    role: {
-      type: String,
-      enum: Role,
-      default: Role.Prospect,
-    },
-    coach: {
-      type: Schema.Types.ObjectId,
-      ref: "User",
+      required: true,
     },
     googleId: {
       type: String,
       default: null,
     },
-    isOnWaitList: {
-      type: Boolean,
-      default: false,
-      required: false,
+    role: {
+      type: String,
+      enum: Object.values(Role),
+      default: Role.Trainee,
+    },
+    status: {
+      type: String,
+      enum: Object.values(TraineeStatus),
+      default: TraineeStatus.NOT_REGISTERED,
     },
     active: {
       type: Boolean,
@@ -66,4 +55,4 @@ const UserSchema = new Schema(
 )
 UserSchema.index({ name: "text" })
 
-export default model<IUser>("User", UserSchema)
+export default model<IUser>("user", UserSchema)
