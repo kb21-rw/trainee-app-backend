@@ -26,6 +26,14 @@ export enum StageName {
   AsynchronousJS = "Asynchronous JS",
 }
 
+export type TraineeDto = {
+  userId: string
+  cohortId: string
+  coachId: string
+  stage: string
+  status: TraineeStatus
+}
+
 export interface INewStage {
   name: StageName
   id: string
@@ -201,13 +209,18 @@ export enum Role {
 }
 
 export enum TraineeStatus {
-  NOT_REGISTERED = "NOT_REGISTERED",
-  ON_WAIT_LIST = "ON_WAIT_LIST",
-  APPLIED = "APPLIED",
   ENROLLED = "ENROLLED",
   DROPPED_OUT = "DROPPED_OUT",
   REJECTED = "REJECTED",
   GRADUATED = "GRADUATED",
+}
+
+export enum UserStatus {
+  REGISTERED = "REGISTERED",
+  ON_WAIT_LIST = "ON_WAIT_LIST",
+  APPLIED = "APPLIED",
+  ENROLLED = "ENROLLED",
+  STAFF = "STAFF",
 }
 
 export type newUpdateUserDto = Partial<

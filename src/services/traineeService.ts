@@ -5,9 +5,10 @@ import {
   getTraineesForCoachQuery,
   getTraineesQuery,
 } from "../queries/traineesQuery"
-import { USER_NOT_FOUND } from "../utils/errorCodes"
-import { updateUserDto } from "../utils/types"
+import { COHORT_BAD_REQUEST, USER_NOT_FOUND } from "../utils/errorCodes"
+import { updateUserDto, TraineeStatus, TraineeDto } from "../utils/types"
 import { updateUserService } from "./userService"
+import { getCohortService } from "./cohortService"
 
 export const getTraineesService = async ({
   searchString,
@@ -37,12 +38,19 @@ export const getTraineesForCoachService = async (
     sortBy,
     traineesPerPage,
   )
-  return trainees
+
+  const registeredTrainees = trainees.filter((trainee: TraineeDto) => {
+    return trainee.status === TraineeStatus.ENROLLED
+  })
+  return registeredTrainees
 }
 
 export const updateTraineeService = async (
   traineeId: string,
-  updates: updateUserDto,
+  updates: updateUserDto & {
+    status?: TraineeStatus
+    stage?: string
+  },
 ) => {
   // To be worked on when new trainee services are implemented
   const trainee = await Trainee.findById(traineeId)
@@ -56,4 +64,42 @@ export const updateTraineeService = async (
   }
 
   return updateUserService(traineeId, updates)
+}
+
+export const createdTraineeService = async (
+  userId: string,
+  cohortId: string,
+  coachId: string,
+  status: TraineeStatus = TraineeStatus.ENROLLED,
+) => {
+  const currentCohort = await getCohortService({ isActive: true })
+  //
+  if (currentCohort.id !== cohortId) {
+    throw new CustomError(
+      COHORT_BAD_REQUEST,
+      "You can only register trainees in the current cohort",
+      400,
+    )
+  }
+
+  if (!currentCohort.coaches.includes(coachId)) {
+    throw new CustomError(
+      COHORT_BAD_REQUEST,
+      "Coach is not part of the current cohort",
+      400,
+    )
+  }
+
+  // add trainee as an applicant for a coach and will have status APPLIED
+
+  const trainee = new Trainee({
+    userId,
+    cohortId,
+    coachId,
+    stage: currentCohort.stages[0].id,
+    traineeStatus: status,
+  })
+
+  await trainee.save()
+  return trainee
 }
