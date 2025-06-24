@@ -1,7 +1,7 @@
-import NewCohort, { ICohort } from "../models/Cohort"
+import Cohort, { ICohort } from "../models/Cohort"
 
 export const getCohortsQuery = async (searchString: string) => {
-  const cohorts: ICohort[] = await NewCohort.aggregate([
+  const cohorts: ICohort[] = await Cohort.aggregate([
     {
       $match: { name: { $regex: new RegExp(searchString, "i") } },
     },

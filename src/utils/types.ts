@@ -9,13 +9,6 @@ interface MetaType {
   __v: number
 }
 
-export interface IStage {
-  id: string
-  name: string
-  description: string
-  participantsCount: number
-}
-
 export enum StageName {
   InterviewOne = "Interview One",
   InterviewTwo = "Interview Two",
@@ -34,7 +27,7 @@ export type TraineeDto = {
   status: TraineeStatus
 }
 
-export interface INewStage {
+export interface IStage {
   name: StageName
   id: string
   description?: string
@@ -63,18 +56,10 @@ export interface CreateApplicationFormDto {
   endDate: string
   stages: Except<IStage, "id">[]
 }
-
 export interface CreateCohortDto {
   name: string
   description?: string
   stages: Except<IStage, "id">[]
-  trainingStartDate: Date
-  cohortId: string
-}
-export interface NewCreateCohortDto {
-  name: string
-  description?: string
-  stages: Except<INewStage, "id">[]
   startDate: Date
   endDate: Date
 }
@@ -91,13 +76,6 @@ export interface UpdateCohortDto {
   name?: string
   description?: string
   stages?: SetOptional<IStage, "id">[]
-  trainingStartDate?: string
-}
-
-export interface NewUpdateCohortDto {
-  name?: string
-  description?: string
-  stages?: SetOptional<INewStage, "id">[]
   startDate?: string
   endDate?: string
 }
@@ -176,13 +154,7 @@ export interface RegisterUserDto {
 export interface AddApplicantsDto {
   prospectIds: string[]
 }
-
 export interface StageDto {
-  name: string
-  description: string
-}
-
-export interface NewStageDto {
   name: StageName
   description?: string
   isCurrent: boolean
@@ -222,7 +194,3 @@ export enum UserStatus {
   ENROLLED = "ENROLLED",
   STAFF = "STAFF",
 }
-
-export type newUpdateUserDto = Partial<
-  Pick<IUser, "name" | "email" | "verified" | "password" | "role" | "active">
->

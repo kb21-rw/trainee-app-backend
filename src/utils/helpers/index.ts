@@ -1,24 +1,10 @@
 import { Except } from "type-fest"
-import { INewStage, IStage, NewStageDto } from "../types"
+import { IStage, StageDto } from "../types"
 import { Types } from "mongoose"
 import CustomError from "../../middlewares/customError"
 import { COHORT_BAD_REQUEST } from "../errorCodes"
 
-export const createStagesHandler = (stages: Except<IStage, "id">[]) => {
-  const stageTitles = stages.map((stage) => stage.name)
-  const uniqueStageTitles = [...new Set(stageTitles)]
-
-  const uniqueStages = uniqueStageTitles.map(
-    (stageTitle) => stages.find((stage) => stage.name === stageTitle)!,
-  )
-
-  return uniqueStages.map((stage) => ({
-    ...stage,
-    id: new Types.ObjectId().toString(),
-  }))
-}
-
-export const validatePreselectionStages = (uniqueStages: NewStageDto[]) => {
+export const validatePreselectionStages = (uniqueStages: StageDto[]) => {
   const preselectionStages = uniqueStages.filter(
     (stage) => stage.isPreselection,
   )
@@ -44,7 +30,7 @@ export const validatePreselectionStages = (uniqueStages: NewStageDto[]) => {
   }
 }
 
-export const createNewStagesHandler = (stages: Except<INewStage, "id">[]) => {
+export const createStagesHandler = (stages: Except<IStage, "id">[]) => {
   const stageTitles = stages.map((stage) => stage.name)
   const uniqueStageTitles = [...new Set(stageTitles)]
 
