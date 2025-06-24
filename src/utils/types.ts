@@ -192,5 +192,6 @@ export enum UserStatus {
   ON_WAIT_LIST = "ON_WAIT_LIST",
   APPLIED = "APPLIED",
   ENROLLED = "ENROLLED",
+  REJECTED = "REJECTED",
   STAFF = "STAFF",
 }

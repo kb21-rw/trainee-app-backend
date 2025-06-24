@@ -1,10 +1,10 @@
 import { NextFunction, Request, Response } from "express"
-import { editUserSchema } from "../validations/userValidation"
 import {
   getTraineesForCoachService,
   getTraineesService,
   updateTraineeService,
 } from "../services/traineeService"
+import { editTraineeSchema } from "../validations/traineeValidation"
 
 export const getTrainees = async (
   req: Request,
@@ -54,7 +54,7 @@ export const updateTrainee = async (
 ) => {
   try {
     const userId = req.params.id
-    await editUserSchema.validateAsync(req.body)
+    await editTraineeSchema.validateAsync(req.body)
     const user = await updateTraineeService(userId, req.body)
     return res.status(200).send(user)
   } catch (error) {
