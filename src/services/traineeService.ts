@@ -1,6 +1,6 @@
 import CustomError from "../middlewares/customError"
 import User from "../models/User"
-import Trainee from "../models/Trainee"
+import Trainee, { ITrainee } from "../models/Trainee"
 import {
   getTraineesForCoachQuery,
   getTraineesQuery,
@@ -43,6 +43,15 @@ export const getTraineesForCoachService = async (
     return trainee.status === TraineeStatus.ENROLLED
   })
   return registeredTrainees
+}
+
+export const getTraineeService = async (query: object) => {
+  const trainee = await Trainee.findOne<ITrainee>(query)
+  if (!trainee) {
+    throw new CustomError(USER_NOT_FOUND, "Trainee not found", 404)
+  }
+
+  return trainee
 }
 
 export const updateTraineeService = async (

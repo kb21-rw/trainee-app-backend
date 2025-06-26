@@ -1,12 +1,13 @@
 import { Document, Schema, Types, model } from "mongoose"
-import { TraineeStatus } from "../utils/types"
+import { IFeedback, TraineeStatus } from "../utils/types"
 
 export interface ITrainee extends Document {
-  userId: Types.ObjectId
-  cohortId: Types.ObjectId
-  coachId: Types.ObjectId | string
+  userId: string
+  cohortId: string
+  coachId: string
   stage: string
   traineeStatus: TraineeStatus
+  feedbacks: IFeedback[]
 }
 
 const TraineeSchema = new Schema({
@@ -33,6 +34,15 @@ const TraineeSchema = new Schema({
     type: String,
     enum: Object.values(TraineeStatus),
     default: TraineeStatus.ENROLLED,
+  },
+  feedbacks: {
+    type: [
+      {
+        stageId: { type: Types.ObjectId, required: true },
+        description: { type: String, required: true },
+      },
+    ],
+    default: [],
   },
 })
 

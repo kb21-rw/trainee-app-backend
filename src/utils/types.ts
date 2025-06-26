@@ -27,6 +27,17 @@ export type TraineeDto = {
   status: TraineeStatus
 }
 
+export interface IFeedback {
+  stageId: string
+  description: string
+}
+
+export interface DecisionDto {
+  traineeId: string
+  decision: Decision
+  feedback: string
+}
+
 export interface IStage {
   name: StageName
   id: string
