@@ -9,13 +9,6 @@ interface MetaType {
   __v: number
 }
 
-export interface IStage {
-  id: string
-  name: string
-  description: string
-  participantsCount: number
-}
-
 export enum StageName {
   InterviewOne = "Interview One",
   InterviewTwo = "Interview Two",
@@ -26,7 +19,26 @@ export enum StageName {
   AsynchronousJS = "Asynchronous JS",
 }
 
-export interface INewStage {
+export type TraineeDto = {
+  userId: string
+  cohortId: string
+  coachId: string
+  stage: string
+  status: TraineeStatus
+}
+
+export interface IFeedback {
+  stageId: string
+  description: string
+}
+
+export interface DecisionDto {
+  traineeId: string
+  decision: Decision
+  feedback: string
+}
+
+export interface IStage {
   name: StageName
   id: string
   description?: string
@@ -55,18 +67,10 @@ export interface CreateApplicationFormDto {
   endDate: string
   stages: Except<IStage, "id">[]
 }
-
 export interface CreateCohortDto {
   name: string
   description?: string
   stages: Except<IStage, "id">[]
-  trainingStartDate: Date
-  cohortId: string
-}
-export interface NewCreateCohortDto {
-  name: string
-  description?: string
-  stages: Except<INewStage, "id">[]
   startDate: Date
   endDate: Date
 }
@@ -83,13 +87,6 @@ export interface UpdateCohortDto {
   name?: string
   description?: string
   stages?: SetOptional<IStage, "id">[]
-  trainingStartDate?: string
-}
-
-export interface NewUpdateCohortDto {
-  name?: string
-  description?: string
-  stages?: SetOptional<INewStage, "id">[]
   startDate?: string
   endDate?: string
 }
@@ -168,13 +165,7 @@ export interface RegisterUserDto {
 export interface AddApplicantsDto {
   prospectIds: string[]
 }
-
 export interface StageDto {
-  name: string
-  description: string
-}
-
-export interface NewStageDto {
   name: StageName
   description?: string
   isCurrent: boolean
@@ -201,15 +192,17 @@ export enum Role {
 }
 
 export enum TraineeStatus {
-  NOT_REGISTERED = "NOT_REGISTERED",
-  ON_WAIT_LIST = "ON_WAIT_LIST",
-  APPLIED = "APPLIED",
   ENROLLED = "ENROLLED",
   DROPPED_OUT = "DROPPED_OUT",
   REJECTED = "REJECTED",
   GRADUATED = "GRADUATED",
 }
 
-export type newUpdateUserDto = Partial<
-  Pick<IUser, "name" | "email" | "verified" | "password" | "role" | "active">
->
+export enum UserStatus {
+  REGISTERED = "REGISTERED",
+  ON_WAIT_LIST = "ON_WAIT_LIST",
+  APPLIED = "APPLIED",
+  ENROLLED = "ENROLLED",
+  REJECTED = "REJECTED",
+  STAFF = "STAFF",
+}

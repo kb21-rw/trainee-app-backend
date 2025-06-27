@@ -1,6 +1,6 @@
 import { Document, model, Schema } from "mongoose"
 import { IForm } from "./Form"
-import { ICoach, INewStage, StageName } from "../utils/types"
+import { ICoach, IStage, StageName } from "../utils/types"
 import { IUser } from "./User"
 
 export interface ICohort extends Document {
@@ -12,7 +12,7 @@ export interface ICohort extends Document {
   endDate: string
   coaches: ICoach["_id"][] // refer to coach IDs
   trainees: IUser["_id"][] // refer to trainee IDs in trainees model
-  stages: INewStage[]
+  stages: IStage[]
   applicationForm: IForm["_id"] | null
   cohortNumber: string
   forms: IForm["_id"][]

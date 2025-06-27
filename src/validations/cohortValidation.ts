@@ -1,7 +1,7 @@
 import Joi from "joi"
 import { Decision } from "../utils/types"
 
-export const createNewCohortValidation = Joi.object({
+export const createCohortValidation = Joi.object({
   name: Joi.string().min(3).max(100).required(),
   description: Joi.string().min(3).max(100).optional(),
   stages: Joi.array()
@@ -40,7 +40,7 @@ export const updateCohortValidation = Joi.object({
 })
 
 export const decisionValidation = Joi.object({
-  userId: Joi.string()
+  traineeId: Joi.string()
     .hex()
     .length(24)
     .message("userId is not valid")
