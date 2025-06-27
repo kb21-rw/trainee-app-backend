@@ -64,7 +64,8 @@ export const createCoachController = async (
   try {
     const loggedInUser = req.user
     const body = req.body
-    const { cohortId } = req.params
+    const { cohortId } = req.query
+    console.log("🚀" + cohortId)
     await registerSchema.validateAsync(body)
     const newUser = await registerService(loggedInUser, body)
 
@@ -76,7 +77,7 @@ export const createCoachController = async (
       cohortId: cohortId,
     })
 
-    await addCoachToCohortService(newUser._id)
+    await addCoachToCohortService(coach._id)
     return res.status(201).send(coach)
   } catch (error) {
     return next(error)

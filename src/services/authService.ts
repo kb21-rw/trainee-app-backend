@@ -12,8 +12,8 @@ import {
 } from "../utils/errorCodes"
 import { sendEmail } from "../utils/helpers/email"
 import { generateRandomPassword } from "../utils/helpers/password"
-import { Role, RegisterUserDto } from "../utils/types"
-import { generateUserIdService, getUserService } from "./userService"
+import { RegisterUserDto, Role } from "../utils/types"
+import { getUserService } from "./userService"
 
 const client = new OAuth2Client(googleClientId)
 
@@ -33,14 +33,16 @@ export const registerService = async (
   const password: string = generateRandomPassword(10)
   const hashedPassword = await hash(password, 10)
 
+  console.log("🚀", "here is okay")
   const createdUser = await User.create({
     ...body,
-    userId: await generateUserIdService(),
     name,
     password: hashedPassword,
     verified: true,
     active: true,
   })
+
+  console.log("🚀", "Something is wrong here")
 
   await sendEmail(createdUser.email, {
     name: createdUser.name,
@@ -63,7 +65,6 @@ export const applicantRegisterService = async (body: any) => {
   const createdUser = await User.create({
     ...body,
     name,
-    userId: await generateUserIdService(),
     password: hashedPassword,
     active: true,
   })
@@ -173,7 +174,6 @@ export const googleAuthService = async (token: string) => {
   }
 
   const createdUser = await User.create({
-    userId: await generateUserIdService(),
     name: payload?.name ?? "",
     email: payload?.email ?? "",
     verified: true,
