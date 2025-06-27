@@ -15,6 +15,32 @@ export interface IStage {
   description: string
   participantsCount: number
 }
+
+export enum StageName {
+  InterviewOne = "Interview One",
+  InterviewTwo = "Interview Two",
+  JSFundamentals = "JS Fundamentals",
+  JSDOM = "JS DOM",
+  ES6 = "ES6",
+  React = "React",
+  AsynchronousJS = "Asynchronous JS",
+}
+
+export interface INewStage {
+  name: StageName
+  id: string
+  description?: string
+  participantsCount: number
+  isPreselection: boolean
+  isCurrent: boolean
+}
+
+export interface ICoach {
+  _id: string
+  userId: IUser["_id"]
+  applicants: IUser["_id"][] // refer to applicants IDs in the trainees model
+  trainees: IUser["_id"][] // refer to trainees IDs in the trainees model
+}
 export interface CreateApplicantTraineeFormDto {
   type: FormType.Applicant | FormType.Trainee
   name: string
@@ -37,6 +63,14 @@ export interface CreateCohortDto {
   trainingStartDate: Date
   cohortId: string
 }
+export interface NewCreateCohortDto {
+  name: string
+  description?: string
+  stages: Except<INewStage, "id">[]
+  startDate: Date
+  endDate: Date
+}
+
 export interface UpdateFormDto {
   name?: string
   description?: string
@@ -50,6 +84,14 @@ export interface UpdateCohortDto {
   description?: string
   stages?: SetOptional<IStage, "id">[]
   trainingStartDate?: string
+}
+
+export interface NewUpdateCohortDto {
+  name?: string
+  description?: string
+  stages?: SetOptional<INewStage, "id">[]
+  startDate?: string
+  endDate?: string
 }
 
 export interface CreateQuestionDto {
@@ -91,13 +133,6 @@ export enum FormType {
   Applicant = "Applicant",
   Trainee = "Trainee",
 }
-export enum Role {
-  Admin = "Admin",
-  Coach = "Coach",
-  Trainee = "Trainee",
-  Applicant = "Applicant",
-  Prospect = "Prospect",
-}
 
 export enum Decision {
   Accepted = "Accepted",
@@ -116,10 +151,7 @@ export interface DecisionDto {
 }
 
 export type updateUserDto = Partial<
-  Pick<
-    IUser,
-    "name" | "email" | "verified" | "password" | "role" | "coach" | "active"
-  >
+  Pick<IUser, "name" | "email" | "verified" | "password" | "role" | "active">
 >
 export interface ICohortOverviewRequest {
   cohortId?: string
@@ -130,7 +162,7 @@ export interface ICohortOverviewRequest {
 export interface RegisterUserDto {
   name: string
   email: string
-  role: Exclude<Role, Role.Applicant | Role.Trainee>
+  role: Exclude<Role, Role.Trainee>
 }
 
 export interface AddApplicantsDto {
@@ -140,6 +172,13 @@ export interface AddApplicantsDto {
 export interface StageDto {
   name: string
   description: string
+}
+
+export interface NewStageDto {
+  name: StageName
+  description?: string
+  isCurrent: boolean
+  isPreselection: boolean
 }
 
 // responses left in lowercase for smoother integration with Apps Script
@@ -152,3 +191,25 @@ export interface JoinWaitListDto {
     lastname: string
   }
 }
+
+// New types for New User model
+export enum Role {
+  Prospect = "Prospect",
+  Admin = "Admin",
+  Coach = "Coach",
+  Trainee = "Trainee",
+}
+
+export enum TraineeStatus {
+  NOT_REGISTERED = "NOT_REGISTERED",
+  ON_WAIT_LIST = "ON_WAIT_LIST",
+  APPLIED = "APPLIED",
+  ENROLLED = "ENROLLED",
+  DROPPED_OUT = "DROPPED_OUT",
+  REJECTED = "REJECTED",
+  GRADUATED = "GRADUATED",
+}
+
+export type newUpdateUserDto = Partial<
+  Pick<IUser, "name" | "email" | "verified" | "password" | "role" | "active">
+>

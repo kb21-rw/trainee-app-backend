@@ -1,27 +1,42 @@
 import Joi from "joi"
 import { Decision } from "../utils/types"
-import {
-  requiredMongodbIdValidation,
-  stageValidation,
-} from "./generalValidation"
 
-export const createCohortValidation = Joi.object({
+export const createNewCohortValidation = Joi.object({
   name: Joi.string().min(3).max(100).required(),
   description: Joi.string().min(3).max(100).optional(),
   stages: Joi.array()
-    .items(Joi.object({ name: Joi.string().min(1), description: Joi.string() }))
+    .items(
+      Joi.object({
+        name: Joi.string().min(1),
+        description: Joi.string().min(3).max(100).optional(),
+        isPreselection: Joi.boolean().required(),
+      }),
+    )
     .min(1)
-    .message("Add at least 1 stage"),
-  trainingStartDate: Joi.date().min("now").required(),
+    .message("Add at least 1 stage")
+    .required(),
+  startDate: Joi.date().min("now").required(),
+  endDate: Joi.date().min(Joi.ref("startDate")).required(),
 })
 
 export const updateCohortValidation = Joi.object({
   name: Joi.string().min(3).max(100),
   description: Joi.string().min(3).max(100),
-  trainingStartDate: Joi.date()
+  startDate: Joi.date()
     .min("now")
     .message("Training start date must be in the future"),
-  stages: Joi.array().items(stageValidation),
+  endDate: Joi.date()
+    .min(Joi.ref("startDate"))
+    .message("Training end date must be after start date"),
+  stages: Joi.array()
+    .items(
+      Joi.object({
+        name: Joi.string().min(1),
+        description: Joi.string().min(3).max(100).optional(),
+        isPreselection: Joi.boolean().required(),
+      }),
+    )
+    .min(1),
 })
 
 export const decisionValidation = Joi.object({
@@ -32,12 +47,4 @@ export const decisionValidation = Joi.object({
     .required(),
   decision: Joi.string().valid(Decision.Accepted, Decision.Rejected).required(),
   feedback: Joi.string().min(0).required(),
-})
-
-export const addApplicantsSchema = Joi.object({
-  prospectIds: Joi.array()
-    .items(requiredMongodbIdValidation)
-    .min(1)
-    .message("Add at least 1 participant")
-    .required(),
 })

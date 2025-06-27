@@ -12,11 +12,10 @@ import CustomError from "./middlewares/customError"
 import { errorHandler } from "./middlewares/errorHandler"
 import authRoute from "./routes/authRoute"
 import coachRoute from "./routes/coachRoute"
-import cohortRoutes from "./routes/cohortRoutes"
+import cohortRoutes from "./routes/cohortRoute"
 import formRoute from "./routes/formRoute"
 import joinWaitListRoute from "./routes/joinWaitListRoute"
 import overviewRoute from "./routes/overviewRoute"
-import participantRoutes from "./routes/participantRoutes"
 import questionRoute from "./routes/questionRoute"
 import responseRoute from "./routes/responseRoute"
 import traineeRoute from "./routes/traineeRoute"
@@ -86,7 +85,6 @@ app.use(express.json())
 app.use("/auth", authRoute)
 app.use("/users", userRoute)
 app.use("/trainees", traineeRoute)
-app.use("/participants", participantRoutes)
 app.use("/coaches", coachRoute)
 app.use("/cohorts", cohortRoutes)
 app.use("/forms", formRoute)
