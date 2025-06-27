@@ -62,7 +62,8 @@ export const decisionService = async (body: DecisionDto) => {
   const { traineeId, decision, feedback } = body
   const trainee = await getTraineeService({ _id: traineeId })
   const currentCohort = await getCurrentCohort()
-  if (currentCohort.id !== trainee.cohortId) {
+
+  if (currentCohort.id !== trainee.cohortId.toString()) {
     throw new CustomError(
       TRAINEE_NOT_FOUND,
       "Trainee not found in the current cohort",

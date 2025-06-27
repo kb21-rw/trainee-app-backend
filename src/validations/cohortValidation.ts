@@ -40,7 +40,7 @@ export const updateCohortValidation = Joi.object({
 })
 
 export const decisionValidation = Joi.object({
-  userId: Joi.string()
+  traineeId: Joi.string()
     .hex()
     .length(24)
     .message("userId is not valid")
