@@ -24,7 +24,7 @@ const TraineeSchema = new Schema({
   coachId: {
     type: Types.ObjectId,
     ref: "User",
-    required: true,
+    required: false,
   },
   stage: {
     type: String,

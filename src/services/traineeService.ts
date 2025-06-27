@@ -5,7 +5,11 @@ import {
   getTraineesForCoachQuery,
   getTraineesQuery,
 } from "../queries/traineesQuery"
-import { COHORT_BAD_REQUEST, USER_NOT_FOUND } from "../utils/errorCodes"
+import {
+  COHORT_BAD_REQUEST,
+  DUPLICATE_TRAINEE,
+  USER_NOT_FOUND,
+} from "../utils/errorCodes"
 import { updateUserDto, TraineeStatus, TraineeDto, Role } from "../utils/types"
 import { updateUserService } from "./userService"
 import { getCurrentCohort } from "../utils/helpers"
@@ -102,7 +106,7 @@ export const updateTraineeService = async (
 export const createTraineeService = async (
   userId: string,
   cohortId: string,
-  coachId: string,
+  coachId?: string,
   status: TraineeStatus = TraineeStatus.ENROLLED,
 ) => {
   const currentCohort = await getCurrentCohort()
@@ -115,7 +119,20 @@ export const createTraineeService = async (
     )
   }
 
-  if (!currentCohort.coaches.includes(coachId)) {
+  const existingTrainee = await getTraineeService({ userId })
+
+  if (
+    existingTrainee &&
+    existingTrainee.cohortId.toString() === currentCohort.id
+  ) {
+    throw new CustomError(
+      DUPLICATE_TRAINEE,
+      "Trainee already exists in the current cohort",
+      409,
+    )
+  }
+
+  if (coachId && !currentCohort.coaches.includes(coachId)) {
     throw new CustomError(
       COHORT_BAD_REQUEST,
       "Coach is not part of the current cohort",
@@ -132,6 +149,10 @@ export const createTraineeService = async (
   })
 
   await trainee.save()
+
+  currentCohort.trainees.push(trainee.id)
+
+  await currentCohort.save()
 
   await updateUserService(userId, { role: Role.Trainee })
 

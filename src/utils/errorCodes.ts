@@ -7,6 +7,7 @@ export const TRAINEE_NOT_FOUND = "TRAINEE404"
 
 export const DUPLICATE_DOCUMENT = "DP0004"
 export const DUPLICATE_USER = "DP0005"
+export const DUPLICATE_TRAINEE = "DP0006"
 export const INVALID_MONGODB_ID = "TT0008M"
 export const INVALID_CREDENTIAL = "TT0008N"
 export const URL_NOT_FOUND = "ULRN068"
