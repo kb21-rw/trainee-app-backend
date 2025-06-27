@@ -1,8 +1,10 @@
 import CustomError from "../middlewares/customError"
+import Coach from "../models/Coach"
 import Cohort from "../models/Cohort"
 import User from "../models/User"
 import { USER_NOT_FOUND } from "../utils/errorCodes"
 import { Role } from "../utils/types"
+import { registerService } from "./authService"
 import { getCohortService } from "./cohortService"
 
 export const getCoachesService = async (cohortId?: string) => {
@@ -51,4 +53,23 @@ export const addCoachToCohortService = async (coachId: string) => {
   await currentCohort.save()
 
   return currentCohort
+}
+
+export const createCoachService = async (
+  loggedInUser: any,
+  body: any,
+  cohortId: string,
+) => {
+  const newUser = await registerService(loggedInUser, body)
+
+  newUser.role = Role.Coach
+  await newUser.save()
+
+  const coach = await Coach.create({
+    userId: newUser._id,
+    cohortId: cohortId,
+  })
+
+  await addCoachToCohortService(coach._id)
+  return coach
 }
