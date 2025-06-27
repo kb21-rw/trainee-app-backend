@@ -33,7 +33,6 @@ export const registerService = async (
   const password: string = generateRandomPassword(10)
   const hashedPassword = await hash(password, 10)
 
-  console.log("🚀", "here is okay")
   const createdUser = await User.create({
     ...body,
     name,
@@ -41,8 +40,6 @@ export const registerService = async (
     verified: true,
     active: true,
   })
-
-  console.log("🚀", "Something is wrong here")
 
   await sendEmail(createdUser.email, {
     name: createdUser.name,

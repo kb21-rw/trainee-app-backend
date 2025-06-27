@@ -1,13 +1,23 @@
 import CustomError from "../middlewares/customError"
+import Cohort from "../models/Cohort"
 import User from "../models/User"
-import { getCoachesQuery } from "../queries/coachQuery"
 import { USER_NOT_FOUND } from "../utils/errorCodes"
 import { Role } from "../utils/types"
 import { getCohortService } from "./cohortService"
 
 export const getCoachesService = async (cohortId?: string) => {
-  const coaches = await getCoachesQuery(cohortId!)
-  return coaches
+  const currentCohort = await Cohort.findById(cohortId)
+    .select(["_id", "name", "isActive", "coaches"])
+    .populate({
+      path: "coaches",
+      populate: {
+        path: "userId",
+        model: User, // Direct reference to imported model
+        select: "name email",
+      },
+    })
+
+  return currentCohort
 }
 
 export const updateCoachOrAdminService = async (
