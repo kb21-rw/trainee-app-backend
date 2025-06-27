@@ -37,7 +37,8 @@ export const updateCoachOrAdminService = async (
 
 export const addCoachToCohortService = async (coachId: string) => {
   const currentCohort = await getCohortService({ isActive: true })
-
   currentCohort.coaches.push(coachId)
   await currentCohort.save()
+
+  return currentCohort
 }

@@ -42,14 +42,7 @@ const CohortSchema = new Schema(
       type: Date,
       required: true,
     },
-    coaches: [
-      {
-        id: { type: String, required: true },
-        userId: { type: Schema.Types.ObjectId, ref: "User", required: true },
-        applicants: [{ type: Schema.Types.ObjectId, ref: "User" }],
-        trainees: [{ type: Schema.Types.ObjectId, ref: "User" }],
-      },
-    ],
+    coaches: [{ type: String, required: true }],
     trainees: [{ type: Schema.Types.ObjectId, ref: "User" }],
     stages: [
       {
