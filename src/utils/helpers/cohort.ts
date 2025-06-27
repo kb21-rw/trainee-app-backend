@@ -1,9 +1,14 @@
-import { Types } from "mongoose"
 import CustomError from "../../middlewares/customError"
-import { COHORT_NOT_FOUND, DUPLICATE_DOCUMENT } from "../errorCodes"
-import { IStage } from "../types"
-import { SetOptional } from "type-fest"
+import {
+  COHORT_BAD_REQUEST,
+  COHORT_NOT_FOUND,
+  DUPLICATE_DOCUMENT,
+  NOT_ALLOWED,
+} from "../errorCodes"
+import { IStage, StageDto } from "../types"
 import Cohort from "../../models/Cohort"
+import { Types } from "mongoose"
+import { Except } from "type-fest"
 
 export const getCurrentCohort = async () => {
   const currentCohort = await Cohort.findOne({ isActive: true })
@@ -15,67 +20,88 @@ export const getCurrentCohort = async () => {
   return currentCohort
 }
 
-export const updateStagesHandler = (
-  cohortStages: IStage[],
-  receivedStages: SetOptional<IStage, "id">[],
-) => {
-  const updatedStages = receivedStages.filter((stage) => stage.id)
-  const addedStages = receivedStages.filter((stage) => !stage.id)
-
-  // check for duplicates in new stages and throw if any
-  const cohortStageTitles = cohortStages.map((stage) => stage.name)
-  addedStages
-    .map((stage) => stage.name)
-    .forEach((addedStageTitle) => {
-      if (cohortStageTitles.includes(addedStageTitle)) {
-        throw new CustomError(
-          DUPLICATE_DOCUMENT,
-          `'${addedStageTitle}' already exists in the stages`,
-          409,
-        )
-      }
-    })
-
-  // update existing stages
-  const updatedCohortStages = cohortStages.map((stage) => {
-    const updatedStage = updatedStages.find(
-      (updatedStage) => updatedStage.id === stage.id.toString(),
-    )
-    return updatedStage ? { ...updatedStage, id: stage.id } : stage
-  })
-
-  // add id property to every stage
-  updatedCohortStages.push(
-    ...addedStages.map((stage) => ({
-      ...stage,
-      id: new Types.ObjectId().toString(),
-    })),
+export const validatePreselectionStages = (uniqueStages: StageDto[]) => {
+  const preselectionStages = uniqueStages.filter(
+    (stage) => stage.isPreselection,
   )
 
-  return updatedCohortStages
+  if (preselectionStages.length === 0) {
+    throw new CustomError(
+      COHORT_BAD_REQUEST,
+      "You must have at least 1 preselection stage",
+      400,
+    )
+  }
+
+  const lastPreselectionIndex = uniqueStages.findLastIndex(
+    (stage) => stage.isPreselection,
+  )
+
+  if (lastPreselectionIndex >= preselectionStages.length) {
+    throw new CustomError(
+      COHORT_BAD_REQUEST,
+      "Preselection stage cannot be after a non preselection one",
+      400,
+    )
+  }
 }
 
-// export const isUserInCohort = (cohort: ICohort, userId: string, role: Role) => {
-//   if (role === Role.Applicant) {
-//     return (
-//       cohort.applicants.find(
-//         (applicant) => applicant.id.toString() === userId,
-//       ) ?? false
-//     )
-//   }
+export const updateStagesHandler = (
+  currentStages: IStage[],
+  receivedStages: StageDto[],
+) => {
+  const receivedStageNames = receivedStages.map((stage) => stage.name)
 
-//   if (role === Role.Trainee) {
-//     return (
-//       cohort.trainees.find((trainee) => trainee.id.toString() === userId) ??
-//       false
-//     )
-//   }
+  const uniqueReceivedStageNames = new Set(receivedStageNames)
+  if (uniqueReceivedStageNames.size !== receivedStages.length) {
+    throw new CustomError(
+      DUPLICATE_DOCUMENT,
+      "Duplicate stage names are not allowed",
+      400,
+    )
+  }
 
-//   if (role === Role.Coach) {
-//     return (
-//       cohort.coaches.find((coachId) => coachId.toString() === userId) ?? false
-//     )
-//   }
+  const currentStageIndex = currentStages.findIndex((stage) => stage.isCurrent)
+  if (receivedStages.length < currentStageIndex + 1) {
+    throw new CustomError(NOT_ALLOWED, "You can't delete a passed stage", 403)
+  }
 
-//   return false
-// }
+  validatePreselectionStages(receivedStages)
+  const updatedStages = currentStages
+    .slice(0, currentStageIndex + 1)
+    .map((stage, i) => ({
+      ...stage,
+      name: receivedStages[i].name,
+      description: receivedStages[i].description,
+      isPreselection: stage.isPreselection,
+    }))
+
+  const afterCurrentStages = receivedStages.slice(currentStageIndex + 1)
+  const addedStages = afterCurrentStages.map((stage) => ({
+    ...stage,
+    id: new Types.ObjectId().toString(),
+    participantsCount: 0,
+    isCurrent: false,
+  }))
+
+  return [...updatedStages, ...addedStages]
+}
+
+export const createStagesHandler = (stages: Except<IStage, "id">[]) => {
+  const stageTitles = stages.map((stage) => stage.name)
+  const uniqueStageTitles = [...new Set(stageTitles)]
+
+  const uniqueStages = uniqueStageTitles.map(
+    (stageTitle) => stages.find((stage) => stage.name === stageTitle)!,
+  )
+
+  validatePreselectionStages(uniqueStages)
+
+  const currentStage = { ...uniqueStages[0], isCurrent: true }
+  uniqueStages[0] = currentStage // Set the first stage as current
+
+  return uniqueStages.map((stage) => ({
+    ...stage,
+    id: new Types.ObjectId().toString(),
+  }))
+}

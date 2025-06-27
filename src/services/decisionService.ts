@@ -2,8 +2,8 @@ import CustomError from "../middlewares/customError"
 import { ICohort } from "../models/Cohort"
 import { ITrainee } from "../models/Trainee"
 import { TRAINEE403_FORBIDDEN, TRAINEE_NOT_FOUND } from "../utils/errorCodes"
+import { getCurrentCohort } from "../utils/helpers"
 import { Decision, DecisionDto, TraineeStatus } from "../utils/types"
-import { getCohortService } from "./cohortService"
 import { getTraineeService } from "./traineeService"
 
 export const acceptTraineeService = async (
@@ -61,7 +61,7 @@ export const rejectTraineeService = async (
 export const decisionService = async (body: DecisionDto) => {
   const { traineeId, decision, feedback } = body
   const trainee = await getTraineeService({ _id: traineeId })
-  const currentCohort = await getCohortService({ isActive: true })
+  const currentCohort = await getCurrentCohort()
   if (currentCohort.id !== trainee.cohortId) {
     throw new CustomError(
       TRAINEE_NOT_FOUND,

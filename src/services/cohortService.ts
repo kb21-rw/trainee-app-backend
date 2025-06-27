@@ -2,10 +2,13 @@ import CustomError from "../middlewares/customError"
 import Cohort, { ICohort } from "../models/Cohort"
 import { COHORT_BAD_REQUEST, COHORT_NOT_FOUND } from "../utils/errorCodes"
 import { CreateCohortDto, UpdateCohortDto } from "../utils/types"
-import { createStagesHandler } from "../utils/helpers"
+import {
+  createStagesHandler,
+  getCurrentCohort,
+  updateStagesHandler,
+} from "../utils/helpers"
 
 import dayjs from "dayjs"
-import { updateStagesService } from "./generalService"
 import { getUserFormResponsesQuery } from "../queries/responseQueries"
 import { getFormService } from "./formService"
 import { getCohortsQuery } from "../queries/cohortQueries"
@@ -92,14 +95,14 @@ export const updateCohortService = async (
   }
 
   if (stages) {
-    cohort.stages = updateStagesService(cohort.stages, stages)
+    cohort.stages = updateStagesHandler(cohort.stages, stages)
   }
 
   return await cohort.save()
 }
 
 export const getApplicationFormService = async () => {
-  const currentCohort = await getCohortService({ isActive: true })
+  const currentCohort = await getCurrentCohort()
 
   if (!currentCohort.applicationForm) {
     return null
@@ -109,7 +112,7 @@ export const getApplicationFormService = async () => {
 }
 
 export const getMyApplicationFormService = async (loggedInUserId: string) => {
-  const currentCohort = await getCohortService({ isActive: true })
+  const currentCohort = await getCurrentCohort()
 
   if (!currentCohort.applicationForm) {
     return null

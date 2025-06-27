@@ -6,9 +6,9 @@ import {
   getTraineesQuery,
 } from "../queries/traineesQuery"
 import { COHORT_BAD_REQUEST, USER_NOT_FOUND } from "../utils/errorCodes"
-import { updateUserDto, TraineeStatus, TraineeDto } from "../utils/types"
+import { updateUserDto, TraineeStatus, TraineeDto, Role } from "../utils/types"
 import { updateUserService } from "./userService"
-import { getCohortService } from "./cohortService"
+import { getCurrentCohort } from "../utils/helpers"
 
 export const getTraineesService = async ({
   searchString,
@@ -71,9 +71,9 @@ export const updateTraineeService = async (
     throw new CustomError(USER_NOT_FOUND, "Trainee not found", 404)
   }
 
-  const currentCohort = await getCohortService({ isActive: true })
+  const currentCohort = await getCurrentCohort()
 
-  if (currentCohort.id !== trainee.cohortId.toString()) {
+  if (currentCohort.id !== trainee.cohortId) {
     throw new CustomError(
       USER_NOT_FOUND,
       "Trainee not found in the current cohort",
@@ -105,7 +105,7 @@ export const createTraineeService = async (
   coachId: string,
   status: TraineeStatus = TraineeStatus.ENROLLED,
 ) => {
-  const currentCohort = await getCohortService({ isActive: true })
+  const currentCohort = await getCurrentCohort()
 
   if (currentCohort.id !== cohortId) {
     throw new CustomError(
@@ -132,5 +132,8 @@ export const createTraineeService = async (
   })
 
   await trainee.save()
+
+  await updateUserService(userId, { role: Role.Trainee })
+
   return trainee
 }
