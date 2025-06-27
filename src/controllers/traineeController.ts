@@ -29,11 +29,11 @@ export const getTrainees = async (
 }
 
 export const getTraineesForCoach = async (
-  req: Request,
+  req: any,
   res: Response,
   next: NextFunction,
 ) => {
-  const searchString = req.query.searchString?.toString() || ""
+  const searchString = req.query.searchString || ""
   const traineesPerPage = Number(req.query.coachesPerPage) || 10
   const sortBy = req.query.sortBy?.toString() || "entry"
   try {
