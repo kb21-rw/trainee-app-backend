@@ -1,5 +1,5 @@
 import CustomError from "../middlewares/customError"
-import User from "../models/User"
+import User, { IUser } from "../models/User"
 import Trainee, { ITrainee } from "../models/Trainee"
 import {
   getTraineesForCoachQuery,
@@ -24,16 +24,21 @@ export const getTraineesService = async ({
 }
 
 export const getTraineesForCoachService = async (
-  id: string,
+  coachId: string,
   {
     searchString,
     sortBy,
     traineesPerPage,
   }: { searchString: string; sortBy: string; traineesPerPage: number },
 ) => {
-  const coach: any = await User.findById(id)
+  const coach = await User.findById<IUser>(coachId)
+
+  if (!coach) {
+    throw new CustomError(USER_NOT_FOUND, "Coach not found", 404)
+  }
+
   const trainees = await getTraineesForCoachQuery(
-    coach._id,
+    coach.id,
     searchString,
     sortBy,
     traineesPerPage,
@@ -117,8 +122,6 @@ export const createTraineeService = async (
       400,
     )
   }
-
-  // add trainee as an applicant for a coach and will have status APPLIED
 
   const trainee = new Trainee({
     userId,

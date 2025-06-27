@@ -1,5 +1,5 @@
 import Joi from "joi"
-import { TraineeStatus } from "../utils/types"
+import { Decision, TraineeStatus } from "../utils/types"
 
 export const editTraineeSchema = Joi.object({
   name: Joi.string().min(3).max(30).trim().optional(),
@@ -13,4 +13,14 @@ export const editTraineeSchema = Joi.object({
     )
     .optional(),
   coachId: Joi.string().optional(),
+})
+
+export const decisionValidation = Joi.object({
+  userId: Joi.string()
+    .hex()
+    .length(24)
+    .message("userId is not valid")
+    .required(),
+  decision: Joi.string().valid(Decision.Accepted, Decision.Rejected).required(),
+  feedback: Joi.string().min(0).required(),
 })
