@@ -2,7 +2,6 @@ import { Document, Schema, model } from "mongoose"
 import { Role, UserStatus } from "../utils/types"
 
 export interface IUser extends Document {
-  userNumber: string
   name: string
   email: string
   verified: boolean

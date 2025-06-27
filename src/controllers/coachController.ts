@@ -6,6 +6,10 @@ import {
   addCoachToCohortService,
 } from "../services/coachService"
 import { mongodbIdValidation } from "../validations/generalValidation"
+import { registerService } from "../services/authService"
+import { registerSchema } from "../validations/authValidation"
+import { Role } from "../utils/types"
+import Coach from "../models/Coach"
 
 export const getCoachesController = async (
   req: any,
@@ -47,6 +51,33 @@ export const addCoachToCohortController = async (
     await mongodbIdValidation.validateAsync(coachId)
     const coach = await addCoachToCohortService(coachId)
     return res.status(200).send(coach)
+  } catch (error) {
+    return next(error)
+  }
+}
+
+export const createCoachController = async (
+  req: any,
+  res: Response,
+  next: NextFunction,
+) => {
+  try {
+    const loggedInUser = req.user
+    const body = req.body
+    const { cohortId } = req.query
+    await registerSchema.validateAsync(body)
+    const newUser = await registerService(loggedInUser, body)
+
+    newUser.role = Role.Coach
+    await newUser.save()
+
+    const coach = await Coach.create({
+      userId: newUser._id,
+      cohortId: cohortId,
+    })
+
+    await addCoachToCohortService(coach._id)
+    return res.status(201).send(coach)
   } catch (error) {
     return next(error)
   }

@@ -1,6 +1,6 @@
 import { Document, model, Schema } from "mongoose"
-import { IForm } from "./Form"
 import { ICoach, IStage, StageName } from "../utils/types"
+import { IForm } from "./Form"
 import { IUser } from "./User"
 
 export interface ICohort extends Document {
@@ -42,14 +42,7 @@ const CohortSchema = new Schema(
       type: Date,
       required: true,
     },
-    coaches: [
-      {
-        id: { type: String, required: true },
-        userId: { type: Schema.Types.ObjectId, ref: "User", required: true },
-        applicants: [{ type: Schema.Types.ObjectId, ref: "User" }],
-        trainees: [{ type: Schema.Types.ObjectId, ref: "User" }],
-      },
-    ],
+    coaches: [{ type: Schema.Types.ObjectId, ref: "Coach" }],
     trainees: [{ type: Schema.Types.ObjectId, ref: "User" }],
     stages: [
       {

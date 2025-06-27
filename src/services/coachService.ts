@@ -1,21 +1,23 @@
 import CustomError from "../middlewares/customError"
+import Cohort from "../models/Cohort"
 import User from "../models/User"
-import { getCoachesQuery } from "../queries/coachQuery"
-import {
-  DUPLICATE_USER,
-  NOT_ALLOWED,
-  USER_NOT_FOUND,
-} from "../utils/errorCodes"
+import { USER_NOT_FOUND } from "../utils/errorCodes"
 import { Role } from "../utils/types"
 import { getCohortService } from "./cohortService"
-import { getUserService } from "./userService"
-import { ObjectId } from "mongodb"
 
 export const getCoachesService = async (cohortId?: string) => {
-  const coaches = await getCoachesQuery(
-    cohortId ? { _id: new ObjectId(cohortId) } : undefined,
-  )
-  return coaches
+  const currentCohort = await Cohort.findById(cohortId)
+    .select(["_id", "name", "isActive", "coaches"])
+    .populate({
+      path: "coaches",
+      populate: {
+        path: "userId",
+        model: User, // Direct reference to imported model
+        select: "name email",
+      },
+    })
+
+  return currentCohort
 }
 
 export const updateCoachOrAdminService = async (
@@ -44,31 +46,9 @@ export const updateCoachOrAdminService = async (
 }
 
 export const addCoachToCohortService = async (coachId: string) => {
-  const coach = await getUserService({ _id: coachId })
   const currentCohort = await getCohortService({ isActive: true })
-
-  const coachExists = currentCohort.coaches.find(
-    (coach) => coach.toString() === coachId,
-  )
-
-  if (coachExists) {
-    throw new CustomError(
-      `${coach.name} is already a coach in the cohort`,
-      DUPLICATE_USER,
-      409,
-    )
-  }
-
-  if (coach.role !== Role.Coach) {
-    throw new CustomError(
-      `${coach.role}s can not be added as coaches`,
-      NOT_ALLOWED,
-      403,
-    )
-  }
-
   currentCohort.coaches.push(coachId)
   await currentCohort.save()
 
-  return coach
+  return currentCohort
 }
