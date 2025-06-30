@@ -19,7 +19,34 @@ export const getCoachesService = async (cohortId?: string) => {
       },
     })
 
-  return currentCohort
+  if (!currentCohort) {
+    return null
+  }
+
+  const cohortObj = currentCohort.toObject()
+
+  const transformedCohort = {
+    ...cohortObj,
+    coaches:
+      cohortObj.coaches?.map((coach: any) => {
+        const coachObj = typeof coach === "object" ? coach : {}
+        if (!coachObj.userId || typeof coachObj.userId !== "object") {
+          console.warn(`Coach ${coachObj._id} has invalid.`)
+          return coachObj
+        }
+
+        return {
+          _id: coachObj._id,
+          name: coachObj.userId.name || "",
+          email: coachObj.userId.email || "",
+          cohortId: coachObj.cohortId,
+          trainees: coachObj.trainees || [],
+          applicants: coachObj.applicants || [],
+          __v: coachObj.__v,
+        }
+      }) || [],
+  }
+  return transformedCohort
 }
 
 export const updateCoachOrAdminService = async (
