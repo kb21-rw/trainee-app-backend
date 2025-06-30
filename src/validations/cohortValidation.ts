@@ -16,7 +16,7 @@ export const createCohortValidation = Joi.object({
     .message("Add at least 1 stage")
     .required(),
   startDate: Joi.date().min("now").required(),
-  endDate: Joi.date().min(Joi.ref("startDate")).required(),
+  endDate: Joi.date().min(Joi.ref("startDate")).optional(),
 })
 
 export const updateCohortValidation = Joi.object({

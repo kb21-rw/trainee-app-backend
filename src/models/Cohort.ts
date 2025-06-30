@@ -9,7 +9,7 @@ export interface ICohort extends Document {
   description: string
   isActive: boolean
   startDate: string
-  endDate: string
+  endDate?: string
   coaches: ICoach["_id"][] // refer to coach IDs
   trainees: IUser["_id"][] // refer to trainee IDs in trainees model
   stages: IStage[]
@@ -40,7 +40,6 @@ const CohortSchema = new Schema(
     },
     endDate: {
       type: Date,
-      required: true,
     },
     coaches: [{ type: Schema.Types.ObjectId, ref: "Coach" }],
     trainees: [{ type: Schema.Types.ObjectId, ref: "User" }],
@@ -53,7 +52,7 @@ const CohortSchema = new Schema(
         },
         description: { type: String },
         participantsCount: { type: Number, default: 0 },
-        isPreselection: { type: Boolean, default: false },
+        isPreselection: { type: Boolean, default: true },
         isCurrent: { type: Boolean, default: false },
       },
     ],
