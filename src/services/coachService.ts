@@ -36,7 +36,11 @@ export const getCoachesService = async (cohortId?: string) => {
         }
 
         return {
-          _id: coachObj._id,
+          // Here we are extracting data from userId which is weird but it's because we populated the coaches data in reference to the userId
+          // It's important to pass userId._id here because that's what the front end will use to send the edit requst to the right coach document.
+          _id: coachObj.userId._id,
+          // Any edits specific to a user being a coach, will be targetting this coachId instead.
+          coachId: coachObj._id,
           name: coachObj.userId.name || "",
           email: coachObj.userId.email || "",
           cohortId: coachObj.cohortId,
