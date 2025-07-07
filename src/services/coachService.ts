@@ -19,7 +19,40 @@ export const getCoachesService = async (cohortId?: string) => {
       },
     })
 
-  return currentCohort
+  if (!currentCohort) {
+    return null
+  }
+
+  const cohortObj = currentCohort.toObject()
+
+  const transformedCohort = {
+    ...cohortObj,
+    coaches:
+      cohortObj.coaches?.map((coach: any) => {
+        const coachObj = typeof coach === "object" ? coach : {}
+        if (!coachObj.userId || typeof coachObj.userId !== "object") {
+          console.warn(
+            `Accessing data on coach with id ${coachObj._id} failed due to invalid userId.`,
+          )
+          return coachObj
+        }
+
+        return {
+          // Here we are extracting data from userId which is weird but it's because we populated the coaches data in reference to the userId
+          // It's important to pass userId._id here because that's what the front end will use to send the edit requst to the right coach document.
+          _id: coachObj.userId._id,
+          // Any edits specific to a user being a coach, will be targetting this coachId instead.
+          coachId: coachObj._id,
+          name: coachObj.userId.name || "",
+          email: coachObj.userId.email || "",
+          cohortId: coachObj.cohortId,
+          trainees: coachObj.trainees || [],
+          applicants: coachObj.applicants || [],
+          __v: coachObj.__v,
+        }
+      }) || [],
+  }
+  return transformedCohort
 }
 
 export const updateCoachOrAdminService = async (

@@ -5,6 +5,7 @@ import {
   getCoachesService,
   updateCoachOrAdminService,
 } from "../services/coachService"
+import { getCohortService } from "../services/cohortService"
 import { registerSchema } from "../validations/authValidation"
 import { mongodbIdValidation } from "../validations/generalValidation"
 import { editUserSchema } from "../validations/userValidation"
@@ -62,9 +63,14 @@ export const createCoachController = async (
   try {
     const loggedInUser = req.user
     const body = req.body
-    const { cohortId } = req.query
+    const currentActiveCohort = await getCohortService({ isActive: true })
+
     await registerSchema.validateAsync(body)
-    const coach = await createCoachService(loggedInUser, body, cohortId)
+    const coach = await createCoachService(
+      loggedInUser,
+      body,
+      currentActiveCohort._id,
+    )
     return res.status(201).send(coach)
   } catch (error) {
     return next(error)
