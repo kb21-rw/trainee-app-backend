@@ -123,9 +123,6 @@ export const getCohortOverviewQuery = async ({
         trainees: {
           $ifNull: ["$traineesInfo", []],
         },
-        applicants: {
-          $ifNull: ["$traineesInfo", []],
-        },
         coaches: {
           $ifNull: ["$coachesUserInfo", []],
         },
