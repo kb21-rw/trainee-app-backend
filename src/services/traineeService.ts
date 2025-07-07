@@ -24,7 +24,7 @@ export const getTraineesService = async ({
   traineesPerPage: number
 }) => {
   const trainees = await getTraineesQuery(searchString, sortBy, traineesPerPage)
-  console.log("trainees", trainees)
+
   return trainees
 }
 
@@ -118,8 +118,6 @@ export const createTraineeService = async (
   }
 
   const existingTrainee = await getTraineeService({ userId })
-
-  console.log("trainee in the cohort", existingTrainee)
 
   if (
     existingTrainee &&
