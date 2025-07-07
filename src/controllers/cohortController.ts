@@ -120,3 +120,29 @@ export const getMyApplicationController = async (
     return next(error)
   }
 }
+
+export const getCohortOverviewController = async (
+  req: Request<
+    any,
+    any,
+    any,
+    { cohortId: string; type: FormType; coachId?: string }
+  >,
+  res: Response,
+  next: NextFunction,
+) => {
+  try {
+    const { cohortId, type, coachId } = req.query
+    const overviewType =
+      type === FormType.Trainee ? FormType.Trainee : FormType.Applicant
+    cohortId && (await mongodbIdValidation.validateAsync(cohortId))
+    const overview = await getCohortOverviewService({
+      cohortId,
+      overviewType,
+      coachId,
+    })
+    return res.status(200).json(overview)
+  } catch (error) {
+    return next(error)
+  }
+}

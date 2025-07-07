@@ -75,7 +75,7 @@ export const updateTraineeService = async (
 
   const currentCohort = await getCurrentCohort()
 
-  if (currentCohort.id !== trainee.cohortId) {
+  if (currentCohort.id !== trainee.cohortId.toString()) {
     throw new CustomError(
       USER_NOT_FOUND,
       "Trainee not found in the current cohort",
@@ -83,7 +83,10 @@ export const updateTraineeService = async (
     )
   }
 
-  if (updates.coachId && !currentCohort.coaches.includes(updates.coachId)) {
+  if (
+    updates.coachId &&
+    currentCohort.coaches.find((coach) => coach.toString() === updates.coachId)
+  ) {
     throw new CustomError(
       COHORT_BAD_REQUEST,
       "Coach is not part of the current cohort",
@@ -96,7 +99,7 @@ export const updateTraineeService = async (
 
   trainee.save()
 
-  const userUpdates = await updateUserService(traineeId, updates)
+  const userUpdates = await updateUserService(trainee.userId, updates)
 
   return { ...trainee.toObject(), ...userUpdates }
 }

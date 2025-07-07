@@ -1,6 +1,6 @@
+import { ObjectId } from "mongodb"
 import Cohort, { ICohort } from "../models/Cohort"
 import { FormType, ICohortOverviewRequest } from "../utils/types"
-import { ObjectId } from "mongodb"
 
 export const getCohortsQuery = async (searchString: string) => {
   const cohorts: ICohort[] = await Cohort.aggregate([
@@ -32,125 +32,59 @@ export const getCohortOverviewQuery = async ({
   overviewType,
   coachId,
 }: ICohortOverviewRequest) => {
-  const cohortDoc = await Cohort.findById(cohortId).lean()
-  if (!cohortDoc) throw new Error("Cohort not found")
-
-  // Find the last preselection stage
-  const preselectionStages = cohortDoc.stages.filter(
-    (stage) => stage.isPreselection,
-  )
-  const lastPreselectionStage =
-    preselectionStages[preselectionStages.length - 1]
-  const lastPreselectionStageId = lastPreselectionStage?.id
-
-  // Build the match condition for trainees
-  let traineeMatch: any = {
-    $expr: { $eq: ["$cohortId", new ObjectId(cohortId)] },
-  }
-  if (lastPreselectionStageId) {
-    if (overviewType === FormType.Trainee) {
-      traineeMatch = {
-        $and: [
-          { $expr: { $eq: ["$cohortId", new ObjectId(cohortId)] } },
-          { passedStages: lastPreselectionStageId },
-        ],
-      }
-    } else {
-      traineeMatch = {
-        $and: [
-          { $expr: { $eq: ["$cohortId", new ObjectId(cohortId)] } },
-          { passedStages: { $ne: lastPreselectionStageId } },
-        ],
-      }
-    }
-  }
-
   const overview = await Cohort.aggregate([
     { $match: { _id: new ObjectId(cohortId) } },
-    // Lookup trainees from the Trainee collection for this cohort, filtered by passedStages
+
+    // Lookup trainees and their user info
     {
       $lookup: {
         from: "trainees",
-        let: { cohortId: "$_id" },
-        pipeline: [
-          { $match: traineeMatch },
-          // Join user info
-          {
-            $lookup: {
-              from: "users",
-              localField: "userId",
-              foreignField: "_id",
-              as: "user",
-            },
-          },
-          { $unwind: "$user" },
-          // Join coach info
-          {
-            $lookup: {
-              from: "users",
-              localField: "coachId",
-              foreignField: "_id",
-              as: "coach",
-            },
-          },
-          { $unwind: { path: "$coach", preserveNullAndEmptyArrays: true } },
-          // Optional: project only the fields you need (user, coach, passedStages, stage)
-          {
-            $project: {
-              user: 1,
-              coach: 1,
-              passedStages: 1,
-              stage: 1,
-            },
-          },
-        ],
+        localField: "trainees",
+        foreignField: "_id",
         as: "traineesInfo",
       },
     },
-
-    {
-      $set: {
-        participantsInfo: "$traineesInfo",
-        participants: {
-          $map: {
-            input: "$traineesInfo",
-            as: "t",
-            in: {
-              id: "$$t.user._id",
-              droppedStage: {
-                id: "$$t.stage", // or full object if you store more
-                isConfirmed: false, // adjust this flag if needed
-              },
-              passedStages: "$$t.passedStages", // if you don’t store passedStages, make it empty or infer from logic
-            },
-          },
-        },
-      },
-    },
-
-    // Lookup coaches (user info)
     {
       $lookup: {
         from: "users",
-        localField: "coaches.id",
+        localField: "traineesInfo.userId",
         foreignField: "_id",
-        as: "coaches",
+        as: "traineesUserInfo",
       },
     },
-
-    // Prepare forms array
+    // Lookup coaches and their user info (may be empty)
+    {
+      $lookup: {
+        from: "coaches",
+        localField: "coaches",
+        foreignField: "_id",
+        as: "coachesInfo",
+      },
+    },
+    {
+      $lookup: {
+        from: "users",
+        localField: "coachesInfo.userId",
+        foreignField: "_id",
+        as: "coachesUserInfo",
+      },
+    },
+    // Lookup forms (may be empty)
     {
       $set: {
         forms: {
-          $concatArrays: [
-            overviewType === FormType.Applicant ? ["$applicationForm"] : [],
-            "$forms",
+          $ifNull: [
+            {
+              $concatArrays: [
+                overviewType === FormType.Applicant ? ["$applicationForm"] : [],
+                { $ifNull: ["$forms", []] },
+              ],
+            },
+            [],
           ],
         },
       },
     },
-
-    // Lookup forms
     {
       $lookup: {
         from: "forms",
@@ -159,19 +93,7 @@ export const getCohortOverviewQuery = async ({
         as: "forms",
       },
     },
-    { $unwind: { path: "$forms" } },
-
-    // Filter forms by type
-    {
-      $match: {
-        $or: [
-          { "forms.type": overviewType },
-          { "forms.type": FormType.Application },
-        ],
-      },
-    },
-
-    // Lookup questions for each form
+    // Lookup questions and responses only if forms exist
     {
       $lookup: {
         from: "questions",
@@ -180,9 +102,6 @@ export const getCohortOverviewQuery = async ({
         as: "questions",
       },
     },
-    { $unwind: { path: "$questions", preserveNullAndEmptyArrays: true } },
-
-    // Lookup responses for each question
     {
       $lookup: {
         from: "responses",
@@ -191,99 +110,49 @@ export const getCohortOverviewQuery = async ({
         as: "responses",
       },
     },
-    { $unwind: { path: "$responses", preserveNullAndEmptyArrays: true } },
-
-    // Lookup user for each response
+    // Group everything for output
     {
-      $lookup: {
-        from: "users",
-        localField: "responses.userId",
-        foreignField: "_id",
-        as: "responses.user",
-      },
-    },
-    { $unwind: { path: "$responses.user", preserveNullAndEmptyArrays: true } },
-
-    // Lookup coach for each response's user
-    {
-      $lookup: {
-        from: "users",
-        localField: "responses.user.coach",
-        foreignField: "_id",
-        as: "responses.user.coach",
-      },
-    },
-    {
-      $unwind: {
-        path: "$responses.user.coach",
-        preserveNullAndEmptyArrays: true,
-      },
-    },
-
-    // Add formId and questionId for easier mapping
-    {
-      $addFields: {
-        "questions.formId": "$forms._id",
-        "responses.questionId": "$questions._id",
-      },
-    },
-
-    // Group everything back into a single document
-    {
-      $group: {
-        _id: "$_id",
-        name: {
-          $first: "$name",
-        },
-        description: {
-          $first: "$description",
-        },
-        isActive: {
-          $first: "$isActive",
-        },
-        stages: {
-          $first: "$stages",
-        },
-        applicationForm: {
-          $first: "$applicationForm",
+      $project: {
+        _id: 1,
+        name: 1,
+        description: 1,
+        isActive: 1,
+        stages: 1,
+        applicationForm: 1,
+        participantsInfo: "$traineesUserInfo",
+        trainees: {
+          $ifNull: ["$traineesInfo", []],
         },
         applicants: {
-          $first: "$applicants",
-        },
-        participantsInfo: { $first: "$participantsInfo" },
-        trainees: {
-          $first: "$trainees",
+          $ifNull: ["$traineesInfo", []],
         },
         coaches: {
-          $first: "$coaches",
+          $ifNull: ["$coachesUserInfo", []],
         },
         forms: {
-          $push: "$forms",
+          $ifNull: ["$forms", []],
         },
         questions: {
-          $push: "$questions",
+          $ifNull: ["$questions", []],
         },
         responses: {
-          $push: "$responses",
+          $ifNull: ["$responses", []],
         },
-        createdAt: {
-          $first: "$createdAt",
-        },
-        updatedAt: {
-          $first: "$updatedAt",
-        },
+        createdAt: 1,
+        updatedAt: 1,
       },
     },
-
-    // Remove duplicates
     {
       $set: {
-        forms: { $setUnion: ["$forms"] },
-        questions: { $setUnion: ["$questions"] },
+        forms: {
+          $setUnion: ["$forms"],
+        },
+        questions: {
+          $setUnion: ["$questions"],
+        },
       },
     },
-
-    // Attach questions to forms
+    // Combine questions with their respective forms
     {
       $set: {
         forms: {
@@ -300,9 +169,16 @@ export const getCohortOverviewQuery = async ({
                       as: "question",
                       cond: {
                         $and: [
-                          { $eq: ["$$question.formId", "$$form._id"] },
                           {
-                            $ne: [{ $ifNull: ["$$question._id", null] }, null],
+                            $eq: ["$$question.formId", "$$form._id"],
+                          },
+                          {
+                            $ne: [
+                              {
+                                $ifNull: ["$$question._id", null],
+                              },
+                              null,
+                            ],
                           },
                         ],
                       },
@@ -315,8 +191,7 @@ export const getCohortOverviewQuery = async ({
         },
       },
     },
-
-    // Attach responses to questions
+    // Combine responses with their respective questions
     {
       $set: {
         forms: {
@@ -355,7 +230,6 @@ export const getCohortOverviewQuery = async ({
                                           ],
                                         }
                                       : { $eq: ["", ""] },
-                                    // Only include responses from users who are trainees in this cohort
                                     {
                                       $in: [
                                         "$$response.user._id",
@@ -363,9 +237,9 @@ export const getCohortOverviewQuery = async ({
                                           $ifNull: [
                                             {
                                               $map: {
-                                                input: "$participantsInfo",
-                                                as: "trainee",
-                                                in: "$$trainee.user._id",
+                                                input: `$${overviewType.toLocaleLowerCase()}s`,
+                                                as: "participant",
+                                                in: "$$participant.id",
                                               },
                                             },
                                             [],
@@ -389,8 +263,6 @@ export const getCohortOverviewQuery = async ({
         },
       },
     },
-
-    // Clean up
     {
       $project: {
         questions: 0,
@@ -398,10 +270,5 @@ export const getCohortOverviewQuery = async ({
       },
     },
   ])
-
-  console.log(
-    "Participants Info (from Trainee):",
-    overview[0]?.participantsInfo,
-  )
   return overview[0]
 }
