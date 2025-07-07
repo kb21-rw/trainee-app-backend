@@ -18,7 +18,6 @@ export const getTraineesQuery = async (
     },
     { $unwind: "$trainee" },
 
-    // Lookup coach document
     {
       $lookup: {
         from: "coaches",
@@ -29,7 +28,6 @@ export const getTraineesQuery = async (
     },
     { $unwind: { path: "$coachDoc", preserveNullAndEmptyArrays: true } },
 
-    // Lookup coach user details
     {
       $lookup: {
         from: "users",
@@ -38,15 +36,15 @@ export const getTraineesQuery = async (
         as: "coach",
       },
     },
-    { $unwind: { path: "$coachUser", preserveNullAndEmptyArrays: true } },
+    { $unwind: { path: "$coach", preserveNullAndEmptyArrays: true } },
 
-    // Filter by search string and role
     {
       $match: {
         "trainee.name": { $regex: new RegExp(searchString, "i") },
         "trainee.role": Role.Trainee,
       },
     },
+
     {
       $project: {
         _id: 1,
@@ -54,15 +52,7 @@ export const getTraineesQuery = async (
         email: "$trainee.email",
         status: 1,
         role: "$trainee.role",
-        coach: {
-          $cond: {
-            if: { $eq: [{ $size: "$coach" }, 0] },
-            then: {},
-            else: {
-              $arrayElemAt: ["$coach", 0],
-            },
-          },
-        },
+        coach: "$coach",
       },
     },
     {
@@ -117,7 +107,7 @@ export const getTraineesForCoachQuery = async (
         as: "coach",
       },
     },
-    { $unwind: { path: "$coachUser", preserveNullAndEmptyArrays: true } },
+    { $unwind: { path: "$coach", preserveNullAndEmptyArrays: true } },
 
     // Filter by search string and role
     {
@@ -137,9 +127,7 @@ export const getTraineesForCoachQuery = async (
           $cond: {
             if: { $eq: [{ $size: "$coach" }, 0] },
             then: {},
-            else: {
-              $arrayElemAt: ["$coach", 0],
-            },
+            else: { $arrayElemAt: ["$coach", 0] },
           },
         },
       },

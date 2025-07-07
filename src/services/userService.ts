@@ -2,7 +2,9 @@ import { hash } from "bcryptjs"
 import CustomError from "../middlewares/customError"
 import User, { IUser } from "../models/User"
 import { USER_NOT_FOUND } from "../utils/errorCodes"
-import { updateUserDto } from "../utils/types"
+import { Role, updateUserDto } from "../utils/types"
+import { createTraineeService } from "./traineeService"
+import { getCurrentCohort } from "../utils/helpers"
 
 export const getUserService = async (query: object) => {
   const user = await User.findOne<IUser>(query)
@@ -36,6 +38,11 @@ export const updateUserService = async (
   }
 
   if (role) {
+    if (user.role === Role.Prospect && role === Role.Trainee) {
+      const currentCohort = await getCurrentCohort()
+      await createTraineeService(user.id, currentCohort.id)
+    }
+
     user.role = role
   }
 

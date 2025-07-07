@@ -23,7 +23,8 @@ export const getTraineesService = async ({
   sortBy: string
   traineesPerPage: number
 }) => {
-  const trainees = getTraineesQuery(searchString, sortBy, traineesPerPage)
+  const trainees = await getTraineesQuery(searchString, sortBy, traineesPerPage)
+  console.log("trainees", trainees)
   return trainees
 }
 
@@ -56,9 +57,6 @@ export const getTraineesForCoachService = async (
 
 export const getTraineeService = async (query: object) => {
   const trainee = await Trainee.findOne<ITrainee>(query)
-  if (!trainee) {
-    throw new CustomError(USER_NOT_FOUND, "Trainee not found", 404)
-  }
 
   return trainee
 }
@@ -120,6 +118,8 @@ export const createTraineeService = async (
   }
 
   const existingTrainee = await getTraineeService({ userId })
+
+  console.log("trainee in the cohort", existingTrainee)
 
   if (
     existingTrainee &&

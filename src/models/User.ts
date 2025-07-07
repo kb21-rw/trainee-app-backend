@@ -38,7 +38,7 @@ const UserSchema = new Schema(
     role: {
       type: String,
       enum: Object.values(Role),
-      default: Role.Trainee,
+      default: Role.Prospect,
     },
     status: {
       type: String,
