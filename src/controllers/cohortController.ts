@@ -7,11 +7,13 @@ import { mongodbIdValidation } from "../validations/generalValidation"
 import {
   createCohortService,
   getApplicationFormService,
+  getCohortOverviewService,
   getCohortService,
   getCohortsService,
   getMyApplicationFormService,
   updateCohortService,
 } from "../services/cohortService"
+import { FormType } from "../utils/types"
 
 export const createCohortController = async (
   req: Request,
@@ -52,6 +54,26 @@ export const getCohortsController = async (
       String(req.query.searchString ?? ""),
     )
     return res.status(200).json(cohorts)
+  } catch (error) {
+    return next(error)
+  }
+}
+
+export const getCohortOverview = async (
+  req: Request<any, any, any, { cohortId: string; type: FormType }>,
+  res: Response,
+  next: NextFunction,
+) => {
+  try {
+    const { cohortId, type } = req.query
+    const overviewType =
+      type === FormType.Trainee ? FormType.Trainee : FormType.Applicant
+    cohortId && (await mongodbIdValidation.validateAsync(cohortId))
+    const overview = await getCohortOverviewService({
+      cohortId,
+      overviewType,
+    })
+    return res.status(200).json(overview)
   } catch (error) {
     return next(error)
   }
