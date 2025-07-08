@@ -22,6 +22,9 @@ export const acceptTraineeService = async (
       currentCohort.stages.findIndex((s) => s.id === stage) + 1
 
     trainee.stage = currentCohort.stages[nextStageIndex].id
+    currentCohort.stages[nextStageIndex].isCurrent = true
+    currentCohort.stages[nextStageIndex - 1].isCurrent = false
+
     trainee.feedbacks.push({
       stageId: currentCohort.stages[nextStageIndex].id,
       description: feedback,
@@ -29,6 +32,7 @@ export const acceptTraineeService = async (
   }
 
   await trainee.save()
+  await currentCohort.save()
   return {
     trainee: trainee.id,
     message: `Trainee with ${trainee.userId} was accepted!`,
