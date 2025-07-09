@@ -10,7 +10,7 @@ import {
   DUPLICATE_TRAINEE,
   USER_NOT_FOUND,
 } from "../utils/errorCodes"
-import { updateUserDto, TraineeStatus, TraineeDto, Role } from "../utils/types"
+import { updateUserDto, TraineeStatus, TraineeDto } from "../utils/types"
 import { updateUserService } from "./userService"
 import { getCurrentCohort } from "../utils/helpers"
 
@@ -154,8 +154,6 @@ export const createTraineeService = async (
   currentCohort.trainees.push(trainee.id)
 
   await currentCohort.save()
-
-  await updateUserService(userId, { role: Role.Trainee })
 
   return trainee
 }

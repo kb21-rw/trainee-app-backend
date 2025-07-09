@@ -38,7 +38,7 @@ export const updateUserService = async (
   }
 
   if (role) {
-    if (user.role === Role.Prospect && role === Role.Trainee) {
+    if (user.role !== Role.Trainee && role === Role.Trainee) {
       const currentCohort = await getCurrentCohort()
       await createTraineeService(user.id, currentCohort.id)
     }

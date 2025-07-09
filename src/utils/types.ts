@@ -43,7 +43,7 @@ export interface IStage {
   id: string
   description?: string
   participantsCount: number
-  isPreselection: boolean
+  isPreselection: "true" | "false"
   isCurrent: boolean
 }
 
@@ -169,7 +169,7 @@ export interface StageDto {
   name: StageName
   description?: string
   isCurrent: boolean
-  isPreselection: boolean
+  isPreselection: "true" | "false"
 }
 
 // responses left in lowercase for smoother integration with Apps Script

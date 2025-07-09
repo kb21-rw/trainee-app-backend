@@ -52,7 +52,7 @@ const CohortSchema = new Schema(
         },
         description: { type: String },
         participantsCount: { type: Number, default: 0 },
-        isPreselection: { type: Boolean, default: true },
+        isPreselection: { type: String, default: "false" },
         isCurrent: { type: Boolean, default: false },
       },
     ],
