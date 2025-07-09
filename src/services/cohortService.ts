@@ -1,7 +1,11 @@
 import CustomError from "../middlewares/customError"
 import Cohort, { ICohort } from "../models/Cohort"
 import { COHORT_BAD_REQUEST, COHORT_NOT_FOUND } from "../utils/errorCodes"
-import { CreateCohortDto, UpdateCohortDto } from "../utils/types"
+import {
+  CreateCohortDto,
+  ICohortOverviewRequest,
+  UpdateCohortDto,
+} from "../utils/types"
 import {
   createStagesHandler,
   getCurrentCohort,
@@ -11,7 +15,10 @@ import {
 import dayjs from "dayjs"
 import { getUserFormResponsesQuery } from "../queries/responseQueries"
 import { getFormService } from "./formService"
-import { getCohortsQuery } from "../queries/cohortQueries"
+import {
+  getCohortOverviewQuery,
+  getCohortsQuery,
+} from "../queries/cohortQueries"
 
 export const getCohortService = async (query: object) => {
   const cohort = await Cohort.findOne<ICohort>(query)
@@ -131,4 +138,18 @@ export const getMyApplicationFormService = async (loggedInUserId: string) => {
     ...completeForm,
     trainingStartDate: currentCohort.startDate,
   }
+}
+
+export const getCohortOverviewService = async ({
+  cohortId,
+  overviewType,
+  coachId,
+}: ICohortOverviewRequest) => {
+  const cohortOverview = await getCohortOverviewQuery({
+    cohortId: cohortId ?? (await getCohortService({ isActive: true }))._id,
+    overviewType,
+    coachId,
+  })
+
+  return cohortOverview
 }

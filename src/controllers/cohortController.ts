@@ -7,11 +7,13 @@ import { mongodbIdValidation } from "../validations/generalValidation"
 import {
   createCohortService,
   getApplicationFormService,
+  getCohortOverviewService,
   getCohortService,
   getCohortsService,
   getMyApplicationFormService,
   updateCohortService,
 } from "../services/cohortService"
+import { FormType } from "../utils/types"
 
 export const createCohortController = async (
   req: Request,
@@ -57,6 +59,26 @@ export const getCohortsController = async (
   }
 }
 
+export const getCohortOverview = async (
+  req: Request<any, any, any, { cohortId: string; type: FormType }>,
+  res: Response,
+  next: NextFunction,
+) => {
+  try {
+    const { cohortId, type } = req.query
+    const overviewType =
+      type === FormType.Trainee ? FormType.Trainee : FormType.Applicant
+    cohortId && (await mongodbIdValidation.validateAsync(cohortId))
+    const overview = await getCohortOverviewService({
+      cohortId,
+      overviewType,
+    })
+    return res.status(200).json(overview)
+  } catch (error) {
+    return next(error)
+  }
+}
+
 export const updateCohortController = async (
   req: Request,
   res: Response,
@@ -94,6 +116,32 @@ export const getMyApplicationController = async (
   try {
     const application = await getMyApplicationFormService(user.id)
     return res.status(200).json(application)
+  } catch (error) {
+    return next(error)
+  }
+}
+
+export const getCohortOverviewController = async (
+  req: Request<
+    any,
+    any,
+    any,
+    { cohortId: string; type: FormType; coachId?: string }
+  >,
+  res: Response,
+  next: NextFunction,
+) => {
+  try {
+    const { cohortId, type, coachId } = req.query
+    const overviewType =
+      type === FormType.Trainee ? FormType.Trainee : FormType.Applicant
+    cohortId && (await mongodbIdValidation.validateAsync(cohortId))
+    const overview = await getCohortOverviewService({
+      cohortId,
+      overviewType,
+      coachId,
+    })
+    return res.status(200).json(overview)
   } catch (error) {
     return next(error)
   }

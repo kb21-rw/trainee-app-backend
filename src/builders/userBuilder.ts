@@ -19,7 +19,6 @@ export class User {
 
   public constructor(data: PartialIUserWithRequiredId) {
     this.id = data.id
-    this.userId = data.userNumber
     this.name = data.name
     this.email = data.email
     this.password = data.password
@@ -35,7 +34,6 @@ export class UserBuilder extends Builder<
 > {
   protected readonly properties: PartialIUserWithRequiredId = {
     id: "66203fa2a3465a4a588d12u1",
-    userNumber: "000001",
     googleId: null,
     name: "trainee name",
     email: "trainee@gmail.com",
