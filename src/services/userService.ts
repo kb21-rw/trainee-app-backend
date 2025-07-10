@@ -5,6 +5,8 @@ import { USER_NOT_FOUND } from "../utils/errorCodes"
 import { Role, updateUserDto } from "../utils/types"
 import { createTraineeService } from "./traineeService"
 import { getCurrentCohort } from "../utils/helpers"
+import Coach from "../models/Coach"
+import { addCoachToCohortService } from "./coachService"
 
 export const getUserService = async (query: object) => {
   const user = await User.findOne<IUser>(query)
@@ -24,6 +26,7 @@ export const updateUserService = async (
   { name, email, verified, password, role, active }: updateUserDto,
 ) => {
   const user = await getUserService({ _id: id })
+  const currentCohort = await getCurrentCohort()
 
   if (name) {
     user.name = name
@@ -39,11 +42,24 @@ export const updateUserService = async (
 
   if (role) {
     if (user.role !== Role.Trainee && role === Role.Trainee) {
-      const currentCohort = await getCurrentCohort()
       await createTraineeService(user.id, currentCohort.id)
     }
 
     user.role = role
+
+    console.log("🚀")
+    console.log("Test")
+    if (role === Role.Coach) {
+      const coach = await Coach.create({
+        userId: id,
+        cohortId: currentCohort.id,
+      })
+      console.log("🚀")
+      console.log("Create coach")
+      await addCoachToCohortService(coach._id)
+      console.log("🚀")
+      console.log("Add coach to cohort")
+    }
   }
 
   if (password) {
