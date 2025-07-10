@@ -1,4 +1,5 @@
 export const FORM_NOT_FOUND = "FORM404"
+export const FORM_STAGE_NOT_FOUND = "FORM404"
 export const USER_NOT_FOUND = "USER404"
 export const STAGE_NOT_FOUND = "STAGE404"
 export const COHORT_NOT_FOUND = "COHORT404"

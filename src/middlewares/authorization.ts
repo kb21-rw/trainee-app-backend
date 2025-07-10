@@ -41,7 +41,7 @@ export const isApplicant = (req: any, res: Response, next: () => void) => {
 
 export const isProspect = (req: any, res: Response, next: () => void) => {
   const { role } = req.user
-  if (role !== Role.Trainee) {
+  if (role !== Role.Prospect) {
     return res.status(401).json({ message: "Only prospects are allowed" })
   }
 
