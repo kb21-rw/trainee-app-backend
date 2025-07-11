@@ -69,7 +69,7 @@ export const getCohortOverviewQuery = async ({
         as: "coachesUserInfo",
       },
     },
-    // Lookup forms (may be empty)
+
     {
       $set: {
         forms: {
@@ -85,6 +85,7 @@ export const getCohortOverviewQuery = async ({
         },
       },
     },
+    // Lookup forms
     {
       $lookup: {
         from: "forms",
@@ -93,102 +94,50 @@ export const getCohortOverviewQuery = async ({
         as: "forms",
       },
     },
-    // Lookup questions and responses only if forms exist
+    // Lookup all questions for all forms
     {
       $lookup: {
         from: "questions",
         localField: "forms.questionIds",
         foreignField: "_id",
-        as: "questions",
+        as: "allQuestions",
       },
     },
+    // Lookup all responses for all questions using responseIds
     {
       $lookup: {
         from: "responses",
-        localField: "questions.responseIds",
+        localField: "allQuestions.responseIds",
         foreignField: "_id",
-        as: "responses",
+        as: "allResponses",
       },
     },
-    // Group everything for output
+
     {
-      $project: {
-        _id: 1,
-        name: 1,
-        description: 1,
-        isActive: 1,
-        stages: 1,
-        applicationForm: 1,
-        participantsInfo: "$traineesUserInfo",
-        trainees: {
-          $ifNull: ["$traineesInfo", []],
-        },
-        coaches: {
-          $ifNull: ["$coachesUserInfo", []],
-        },
-        forms: {
-          $ifNull: ["$forms", []],
-        },
-        questions: {
-          $ifNull: ["$questions", []],
-        },
-        responses: {
-          $ifNull: ["$responses", []],
-        },
-        createdAt: 1,
-        updatedAt: 1,
+      $lookup: {
+        from: "users",
+        localField: "allResponses.userId",
+        foreignField: "_id",
+        as: "allResponseUsers",
       },
     },
     {
       $set: {
-        forms: {
-          $setUnion: ["$forms"],
-        },
-        questions: {
-          $setUnion: ["$questions"],
-        },
-      },
-    },
-    // Combine questions with their respective forms
-    {
-      $set: {
-        forms: {
+        participantIds: {
           $map: {
-            input: "$forms",
-            as: "form",
-            in: {
-              $mergeObjects: [
-                "$$form",
-                {
-                  questions: {
-                    $filter: {
-                      input: "$questions",
-                      as: "question",
-                      cond: {
-                        $and: [
-                          {
-                            $eq: ["$$question.formId", "$$form._id"],
-                          },
-                          {
-                            $ne: [
-                              {
-                                $ifNull: ["$$question._id", null],
-                              },
-                              null,
-                            ],
-                          },
-                        ],
-                      },
-                    },
-                  },
-                },
-              ],
-            },
+            input:
+              overviewType === FormType.Applicant
+                ? "$traineesUserInfo"
+                : overviewType === FormType.Trainee
+                  ? "$traineesUserInfo"
+                  : "$coachesUserInfo",
+            as: "participant",
+            in: "$$participant._id",
           },
         },
       },
     },
-    // Combine responses with their respective questions
+    // Process each form to include its questions with responses
     {
       $set: {
         forms: {
@@ -201,48 +150,87 @@ export const getCohortOverviewQuery = async ({
                 {
                   questions: {
                     $map: {
-                      input: "$$form.questions",
+                      input: {
+                        $filter: {
+                          input: "$allQuestions",
+                          as: "question",
+                          cond: {
+                            $in: [
+                              "$$question._id",
+                              { $ifNull: ["$$form.questionIds", []] },
+                            ],
+                          },
+                        },
+                      },
                       as: "question",
                       in: {
                         $mergeObjects: [
                           "$$question",
                           {
                             responses: {
-                              $filter: {
-                                input: "$responses",
-                                as: "response",
-                                cond: {
-                                  $and: [
-                                    {
-                                      $eq: [
-                                        "$$response.questionId",
-                                        "$$question._id",
-                                      ],
-                                    },
-                                    coachId
-                                      ? {
-                                          $eq: [
-                                            "$$response.user.coach._id",
-                                            new ObjectId(coachId),
-                                          ],
-                                        }
-                                      : { $eq: ["", ""] },
-                                    {
-                                      $in: [
-                                        "$$response.user._id",
+                              $map: {
+                                input: {
+                                  $filter: {
+                                    input: "$allResponses",
+                                    as: "response",
+                                    cond: {
+                                      $and: [
+                                        // Response is in this question's responseIds
                                         {
-                                          $ifNull: [
+                                          $in: [
+                                            "$$response._id",
                                             {
-                                              $map: {
-                                                input: `$${overviewType.toLocaleLowerCase()}s`,
-                                                as: "participant",
-                                                in: "$$participant.id",
-                                              },
+                                              $ifNull: [
+                                                "$$question.responseIds",
+                                                [],
+                                              ],
                                             },
-                                            [],
+                                          ],
+                                        },
+
+                                        coachId
+                                          ? {
+                                              $eq: [
+                                                "$$response.user.coach._id",
+                                                new ObjectId(coachId),
+                                              ],
+                                            }
+                                          : { $literal: true },
+
+                                        {
+                                          $in: [
+                                            "$$response.userId",
+                                            {
+                                              $ifNull: ["$participantIds", []],
+                                            },
                                           ],
                                         },
                                       ],
+                                    },
+                                  },
+                                },
+                                as: "response",
+                                in: {
+                                  $mergeObjects: [
+                                    "$$response",
+                                    {
+                                      user: {
+                                        $arrayElemAt: [
+                                          {
+                                            $filter: {
+                                              input: "$allResponseUsers",
+                                              as: "user",
+                                              cond: {
+                                                $eq: [
+                                                  "$$user._id",
+                                                  "$$response.userId",
+                                                ],
+                                              },
+                                            },
+                                          },
+                                          0,
+                                        ],
+                                      },
                                     },
                                   ],
                                 },
@@ -260,12 +248,28 @@ export const getCohortOverviewQuery = async ({
         },
       },
     },
+
     {
       $project: {
-        questions: 0,
-        responses: 0,
+        _id: 1,
+        name: 1,
+        description: 1,
+        isActive: 1,
+        stages: 1,
+        applicationForm: 1,
+        participantsInfo: "$traineesUserInfo",
+        trainees: {
+          $ifNull: ["$traineesInfo", []],
+        },
+        coaches: {
+          $ifNull: ["$coachesUserInfo", []],
+        },
+        forms: 1,
+        createdAt: 1,
+        updatedAt: 1,
       },
     },
   ])
+
   return overview[0]
 }
