@@ -10,6 +10,7 @@ interface MetaType {
 }
 
 export enum StageName {
+  Application = "Application",
   InterviewOne = "Interview One",
   InterviewTwo = "Interview Two",
   JSFundamentals = "JS Fundamentals",
@@ -57,6 +58,7 @@ export interface CreateApplicantTraineeFormDto {
   type: FormType.Applicant | FormType.Trainee
   name: string
   description: string
+  stage?: string
 }
 
 export interface CreateApplicationFormDto {
@@ -65,7 +67,7 @@ export interface CreateApplicationFormDto {
   description: string
   startDate: string
   endDate: string
-  stages: Except<IStage, "id">[]
+  stage?: string
 }
 export interface CreateCohortDto {
   name: string
@@ -80,7 +82,7 @@ export interface UpdateFormDto {
   description?: string
   startDate?: string
   endDate?: string
-  stages?: StageDto[]
+  stage: IStage["id"]
 }
 
 export interface UpdateCohortDto {

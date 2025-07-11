@@ -1,3 +1,4 @@
+import { Types } from "mongoose"
 import CustomError from "../middlewares/customError"
 import Form, { IApplicationForm, IForm } from "../models/Form"
 import Question from "../models/Question"
@@ -7,17 +8,18 @@ import {
   APPLICATION_FORM_ERROR,
   DUPLICATE_DOCUMENT,
   FORM_NOT_FOUND,
+  FORM_STAGE_NOT_FOUND,
   NOT_ALLOWED,
 } from "../utils/errorCodes"
-import { getCurrentCohort, updateStagesHandler } from "../utils/helpers/cohort"
+import { getCurrentCohort } from "../utils/helpers/cohort"
 import {
   CreateApplicantTraineeFormDto,
   CreateApplicationFormDto,
   FormType,
   GetCohortDto,
+  StageName,
   UpdateFormDto,
 } from "../utils/types"
-import { createStagesHandler } from "../utils/helpers"
 import dayjs from "dayjs"
 
 export const getFormsService = async (
@@ -51,13 +53,6 @@ export const updateFormService = async (
 
     if (formData.endDate) {
       applicationForm.endDate = dayjs(formData.endDate).toISOString()
-    }
-
-    if (formData.stages) {
-      applicationForm.stages = updateStagesHandler(
-        applicationForm.stages,
-        formData.stages,
-      )
     }
   }
 
@@ -97,17 +92,35 @@ export const createFormService = async (
         409,
       )
     }
+
+    if (formData.stage) {
+      if (
+        !currentCohort.stages.some(
+          (stage) => stage.id.toString() === formData.stage,
+        )
+      ) {
+        throw new CustomError(
+          FORM_STAGE_NOT_FOUND,
+          "Stage not found in the current cohort",
+          404,
+        )
+      }
+    }
   }
 
-  const stages =
-    formData.type === FormType.Application
-      ? createStagesHandler(formData.stages)
-      : undefined
-
-  const form = await Form.create({ ...formData, stages })
+  const form = await Form.create({ ...formData })
 
   if (form.type === FormType.Application) {
     currentCohort.applicationForm = form.id
+
+    currentCohort.stages.unshift({
+      id: new Types.ObjectId().toString(),
+      name: StageName.Application,
+      description: "Application stage",
+      isPreselection: "true",
+      participantsCount: 0,
+      isCurrent: false, // this is can change
+    })
   } else {
     currentCohort.forms.push(form.id)
   }

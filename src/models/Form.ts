@@ -8,13 +8,13 @@ export interface IBaseForm extends Document {
   description: string
   type: FormType
   questionIds: IQuestion["_id"][]
+  stageId?: IStage["id"]
 }
 
 export interface IExtraApplicantFormFields {
   type: FormType.Application
   startDate: string
   endDate: string
-  stages: IStage[]
 }
 
 export interface IApplicationForm
@@ -43,20 +43,7 @@ const FormSchema = new Schema<IForm>(
     },
     startDate: String,
     endDate: String,
-    stages: {
-      type: [
-        {
-          id: { type: String, required: true },
-          name: { type: String, required: true },
-          description: { type: String, default: "" },
-          participantsCount: { type: Number, default: 0 },
-          _id: false,
-        },
-      ],
-      required: function (this: IForm) {
-        return this.type === FormType.Application
-      },
-    },
+    stageId: { type: String },
   },
   { timestamps: {} },
 )
