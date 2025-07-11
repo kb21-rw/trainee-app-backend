@@ -1,17 +1,20 @@
 import CustomError from "../middlewares/customError"
-import NewCohort, { ICohort } from "../models/Cohort"
+import Cohort, { ICohort } from "../models/Cohort"
 import { COHORT_BAD_REQUEST, COHORT_NOT_FOUND } from "../utils/errorCodes"
-import { NewCreateCohortDto, NewUpdateCohortDto } from "../utils/types"
-import { createNewStagesHandler } from "../utils/helpers"
+import { CreateCohortDto, UpdateCohortDto } from "../utils/types"
+import {
+  createStagesHandler,
+  getCurrentCohort,
+  updateStagesHandler,
+} from "../utils/helpers"
 
 import dayjs from "dayjs"
-import { updateNewStagesService } from "./generalService"
 import { getUserFormResponsesQuery } from "../queries/responseQueries"
 import { getFormService } from "./formService"
 import { getCohortsQuery } from "../queries/cohortQueries"
 
 export const getCohortService = async (query: object) => {
-  const cohort = await NewCohort.findOne<ICohort>(query)
+  const cohort = await Cohort.findOne<ICohort>(query)
   if (!cohort) {
     throw new CustomError(COHORT_NOT_FOUND, "Cohort not found", 404)
   }
@@ -25,7 +28,7 @@ export const getCohortsService = async (searchString: string) => {
 
 export const generateCohortIdService = async () => {
   let cohortNumber = 1
-  const lastCohort = await NewCohort.findOne().sort({ cohortNumber: -1 })
+  const lastCohort = await Cohort.findOne().sort({ cohortNumber: -1 })
   if (lastCohort?.cohortNumber) {
     cohortNumber = parseInt(lastCohort.cohortNumber, 10) + 1
   }
@@ -33,14 +36,14 @@ export const generateCohortIdService = async () => {
   return String(cohortNumber).padStart(6, "0")
 }
 
-export const createCohortService = async (cohortData: NewCreateCohortDto) => {
-  await NewCohort.updateOne({ isActive: true }, { isActive: false })
+export const createCohortService = async (cohortData: CreateCohortDto) => {
+  await Cohort.updateOne({ isActive: true }, { isActive: false })
 
   const cohortNumber = await generateCohortIdService()
-  const newCohort = await NewCohort.create({
+  const newCohort = await Cohort.create({
     ...cohortData,
     cohortNumber,
-    stages: createNewStagesHandler(cohortData.stages),
+    stages: createStagesHandler(cohortData.stages),
   })
 
   return newCohort
@@ -48,10 +51,10 @@ export const createCohortService = async (cohortData: NewCreateCohortDto) => {
 
 export const updateCohortService = async (
   cohortId: string,
-  formData: NewUpdateCohortDto,
+  formData: UpdateCohortDto,
 ) => {
   const { name, description, stages, startDate, endDate } = formData
-  const cohort = await NewCohort.findById(cohortId)
+  const cohort = await Cohort.findById(cohortId)
 
   if (!cohort) {
     throw new CustomError(COHORT_NOT_FOUND, "Cohort not found", 404)
@@ -92,14 +95,14 @@ export const updateCohortService = async (
   }
 
   if (stages) {
-    cohort.stages = updateNewStagesService(cohort.stages, stages)
+    cohort.stages = updateStagesHandler(cohort.stages, stages)
   }
 
   return await cohort.save()
 }
 
 export const getApplicationFormService = async () => {
-  const currentCohort = await getCohortService({ isActive: true })
+  const currentCohort = await getCurrentCohort()
 
   if (!currentCohort.applicationForm) {
     return null
@@ -109,7 +112,7 @@ export const getApplicationFormService = async () => {
 }
 
 export const getMyApplicationFormService = async (loggedInUserId: string) => {
-  const currentCohort = await getCohortService({ isActive: true })
+  const currentCohort = await getCurrentCohort()
 
   if (!currentCohort.applicationForm) {
     return null

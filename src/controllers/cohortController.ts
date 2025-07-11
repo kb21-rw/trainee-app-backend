@@ -1,6 +1,6 @@
 import { NextFunction, Request, Response } from "express"
 import {
-  createNewCohortValidation,
+  createCohortValidation,
   updateCohortValidation,
 } from "../validations/cohortValidation"
 import { mongodbIdValidation } from "../validations/generalValidation"
@@ -19,7 +19,7 @@ export const createCohortController = async (
   next: NextFunction,
 ) => {
   try {
-    await createNewCohortValidation.validateAsync(req.body)
+    await createCohortValidation.validateAsync(req.body)
     const createdCohort = await createCohortService(req.body)
     return res.status(201).json(createdCohort)
   } catch (error) {

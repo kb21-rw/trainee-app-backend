@@ -2,7 +2,7 @@ import { hash } from "bcryptjs"
 import CustomError from "../middlewares/customError"
 import User, { IUser } from "../models/User"
 import { USER_NOT_FOUND } from "../utils/errorCodes"
-import { newUpdateUserDto } from "../utils/types"
+import { updateUserDto } from "../utils/types"
 
 export const getUserService = async (query: object) => {
   const user = await User.findOne<IUser>(query)
@@ -19,7 +19,7 @@ export const getUsersService = async (search?: object) => {
 
 export const updateUserService = async (
   id: string,
-  { name, email, verified, password, role, active }: newUpdateUserDto,
+  { name, email, verified, password, role, active }: updateUserDto,
 ) => {
   const user = await getUserService({ _id: id })
 
@@ -61,12 +61,12 @@ export const deleteUserService = async (userId: string) => {
   return user
 }
 
-export const generateUserIdService = async () => {
-  let userId = 1
-  const lastUser = await User.findOne().sort({ userNumber: -1 })
-  if (lastUser) {
-    userId = parseInt(lastUser.userNumber, 10) + 1
-  }
+// export const generateUserIdService = async () => {
+//   let userId = 1
+//   const lastUser = await User.findOne().sort({ userNumber: -1 })
+//   if (lastUser) {
+//     userId = parseInt(lastUser.userNumber, 10) + 1
+//   }
 
-  return String(userId).padStart(6, "0")
-}
+//   return String(userId).padStart(6, "0")
+// }

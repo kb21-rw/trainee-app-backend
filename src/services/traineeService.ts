@@ -1,13 +1,18 @@
 import CustomError from "../middlewares/customError"
-import User from "../models/User"
-import Trainee from "../models/Trainee"
+import User, { IUser } from "../models/User"
+import Trainee, { ITrainee } from "../models/Trainee"
 import {
   getTraineesForCoachQuery,
   getTraineesQuery,
 } from "../queries/traineesQuery"
-import { USER_NOT_FOUND } from "../utils/errorCodes"
-import { updateUserDto } from "../utils/types"
+import {
+  COHORT_BAD_REQUEST,
+  DUPLICATE_TRAINEE,
+  USER_NOT_FOUND,
+} from "../utils/errorCodes"
+import { updateUserDto, TraineeStatus, TraineeDto, Role } from "../utils/types"
 import { updateUserService } from "./userService"
+import { getCurrentCohort } from "../utils/helpers"
 
 export const getTraineesService = async ({
   searchString,
@@ -23,31 +28,56 @@ export const getTraineesService = async ({
 }
 
 export const getTraineesForCoachService = async (
-  id: string,
+  coachId: string,
   {
     searchString,
     sortBy,
     traineesPerPage,
   }: { searchString: string; sortBy: string; traineesPerPage: number },
 ) => {
-  const coach: any = await User.findById(id)
+  const coach = await User.findById<IUser>(coachId)
+
+  if (!coach) {
+    throw new CustomError(USER_NOT_FOUND, "Coach not found", 404)
+  }
+
   const trainees = await getTraineesForCoachQuery(
-    coach._id,
+    coach.id,
     searchString,
     sortBy,
     traineesPerPage,
   )
-  return trainees
+
+  const registeredTrainees = trainees.filter((trainee: TraineeDto) => {
+    return trainee.status === TraineeStatus.ENROLLED
+  })
+  return registeredTrainees
+}
+
+export const getTraineeService = async (query: object) => {
+  const trainee = await Trainee.findOne<ITrainee>(query)
+  if (!trainee) {
+    throw new CustomError(USER_NOT_FOUND, "Trainee not found", 404)
+  }
+
+  return trainee
 }
 
 export const updateTraineeService = async (
   traineeId: string,
-  updates: updateUserDto,
+  updates: updateUserDto & {
+    status?: TraineeStatus
+    coachId?: string
+  },
 ) => {
-  // To be worked on when new trainee services are implemented
   const trainee = await Trainee.findById(traineeId)
-
   if (!trainee) {
+    throw new CustomError(USER_NOT_FOUND, "Trainee not found", 404)
+  }
+
+  const currentCohort = await getCurrentCohort()
+
+  if (currentCohort.id !== trainee.cohortId) {
     throw new CustomError(
       USER_NOT_FOUND,
       "Trainee not found in the current cohort",
@@ -55,5 +85,76 @@ export const updateTraineeService = async (
     )
   }
 
-  return updateUserService(traineeId, updates)
+  if (updates.coachId && !currentCohort.coaches.includes(updates.coachId)) {
+    throw new CustomError(
+      COHORT_BAD_REQUEST,
+      "Coach is not part of the current cohort",
+      400,
+    )
+  }
+
+  trainee.traineeStatus = updates.status || trainee.traineeStatus
+  trainee.coachId = updates.coachId || trainee.coachId
+
+  trainee.save()
+
+  const userUpdates = await updateUserService(traineeId, updates)
+
+  return { ...trainee.toObject(), ...userUpdates }
+}
+
+export const createTraineeService = async (
+  userId: string,
+  cohortId: string,
+  coachId?: string,
+  status: TraineeStatus = TraineeStatus.ENROLLED,
+) => {
+  const currentCohort = await getCurrentCohort()
+
+  if (currentCohort.id !== cohortId) {
+    throw new CustomError(
+      COHORT_BAD_REQUEST,
+      "You can only register trainees in the current cohort",
+      400,
+    )
+  }
+
+  const existingTrainee = await getTraineeService({ userId })
+
+  if (
+    existingTrainee &&
+    existingTrainee.cohortId.toString() === currentCohort.id
+  ) {
+    throw new CustomError(
+      DUPLICATE_TRAINEE,
+      "Trainee already exists in the current cohort",
+      409,
+    )
+  }
+
+  if (coachId && !currentCohort.coaches.includes(coachId)) {
+    throw new CustomError(
+      COHORT_BAD_REQUEST,
+      "Coach is not part of the current cohort",
+      400,
+    )
+  }
+
+  const trainee = new Trainee({
+    userId,
+    cohortId,
+    coachId,
+    stage: currentCohort.stages[0].id,
+    traineeStatus: status,
+  })
+
+  await trainee.save()
+
+  currentCohort.trainees.push(trainee.id)
+
+  await currentCohort.save()
+
+  await updateUserService(userId, { role: Role.Trainee })
+
+  return trainee
 }

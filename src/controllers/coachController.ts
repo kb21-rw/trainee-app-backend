@@ -1,11 +1,14 @@
 import { NextFunction, Response } from "express"
-import { editUserSchema } from "../validations/userValidation"
 import {
+  addCoachToCohortService,
+  createCoachService,
   getCoachesService,
   updateCoachOrAdminService,
-  addCoachToCohortService,
 } from "../services/coachService"
+import { getCohortService } from "../services/cohortService"
+import { registerSchema } from "../validations/authValidation"
 import { mongodbIdValidation } from "../validations/generalValidation"
+import { editUserSchema } from "../validations/userValidation"
 
 export const getCoachesController = async (
   req: any,
@@ -47,6 +50,28 @@ export const addCoachToCohortController = async (
     await mongodbIdValidation.validateAsync(coachId)
     const coach = await addCoachToCohortService(coachId)
     return res.status(200).send(coach)
+  } catch (error) {
+    return next(error)
+  }
+}
+
+export const createCoachController = async (
+  req: any,
+  res: Response,
+  next: NextFunction,
+) => {
+  try {
+    const loggedInUser = req.user
+    const body = req.body
+    const currentActiveCohort = await getCohortService({ isActive: true })
+
+    await registerSchema.validateAsync(body)
+    const coach = await createCoachService(
+      loggedInUser,
+      body,
+      currentActiveCohort._id,
+    )
+    return res.status(201).send(coach)
   } catch (error) {
     return next(error)
   }

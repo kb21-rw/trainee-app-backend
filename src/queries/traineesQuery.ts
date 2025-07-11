@@ -1,44 +1,59 @@
 import { Types } from "mongoose"
-import User from "../models/User"
 import { Role } from "../utils/types"
+import Trainee from "../models/Trainee"
 
 export const getTraineesQuery = async (
   searchString: string,
   sortBy: string,
   traineesPerPage: number,
 ) => {
-  const trainees = await User.aggregate([
-    {
-      $match: {
-        $or: [{ name: { $regex: new RegExp(searchString, "i") } }],
-        role: Role.Trainee,
-      },
-    },
+  const trainees = await Trainee.aggregate([
     {
       $lookup: {
         from: "users",
-        localField: "coach",
+        localField: "userId",
+        foreignField: "_id",
+        as: "trainee",
+      },
+    },
+    { $unwind: "$trainee" },
+
+    // Lookup coach document
+    {
+      $lookup: {
+        from: "coaches",
+        localField: "coachId",
+        foreignField: "_id",
+        as: "coachDoc",
+      },
+    },
+    { $unwind: { path: "$coachDoc", preserveNullAndEmptyArrays: true } },
+
+    // Lookup coach user details
+    {
+      $lookup: {
+        from: "users",
+        localField: "coachDoc.userId",
         foreignField: "_id",
         as: "coach",
       },
     },
+    { $unwind: { path: "$coachUser", preserveNullAndEmptyArrays: true } },
+
+    // Filter by search string and role
     {
-      $addFields: {
-        coach: {
-          $cond: {
-            if: { $eq: [{ $size: "$coach" }, 0] },
-            then: [{}],
-            else: "$coach",
-          },
-        },
+      $match: {
+        "trainee.name": { $regex: new RegExp(searchString, "i") },
+        "trainee.role": Role.Trainee,
       },
     },
     {
       $project: {
         _id: 1,
-        name: 1,
-        email: 1,
-        role: 1,
+        name: "$trainee.name",
+        email: "$trainee.email",
+        status: 1,
+        role: "$trainee.role",
         coach: {
           $cond: {
             if: { $eq: [{ $size: "$coach" }, 0] },
@@ -66,39 +81,58 @@ export const getTraineesForCoachQuery = async (
   sortBy: string,
   traineesPerPage: number,
 ) => {
-  const trainees = await User.aggregate([
+  const trainees = await Trainee.aggregate([
     {
       $match: {
-        coach: coachId,
-        role: Role.Trainee,
-        $or: [{ name: { $regex: new RegExp(searchString, "i") } }],
+        coachId: coachId,
       },
     },
     {
       $lookup: {
         from: "users",
-        localField: "coach",
+        localField: "userId",
+        foreignField: "_id",
+        as: "trainee",
+      },
+    },
+    { $unwind: "$trainee" },
+
+    // Lookup coach document
+    {
+      $lookup: {
+        from: "coaches",
+        localField: "coachId",
+        foreignField: "_id",
+        as: "coachDoc",
+      },
+    },
+    { $unwind: { path: "$coachDoc", preserveNullAndEmptyArrays: true } },
+
+    // Lookup coach user details
+    {
+      $lookup: {
+        from: "users",
+        localField: "coachDoc.userId",
         foreignField: "_id",
         as: "coach",
       },
     },
+    { $unwind: { path: "$coachUser", preserveNullAndEmptyArrays: true } },
+
+    // Filter by search string and role
     {
-      $addFields: {
-        coach: {
-          $cond: {
-            if: { $eq: [{ $size: "$coach" }, 0] },
-            then: [{}],
-            else: "$coach",
-          },
-        },
+      $match: {
+        "trainee.name": { $regex: new RegExp(searchString, "i") },
+        "trainee.role": Role.Trainee,
       },
     },
     {
       $project: {
         _id: 1,
-        name: 1,
-        email: 1,
-        role: 1,
+        name: "$trainee.name",
+        email: "$trainee.email",
+        status: 1,
+        role: "$trainee.role",
         coach: {
           $cond: {
             if: { $eq: [{ $size: "$coach" }, 0] },

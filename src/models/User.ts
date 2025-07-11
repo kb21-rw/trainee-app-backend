@@ -1,15 +1,14 @@
 import { Document, Schema, model } from "mongoose"
-import { Role, TraineeStatus } from "../utils/types"
+import { Role, UserStatus } from "../utils/types"
 
 export interface IUser extends Document {
-  userNumber: string
   name: string
   email: string
   verified: boolean
   password: string
   googleId: string | null
   role: Role
-  status: TraineeStatus
+  status: UserStatus
   active: boolean
 }
 
@@ -43,8 +42,8 @@ const UserSchema = new Schema(
     },
     status: {
       type: String,
-      enum: Object.values(TraineeStatus),
-      default: TraineeStatus.NOT_REGISTERED,
+      enum: Object.values(UserStatus),
+      default: UserStatus.REGISTERED,
     },
     active: {
       type: Boolean,

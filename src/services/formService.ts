@@ -9,7 +9,7 @@ import {
   FORM_NOT_FOUND,
   NOT_ALLOWED,
 } from "../utils/errorCodes"
-import { getCurrentCohort } from "../utils/helpers/cohort"
+import { getCurrentCohort, updateStagesHandler } from "../utils/helpers/cohort"
 import {
   CreateApplicantTraineeFormDto,
   CreateApplicationFormDto,
@@ -19,7 +19,6 @@ import {
 } from "../utils/types"
 import { createStagesHandler } from "../utils/helpers"
 import dayjs from "dayjs"
-import { updateStagesService } from "./generalService"
 
 export const getFormsService = async (
   searchString: string,
@@ -55,7 +54,7 @@ export const updateFormService = async (
     }
 
     if (formData.stages) {
-      applicationForm.stages = updateStagesService(
+      applicationForm.stages = updateStagesHandler(
         applicationForm.stages,
         formData.stages,
       )
