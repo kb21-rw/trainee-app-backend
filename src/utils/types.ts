@@ -1,6 +1,7 @@
 import { Date, Types } from "mongoose"
 import { Except, SetOptional } from "type-fest"
 import { IUser } from "../models/User"
+import { ITrainee } from "../models/Trainee"
 
 interface MetaType {
   _id: string
@@ -51,8 +52,8 @@ export interface IStage {
 export interface ICoach {
   _id: string
   userId: IUser["_id"]
-  applicants: IUser["_id"][] // refer to applicants IDs in the trainees model
-  trainees: IUser["_id"][] // refer to trainees IDs in the trainees model
+  applicants: ITrainee["_id"][]
+  trainees: ITrainee["_id"][]
 }
 export interface CreateApplicantTraineeFormDto {
   type: FormType.Applicant | FormType.Trainee
