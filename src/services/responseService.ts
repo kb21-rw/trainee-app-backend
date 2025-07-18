@@ -33,7 +33,7 @@ export const createCoachResponseService = async (
   const currentCohort = await getCohortService({ isActive: true })
 
   const participant = await Trainee.findOne({
-    $and: [{ _id: userId }],
+    $and: [{ userId: userId }],
   })
 
   if (
