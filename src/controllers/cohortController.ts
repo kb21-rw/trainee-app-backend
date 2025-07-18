@@ -121,7 +121,7 @@ export const getMyApplicationController = async (
   }
 }
 
-export const getCohortOverviewController = async (
+export const getCoachCohortOverview = async (
   req: Request<
     any,
     any,
