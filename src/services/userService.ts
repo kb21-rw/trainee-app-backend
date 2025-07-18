@@ -2,7 +2,11 @@ import { hash } from "bcryptjs"
 import CustomError from "../middlewares/customError"
 import User, { IUser } from "../models/User"
 import { USER_NOT_FOUND } from "../utils/errorCodes"
-import { updateUserDto } from "../utils/types"
+import { Role, updateUserDto } from "../utils/types"
+import { createTraineeService } from "./traineeService"
+import { getCurrentCohort } from "../utils/helpers"
+import Coach from "../models/Coach"
+import { addCoachToCohortService } from "./coachService"
 
 export const getUserService = async (query: object) => {
   const user = await User.findOne<IUser>(query)
@@ -22,6 +26,7 @@ export const updateUserService = async (
   { name, email, verified, password, role, active }: updateUserDto,
 ) => {
   const user = await getUserService({ _id: id })
+  const currentCohort = await getCurrentCohort()
 
   if (name) {
     user.name = name
@@ -36,7 +41,19 @@ export const updateUserService = async (
   }
 
   if (role) {
+    if (user.role !== Role.Trainee && role === Role.Trainee) {
+      await createTraineeService(user.id, currentCohort.id)
+    }
+
     user.role = role
+
+    if (role === Role.Coach) {
+      const coach = await Coach.create({
+        userId: id,
+        cohortId: currentCohort.id,
+      })
+      await addCoachToCohortService(coach._id)
+    }
   }
 
   if (password) {
@@ -60,13 +77,3 @@ export const deleteUserService = async (userId: string) => {
 
   return user
 }
-
-// export const generateUserIdService = async () => {
-//   let userId = 1
-//   const lastUser = await User.findOne().sort({ userNumber: -1 })
-//   if (lastUser) {
-//     userId = parseInt(lastUser.userNumber, 10) + 1
-//   }
-
-//   return String(userId).padStart(6, "0")
-// }

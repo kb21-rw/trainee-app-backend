@@ -24,7 +24,7 @@ const TraineeSchema = new Schema({
   coachId: {
     type: Types.ObjectId,
     ref: "User",
-    required: false,
+    default: null,
   },
   stage: {
     type: String,
@@ -46,4 +46,5 @@ const TraineeSchema = new Schema({
   },
 })
 
+TraineeSchema.index({ userId: 1, cohortId: 1 }, { unique: true })
 export default model<ITrainee>("Trainee", TraineeSchema)

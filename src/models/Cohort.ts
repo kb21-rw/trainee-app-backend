@@ -1,7 +1,7 @@
 import { Document, model, Schema } from "mongoose"
 import { ICoach, IStage, StageName } from "../utils/types"
 import { IForm } from "./Form"
-import { IUser } from "./User"
+import { ITrainee } from "./Trainee"
 
 export interface ICohort extends Document {
   id: string
@@ -9,9 +9,9 @@ export interface ICohort extends Document {
   description: string
   isActive: boolean
   startDate: string
-  endDate: string
-  coaches: ICoach["_id"][] // refer to coach IDs
-  trainees: IUser["_id"][] // refer to trainee IDs in trainees model
+  endDate?: string
+  coaches: ICoach["_id"][]
+  trainees: ITrainee["_id"][]
   stages: IStage[]
   applicationForm: IForm["_id"] | null
   cohortNumber: string
@@ -40,7 +40,6 @@ const CohortSchema = new Schema(
     },
     endDate: {
       type: Date,
-      required: true,
     },
     coaches: [{ type: Schema.Types.ObjectId, ref: "Coach" }],
     trainees: [{ type: Schema.Types.ObjectId, ref: "User" }],
@@ -53,7 +52,7 @@ const CohortSchema = new Schema(
         },
         description: { type: String },
         participantsCount: { type: Number, default: 0 },
-        isPreselection: { type: Boolean, default: false },
+        isPreselection: { type: String, default: "false" },
         isCurrent: { type: Boolean, default: false },
       },
     ],

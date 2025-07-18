@@ -9,6 +9,7 @@ import {
   createCohortController,
   getApplicationFormController,
   getCohortController,
+  getCohortOverview,
   getCohortsController,
   getMyApplicationController,
   updateCohortController,
@@ -19,6 +20,7 @@ const router = Router()
 
 router.post("/", verifyJWT, isAdmin, createCohortController)
 router.get("/", verifyJWT, isAdminOrCoach, getCohortsController)
+router.get("/overview", verifyJWT, isAdminOrCoach, getCohortOverview)
 router.get("/application", verifyJWT, isAdmin, getApplicationFormController)
 router.get(
   "/my-application",

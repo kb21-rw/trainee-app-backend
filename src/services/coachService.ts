@@ -31,7 +31,9 @@ export const getCoachesService = async (cohortId?: string) => {
       cohortObj.coaches?.map((coach: any) => {
         const coachObj = typeof coach === "object" ? coach : {}
         if (!coachObj.userId || typeof coachObj.userId !== "object") {
-          console.warn(`Coach ${coachObj._id} has invalid.`)
+          console.warn(
+            `Accessing data on coach with id ${coachObj._id} failed due to invalid userId.`,
+          )
           return coachObj
         }
 

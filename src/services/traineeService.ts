@@ -10,7 +10,7 @@ import {
   DUPLICATE_TRAINEE,
   USER_NOT_FOUND,
 } from "../utils/errorCodes"
-import { updateUserDto, TraineeStatus, TraineeDto, Role } from "../utils/types"
+import { updateUserDto, TraineeStatus, TraineeDto } from "../utils/types"
 import { updateUserService } from "./userService"
 import { getCurrentCohort } from "../utils/helpers"
 
@@ -23,7 +23,8 @@ export const getTraineesService = async ({
   sortBy: string
   traineesPerPage: number
 }) => {
-  const trainees = getTraineesQuery(searchString, sortBy, traineesPerPage)
+  const trainees = await getTraineesQuery(searchString, sortBy, traineesPerPage)
+
   return trainees
 }
 
@@ -56,9 +57,6 @@ export const getTraineesForCoachService = async (
 
 export const getTraineeService = async (query: object) => {
   const trainee = await Trainee.findOne<ITrainee>(query)
-  if (!trainee) {
-    throw new CustomError(USER_NOT_FOUND, "Trainee not found", 404)
-  }
 
   return trainee
 }
@@ -77,7 +75,7 @@ export const updateTraineeService = async (
 
   const currentCohort = await getCurrentCohort()
 
-  if (currentCohort.id !== trainee.cohortId) {
+  if (currentCohort.id !== trainee.cohortId.toString()) {
     throw new CustomError(
       USER_NOT_FOUND,
       "Trainee not found in the current cohort",
@@ -85,7 +83,10 @@ export const updateTraineeService = async (
     )
   }
 
-  if (updates.coachId && !currentCohort.coaches.includes(updates.coachId)) {
+  if (
+    updates.coachId &&
+    currentCohort.coaches.find((coach) => coach.toString() === updates.coachId)
+  ) {
     throw new CustomError(
       COHORT_BAD_REQUEST,
       "Coach is not part of the current cohort",
@@ -98,7 +99,7 @@ export const updateTraineeService = async (
 
   trainee.save()
 
-  const userUpdates = await updateUserService(traineeId, updates)
+  const userUpdates = await updateUserService(trainee.userId, updates)
 
   return { ...trainee.toObject(), ...userUpdates }
 }
@@ -153,8 +154,6 @@ export const createTraineeService = async (
   currentCohort.trainees.push(trainee.id)
 
   await currentCohort.save()
-
-  await updateUserService(userId, { role: Role.Trainee })
 
   return trainee
 }

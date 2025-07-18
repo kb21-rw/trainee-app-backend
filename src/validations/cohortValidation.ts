@@ -9,14 +9,14 @@ export const createCohortValidation = Joi.object({
       Joi.object({
         name: Joi.string().min(1),
         description: Joi.string().min(3).max(100).optional(),
-        isPreselection: Joi.boolean().required(),
+        isPreselection: Joi.string().required(),
       }),
     )
     .min(1)
     .message("Add at least 1 stage")
     .required(),
   startDate: Joi.date().min("now").required(),
-  endDate: Joi.date().min(Joi.ref("startDate")).required(),
+  endDate: Joi.date().min(Joi.ref("startDate")).optional(),
 })
 
 export const updateCohortValidation = Joi.object({
@@ -33,7 +33,7 @@ export const updateCohortValidation = Joi.object({
       Joi.object({
         name: Joi.string().min(1),
         description: Joi.string().min(3).max(100).optional(),
-        isPreselection: Joi.boolean().required(),
+        isPreselection: Joi.string().required(),
       }),
     )
     .min(1),
