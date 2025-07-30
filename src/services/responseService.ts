@@ -1,5 +1,19 @@
+import dayjs from "dayjs"
 import CustomError from "../middlewares/customError"
+import Coach from "../models/Coach"
+import Form, { IApplicationForm } from "../models/Form"
 import Question, { IQuestion } from "../models/Question"
+import { IResponse } from "../models/Response"
+import Trainee from "../models/Trainee"
+import User, { IUser } from "../models/User"
+import {
+  APPLICATION_FORM_ERROR,
+  NOT_ALLOWED,
+  QUESTION_NOT_FOUND,
+  RESPONSE_NOT_FOUND,
+  USER_NOT_FOUND,
+} from "../utils/errorCodes"
+import { getUserFormResponses, upsertResponse } from "../utils/helpers/response"
 import {
   CreateApplicationResponseDto,
   CreateResponseDto,
@@ -8,21 +22,7 @@ import {
   TraineeStatus,
   UserStatus,
 } from "../utils/types"
-import { IResponse } from "../models/Response"
-import User, { IUser } from "../models/User"
-import {
-  NOT_ALLOWED,
-  QUESTION_NOT_FOUND,
-  USER_NOT_FOUND,
-  APPLICATION_FORM_ERROR,
-  RESPONSE_NOT_FOUND,
-} from "../utils/errorCodes"
-import dayjs from "dayjs"
-import { getUserFormResponses, upsertResponse } from "../utils/helpers/response"
 import { getCohortService } from "./cohortService"
-import Form, { IApplicationForm } from "../models/Form"
-import Trainee from "../models/Trainee"
-import Coach from "../models/Coach"
 
 export const createCoachResponseService = async (
   loggedInUser: IUser,
@@ -33,7 +33,7 @@ export const createCoachResponseService = async (
   const currentCohort = await getCohortService({ isActive: true })
 
   const participant = await Trainee.findOne({
-    $and: [{ _id: userId }],
+    $and: [{ userId: userId }],
   })
 
   if (
@@ -54,13 +54,10 @@ export const createCoachResponseService = async (
     })
   }
 
-  if (
-    (loggedInUser.role !== Role.Admin && loggedInUser.role !== Role.Coach) ||
-    (coach && coach._id.toString() !== participant.coachId.toString())
-  ) {
+  if (coach && coach.userId.toString() !== participant.coachId.toString()) {
     throw new CustomError(
       NOT_ALLOWED,
-      "Only admin or the coach of a trainee/applicant can provide a response",
+      "You can only edit applicants/trainees assigned to you.",
       403,
     )
   }
