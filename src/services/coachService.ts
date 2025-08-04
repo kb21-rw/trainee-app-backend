@@ -15,7 +15,7 @@ export const getCoachesService = async (cohortId?: string) => {
       populate: {
         path: "userId",
         model: User, // Direct reference to imported model
-        select: "name email",
+        select: "name email active",
       },
     })
 
@@ -45,6 +45,7 @@ export const getCoachesService = async (cohortId?: string) => {
           coachId: coachObj._id,
           name: coachObj.userId.name || "",
           email: coachObj.userId.email || "",
+          active: coachObj.userId.active,
           cohortId: coachObj.cohortId,
           trainees: coachObj.trainees || [],
           applicants: coachObj.applicants || [],
