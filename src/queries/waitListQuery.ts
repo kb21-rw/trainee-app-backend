@@ -1,12 +1,12 @@
 import User from "../models/User"
-import { Role } from "../utils/types"
+import { Role, UserStatus } from "../utils/types"
 
 export async function addProspectToTheWaitList(email: string) {
   const query = { email, role: Role.Prospect }
   const addedProspect = await User.findOneAndUpdate(
     query,
     {
-      isOnWaitList: true,
+      status: UserStatus.ON_WAIT_LIST,
     },
     { new: true },
   )
