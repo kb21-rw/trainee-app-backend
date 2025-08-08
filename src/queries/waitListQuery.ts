@@ -18,7 +18,7 @@ export async function removeProspectFromTheWaitList(email: string) {
   const removedProspect = await User.findOneAndUpdate(
     query,
     {
-      isOnWaitList: false,
+      status: UserStatus.REGISTERED,
     },
     { new: true },
   )
