@@ -47,19 +47,31 @@ export const createCoachResponseService = async (
     )
   }
 
-  let coach: ICoach | null = null
-  if (loggedInUser.role === Role.Coach) {
-    coach = await Coach.findOne({
-      userId: loggedInUser.id,
-    })
-  }
+  const coach: ICoach | null =
+    loggedInUser.role === Role.Coach
+      ? await Coach.findOne({ userId: loggedInUser.id })
+      : null
 
-  if (coach && coach.userId.toString() !== participant.coachId.toString()) {
-    throw new CustomError(
-      NOT_ALLOWED,
-      "You can only edit applicants/trainees assigned to you.",
-      403,
+  if (coach) {
+    const participantStage = currentCohort.stages.find(
+      (stage) => stage.id === participant.stage,
     )
+
+    const isPreselectionStage = participantStage?.isPreselection === "true"
+    const assignedCoachId = isPreselectionStage
+      ? participant.preselectionCoachId
+      : participant.postselectionCoachId
+
+    const isAssignedCoach =
+      coach.userId.toString() === assignedCoachId?.toString()
+
+    if (!isAssignedCoach) {
+      throw new CustomError(
+        NOT_ALLOWED,
+        "You can only edit applicants/trainees assigned to you.",
+        403,
+      )
+    }
   }
 
   const relatedQuestion = await Question.findById<IQuestion>(questionId)
