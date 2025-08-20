@@ -4,7 +4,8 @@ import { IFeedback, TraineeStatus } from "../utils/types"
 export interface ITrainee extends Document {
   userId: string
   cohortId: string
-  coachId: string
+  preselectionCoachId: string
+  postselectionCoachId: string
   stage: string
   traineeStatus: TraineeStatus
   feedbacks: IFeedback[]
@@ -21,7 +22,12 @@ const TraineeSchema = new Schema({
     ref: "Cohort",
     required: true,
   },
-  coachId: {
+  preselectionCoachId: {
+    type: Types.ObjectId,
+    ref: "User",
+    default: null,
+  },
+  postselectionCoachId: {
     type: Types.ObjectId,
     ref: "User",
     default: null,

@@ -83,19 +83,38 @@ export const updateTraineeService = async (
     )
   }
 
-  if (
-    updates.coachId &&
-    currentCohort.coaches.find((coach) => coach.toString() === updates.coachId)
-  ) {
-    throw new CustomError(
-      COHORT_BAD_REQUEST,
-      "Coach is not part of the current cohort",
-      400,
+  if (updates.coachId) {
+    const isCoachInCohort = !currentCohort.coaches.some(
+      (coachId) => coachId.toString() === updates.coachId,
+    ) // this is negated for now since ther references of coach and trainees are incompatible for now
+
+    if (!isCoachInCohort) {
+      console.log(
+        "not in current cohort",
+        currentCohort.coaches[0].toString(),
+        updates.coachId,
+      )
+      throw new CustomError(
+        COHORT_BAD_REQUEST,
+        "Coach is not part of the current cohort",
+        400,
+      )
+    }
+
+    const traineeStage = currentCohort.stages.find(
+      (stage) => stage.id === trainee.stage,
     )
+
+    const isPreselectionStage = traineeStage?.isPreselection === "true"
+
+    if (isPreselectionStage) {
+      trainee.preselectionCoachId = updates.coachId
+    } else {
+      trainee.postselectionCoachId = updates.coachId
+    }
   }
 
   trainee.traineeStatus = updates.status || trainee.traineeStatus
-  trainee.coachId = updates.coachId || trainee.coachId
 
   trainee.save()
 
@@ -144,7 +163,7 @@ export const createTraineeService = async (
   const trainee = new Trainee({
     userId,
     cohortId,
-    coachId,
+    preselectionCoachId: coachId,
     stage: currentCohort.stages[0].id,
     traineeStatus: status,
   })
