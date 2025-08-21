@@ -46,5 +46,9 @@ export const decisionValidation = Joi.object({
     .message("userId is not valid")
     .required(),
   decision: Joi.string().valid(Decision.Accepted, Decision.Rejected).required(),
-  feedback: Joi.string().min(0).required(),
+  feedback: Joi.string().min(3).required().messages({
+    "string.base": "Feedback must be a string",
+    "string.empty": "Please add feedback before you proceed",
+    "any.required": "Feedback is required",
+  }),
 })
