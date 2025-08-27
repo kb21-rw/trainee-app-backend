@@ -43,13 +43,10 @@ io.on("connection", (socket) => {
   console.log("Client connected:", socket.id)
 
   socket.on("join-room", (email) => {
-    console.log("Received: " + email)
-    room.push(email)
     socket.join(email)
   })
 
   socket.on("disconnect", () => {
-    room.pop()
     console.log("Client disconnected:", socket.id)
   })
 })

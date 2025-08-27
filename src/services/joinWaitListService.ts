@@ -1,25 +1,37 @@
 import CustomError from "../middlewares/customError"
 import { getProspect } from "../queries/prospectQuery"
 import { addProspectToTheWaitList } from "../queries/waitListQuery"
-import { io, room } from "../server"
+import { io } from "../server"
 import { USER_NOT_FOUND } from "../utils/errorCodes"
 import { JoinWaitListDto } from "../utils/types"
 
 const joinWaitListService = async (joinWaitListData: JoinWaitListDto) => {
-  const recipient = room[0]
-  const email = joinWaitListData.responses.email
+  console.log("TESTING --- TESTING --- JOIN WAIT LIST SERVICE --- TESTING ---")
+  const formEmail = joinWaitListData.responses.email
 
-  const prospect = await getProspect(email)
+  console.log("=== EMAIL COMPARISON ===")
+  console.log("Form email:", formEmail)
+  console.log("Form email type:", typeof formEmail)
+  console.log("Form email length:", formEmail?.length)
+
+  const prospect = await getProspect(formEmail)
 
   if (prospect) {
-    const addedProspect = await addProspectToTheWaitList(email)
+    console.log("Found prospect with email:", prospect.email)
+    console.log("Prospect email type:", typeof prospect.email)
+    console.log("Prospect email length:", prospect.email?.length)
+    console.log("Emails match:", formEmail === prospect.email)
 
-    io.to(recipient).emit("joinedTheWaitList", { email })
+    const addedProspect = await addProspectToTheWaitList(formEmail)
+
+    console.log("Emitting to room:", formEmail)
+    io.to(formEmail).emit("joinedTheWaitList", { email: formEmail })
 
     return addedProspect
   }
 
-  io.to(recipient).emit("waitListError", {
+  console.log("Emitting waitListError to:", formEmail) // Add this
+  io.to(formEmail).emit("waitListError", {
     errorMessage: "Provide the email you used while registering into the app!",
   })
 
