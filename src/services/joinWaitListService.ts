@@ -6,32 +6,27 @@ import { USER_NOT_FOUND } from "../utils/errorCodes"
 import { JoinWaitListDto } from "../utils/types"
 
 const joinWaitListService = async (joinWaitListData: JoinWaitListDto) => {
-  console.log("TESTING --- TESTING --- JOIN WAIT LIST SERVICE --- TESTING ---")
-  const formEmail = joinWaitListData.responses.email
+  const email = joinWaitListData.responses.email.trim().toLowerCase()
 
-  console.log("=== EMAIL COMPARISON ===")
-  console.log("Form email:", formEmail)
-  console.log("Form email type:", typeof formEmail)
-  console.log("Form email length:", formEmail?.length)
-
-  const prospect = await getProspect(formEmail)
+  const prospect = await getProspect(email)
 
   if (prospect) {
-    console.log("Found prospect with email:", prospect.email)
-    console.log("Prospect email type:", typeof prospect.email)
-    console.log("Prospect email length:", prospect.email?.length)
-    console.log("Emails match:", formEmail === prospect.email)
+    const addedProspect = await addProspectToTheWaitList(email)
 
-    const addedProspect = await addProspectToTheWaitList(formEmail)
+    if (!addedProspect) {
+      throw new CustomError(
+        USER_NOT_FOUND,
+        "Failed to add prospect to waitlist",
+        500,
+      )
+    }
 
-    console.log("Emitting to room:", formEmail)
-    io.to(formEmail).emit("joinedTheWaitList", { email: formEmail })
+    io.to(email).emit("joinedTheWaitList", { email })
 
     return addedProspect
   }
 
-  console.log("Emitting waitListError to:", formEmail) // Add this
-  io.to(formEmail).emit("waitListError", {
+  io.to(email).emit("waitListError", {
     errorMessage: "Provide the email you used while registering into the app!",
   })
 

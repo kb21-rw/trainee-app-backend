@@ -8,9 +8,6 @@ export const joinWaitListController = async (
   next: NextFunction,
 ) => {
   try {
-    console.log("🔥 CONTROLLER HIT - Received waitlist request:", req.body)
-    console.log("🔥 Request email:", req.body.responses?.email)
-
     await joinWaitListFormValidation.validateAsync(req.body)
 
     const addedProspect = await joinWaitListService(req.body)
