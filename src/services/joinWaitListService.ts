@@ -1,25 +1,32 @@
 import CustomError from "../middlewares/customError"
 import { getProspect } from "../queries/prospectQuery"
 import { addProspectToTheWaitList } from "../queries/waitListQuery"
-import { io, room } from "../server"
+import { io } from "../server"
 import { USER_NOT_FOUND } from "../utils/errorCodes"
 import { JoinWaitListDto } from "../utils/types"
 
 const joinWaitListService = async (joinWaitListData: JoinWaitListDto) => {
-  const recipient = room[0]
-  const email = joinWaitListData.responses.email
+  const email = joinWaitListData.responses.email.trim().toLowerCase()
 
   const prospect = await getProspect(email)
 
   if (prospect) {
     const addedProspect = await addProspectToTheWaitList(email)
 
-    io.to(recipient).emit("joinedTheWaitList", { email })
+    if (!addedProspect) {
+      throw new CustomError(
+        USER_NOT_FOUND,
+        "Failed to add prospect to waitlist",
+        500,
+      )
+    }
+
+    io.to(email).emit("joinedTheWaitList", { email })
 
     return addedProspect
   }
 
-  io.to(recipient).emit("waitListError", {
+  io.to(email).emit("waitListError", {
     errorMessage: "Provide the email you used while registering into the app!",
   })
 
