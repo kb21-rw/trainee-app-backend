@@ -40,12 +40,10 @@ export const updateUserService = async (
     user.verified = verified
   }
 
-  if (role) {
-    if (user.role !== Role.Trainee && role === Role.Trainee) {
+  if (role && user.role !== role) {
+    if (role === Role.Trainee) {
       await createTraineeService(user.id, currentCohort.id)
     }
-
-    user.role = role
 
     if (role === Role.Coach) {
       const coach = await Coach.create({
@@ -54,6 +52,8 @@ export const updateUserService = async (
       })
       await addCoachToCohortService(coach._id)
     }
+
+    user.role = role
   }
 
   if (password) {
