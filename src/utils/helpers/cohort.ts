@@ -6,7 +6,7 @@ import {
   NOT_ALLOWED,
 } from "../errorCodes"
 import { IStage, StageDto } from "../types"
-import Cohort from "../../models/Cohort"
+import Cohort, { ICohort } from "../../models/Cohort"
 import { Types } from "mongoose"
 import { Except } from "type-fest"
 
@@ -104,4 +104,21 @@ export const createStagesHandler = (stages: Except<IStage, "id">[]) => {
     ...stage,
     id: new Types.ObjectId().toString(),
   }))
+}
+
+export const verifyCoachisInCohort = async (
+  coachId: string,
+  cohort: ICohort,
+) => {
+  const isCoachInCohort = !cohort.coaches.some(
+    (coach) => coach.toString() === coachId,
+  ) // this is negated for now since ther references of coach and trainees are incompatible for now
+
+  if (!isCoachInCohort) {
+    throw new CustomError(
+      COHORT_BAD_REQUEST,
+      "Coach is not part of the current cohort",
+      400,
+    )
+  }
 }
