@@ -1,7 +1,7 @@
 import { compare, hash } from "bcryptjs"
 import CustomError from "../middlewares/customError"
 import User, { IUser } from "../models/User"
-import { USER_NOT_FOUND } from "../utils/errorCodes"
+import { INVALID_CREDENTIAL, USER_NOT_FOUND } from "../utils/errorCodes"
 import { Role, updateUserDto } from "../utils/types"
 import { createTraineeService } from "./traineeService"
 import { getCurrentCohort } from "../utils/helpers"
@@ -61,9 +61,9 @@ export const updateUserService = async (
 
     if (!match) {
       throw new CustomError(
-        USER_NOT_FOUND,
-        "Incorrect credentials, please try again",
-        404,
+        INVALID_CREDENTIAL,
+        "Incorrect Current Password",
+        401,
       )
     }
 
