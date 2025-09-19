@@ -5,6 +5,7 @@ export const ProfileSchema = Joi.object({
   name: Joi.string().optional(),
   email: Joi.string().email().optional(),
   password: Joi.string().min(6).optional(),
+  oldPassword: Joi.string().min(1).optional(),
 })
 
 export const editUserSchema = Joi.object({
