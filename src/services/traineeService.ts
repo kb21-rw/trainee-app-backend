@@ -66,6 +66,7 @@ export const updateTraineeService = async (
   updates: updateUserDto & {
     status?: TraineeStatus
     coachId?: string
+    comment?: string
   },
 ) => {
   const trainee = await Trainee.findById(traineeId)
@@ -102,7 +103,7 @@ export const updateTraineeService = async (
   }
 
   trainee.traineeStatus = updates.status || trainee.traineeStatus
-
+  trainee.comment = updates.comment || trainee.comment
   trainee.save()
 
   const userUpdates = await updateUserService(trainee.userId, updates)

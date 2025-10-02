@@ -13,6 +13,7 @@ export const editTraineeSchema = Joi.object({
     )
     .optional(),
   coachId: Joi.string().optional(),
+  comment: Joi.string().optional(),
 })
 
 export const decisionValidation = Joi.object({

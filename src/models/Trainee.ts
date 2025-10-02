@@ -8,6 +8,7 @@ export interface ITrainee extends Document {
   postselectionCoachId: string
   stage: string
   traineeStatus: TraineeStatus
+  comment: string
   feedbacks: IFeedback[]
 }
 
@@ -40,6 +41,10 @@ const TraineeSchema = new Schema({
     type: String,
     enum: Object.values(TraineeStatus),
     default: TraineeStatus.ENROLLED,
+  },
+  comment: {
+    type: String,
+    default: "",
   },
   feedbacks: {
     type: [
