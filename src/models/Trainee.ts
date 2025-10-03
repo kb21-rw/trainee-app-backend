@@ -8,7 +8,7 @@ export interface ITrainee extends Document {
   postselectionCoachId: string
   stage: string
   traineeStatus: TraineeStatus
-  comment: string
+  comment: string | null
   feedbacks: IFeedback[]
 }
 
@@ -44,7 +44,7 @@ const TraineeSchema = new Schema({
   },
   comment: {
     type: String,
-    default: "",
+    default: null,
   },
   feedbacks: {
     type: [

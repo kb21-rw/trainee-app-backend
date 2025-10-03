@@ -29,7 +29,7 @@ export const acceptTraineeService = async (
       stageId: currentCohort.stages[nextStageIndex].id,
       description: feedback,
     })
-    trainee.comment = "" //reset comment on stage change
+    trainee.comment = null //reset comment on stage change
   }
 
   await trainee.save()
