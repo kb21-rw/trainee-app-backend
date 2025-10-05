@@ -1,7 +1,7 @@
-import { hash } from "bcryptjs"
+import { compare, hash } from "bcryptjs"
 import CustomError from "../middlewares/customError"
 import User, { IUser } from "../models/User"
-import { USER_NOT_FOUND } from "../utils/errorCodes"
+import { INVALID_CREDENTIAL, USER_NOT_FOUND } from "../utils/errorCodes"
 import { Role, updateUserDto } from "../utils/types"
 import { createTraineeService } from "./traineeService"
 import { getCurrentCohort } from "../utils/helpers"
@@ -23,7 +23,7 @@ export const getUsersService = async (search?: object) => {
 
 export const updateUserService = async (
   id: string,
-  { name, email, verified, password, role, active }: updateUserDto,
+  { name, email, verified, password, oldPassword, role, active }: updateUserDto,
 ) => {
   const user = await getUserService({ _id: id })
   const currentCohort = await getCurrentCohort()
@@ -56,7 +56,17 @@ export const updateUserService = async (
     user.role = role
   }
 
-  if (password) {
+  if (password && oldPassword) {
+    const match = await compare(oldPassword, user.password)
+
+    if (!match) {
+      throw new CustomError(
+        INVALID_CREDENTIAL,
+        "Incorrect Current Password",
+        401,
+      )
+    }
+
     const hashedPassword = await hash(password, 10)
     user.password = hashedPassword
   }

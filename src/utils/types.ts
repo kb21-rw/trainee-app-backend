@@ -152,7 +152,7 @@ export interface DecisionDto {
 
 export type updateUserDto = Partial<
   Pick<IUser, "name" | "email" | "verified" | "password" | "role" | "active">
->
+> & { oldPassword?: string }
 export interface ICohortOverviewRequest {
   cohortId?: string
   overviewType: FormType.Applicant | FormType.Trainee
